@@ -10,6 +10,10 @@ const gitignorePath = path.resolve(import.meta.dirname, '.gitignore');
 
 export default defineConfig(
 	includeIgnoreFile(gitignorePath),
+	// apps/control is a separate Deno app (its own deno.jsonc `fmt`/`lint`
+	// tasks) using Deno-only syntax (`Deno.serve`, `npm:` specifiers) this
+	// project's ESLint config doesn't understand.
+	{ ignores: ['apps/**'] },
 	js.configs.recommended,
 	ts.configs.recommended,
 	svelte.configs.recommended,

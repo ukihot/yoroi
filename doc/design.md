@@ -2008,7 +2008,7 @@ Merge権限をMergerへ渡す前に、要件20.2章の注入リストを`tests/f
 | 未決事項 | 設計上の対応 |
 |---|---|
 | private keyのDeno Production secret vs 外部KMS sign-only | 17.4節`IdentityIssuer`をinterfaceとして抽象化済み。決定後は実装差し替えのみで済む |
-| 本番PostgreSQLの提供形態 | `packages/postgres`は接続文字列のみに依存し、Prisma Postgres/managed Postgres/専用accountいずれでも変更不要 |
+| 本番PostgreSQLの提供形態 | **決定（2026-08-25）**：自前調達せず、Deno Deploy標準装備のPostgresを採用し、Drizzle（`drizzle-orm/postgres-js`）で扱う。`apps/control`は接続文字列（`DATABASE_URL`、Productionコンテキストのsecret）のみに依存するため、この決定は実装差し替え不要で反映済み（`apps/control/README.md`参照） |
 | Deno KV採用可否 | 6章のテーブル設計はPostgreSQL前提。KV版は別adapter（`EventStore`実装）として`packages/postgres`と同じinterfaceで用意し、本体ロジックへ影響させない |
 | scope digestアルゴリズムの適用範囲（symlink/submodule/LFS等） | 8.4節の「安全側失効テーブル」を初版の既定挙動とし、policy拡張ポイント（`formatter_exception`等）で段階的に緩和できる構造にした |
 | GHES対応 | 13章`GitHubAdapter`インターフェースをGitHub.com/GHESで共通化し、差異はadapter実装内に閉じる |
