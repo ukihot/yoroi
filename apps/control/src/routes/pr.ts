@@ -1,6 +1,7 @@
 import { and, desc, eq, gt, isNull } from "drizzle-orm";
 import { db } from "../db/client.ts";
 import {
+	appendDecisionEvent,
 	approval,
 	decisionEvent,
 	feedbackCase,
@@ -8,7 +9,7 @@ import {
 	prScopeRequirement,
 	pullRequestRevision,
 	repository,
-} from "../db/schema.ts";
+} from "@yoroi/postgres";
 import { badRequest, json, notFound } from "../lib/http.ts";
 import type { RouteHandler } from "../app.ts";
 import type {
@@ -95,8 +96,11 @@ const RECHECK_COOLDOWN_MS = 60_000;
 /**
  * design.md §15.2's recheck coalescing: a repeat call within 60s for the
  * same PR short-circuits to 'pending' instead of re-running. There is no
- * real GitHub refetch / Policy Engine evaluation to run yet (see
- * db/schema.ts's notes on pr_decision_snapshot) — this re-reads the stored
+ * real GitHub refetch / Policy Engine evaluation wired into this
+ * console-facing HTTP route yet (the GitHub-comment-triggered `/yoroi
+ * recheck` slash command in apps/control/src/worker/slash-commands.ts does
+ * have one, via packages/notifications' handleRecheck — see that file for
+ * the real version of this logic) — this re-reads the stored
  * snapshot and reports whether it changed since last read, which today
  * means 'unchanged' unless no snapshot exists yet for this PR. A
  * `decision_event` row is always appended so the audit trail reflects that
@@ -137,13 +141,17 @@ export const handleRecheck: RouteHandler = async (_req, actor, params) => {
 		outcome = snapshot ? "unchanged" : "changed";
 	}
 
-	await db.insert(decisionEvent).values({
+	await appendDecisionEvent(db, {
+		operationId: null,
 		repoId,
 		prNumber,
 		actorStableId: actor.actorStableId,
 		operation: "recheck",
+		fromState: null,
+		toState: null,
 		reasonCode: "manual_recheck",
 		result: outcome,
+		evidence: {},
 	});
 
 	return json({ outcome } satisfies { outcome: RecheckOutcome });
@@ -178,13 +186,17 @@ export const handleFeedback: RouteHandler = async (req, actor, params) => {
 		.returning();
 	if (!row) throw new Error("feedback_case insert returned no row");
 
-	await db.insert(decisionEvent).values({
+	await appendDecisionEvent(db, {
+		operationId: null,
 		repoId,
 		prNumber,
 		actorStableId: actor.actorStableId,
 		operation: "feedback",
+		fromState: null,
+		toState: null,
 		reasonCode: "console_feedback",
 		result: "recorded",
+		evidence: {},
 	});
 
 	const feedback: FeedbackCase = {

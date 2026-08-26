@@ -1,0 +1,29 @@
+{
+	// yoroi-merger (design.md §2.2, §12.3, §17.3). Separate Deno Deploy app,
+	// separate GitHub App, separate deploy permissions from yoroi-control —
+	// see this app's README and design.md §19.3's trust boundary diagram.
+	"tasks": {
+		"dev": "deno run --watch --env-file=.env -A main.ts",
+		"start": "deno run -A main.ts",
+		"check": "deno check main.ts",
+		"test": "deno test -A --env-file=.env.test",
+		"fmt": "deno fmt",
+		"lint": "deno lint"
+	},
+	"imports": {
+		"@yoroi/domain": "../../packages/domain/mod.ts",
+		"@yoroi/github": "../../packages/github/mod.ts",
+		"@yoroi/postgres": "../../packages/postgres/mod.ts",
+		"@yoroi/evidence": "../../packages/evidence/mod.ts",
+		"@yoroi/observability": "../../packages/observability/mod.ts",
+		"zod": "npm:zod@3",
+		"octokit": "npm:octokit@3",
+		"@std/assert": "jsr:@std/assert@^1"
+	},
+	"compilerOptions": {
+		"strict": true,
+		"noUncheckedIndexedAccess": true
+	},
+	"fmt": { "useTabs": true, "lineWidth": 100 },
+	"lint": { "rules": { "tags": ["recommended"] } }
+}

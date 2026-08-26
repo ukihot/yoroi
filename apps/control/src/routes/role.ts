@@ -17,8 +17,8 @@ const KNOWN_ROLES: readonly Role[] = [
 
 /**
  * MVP: no real ownership-graph/org-membership source yet (design.md defers
- * this — see doc/design.md §21/§22 and src/db/schema.ts's notes on
- * pr_reviewer_assignment). Mirrors the console app's own former
+ * this — see doc/design.md §21/§22 and packages/postgres/src/schema.ts's
+ * notes on pr_reviewer_assignment). Mirrors the console app's own former
  * `roles.ts` env-var fallback, now served from the backend so the console
  * doesn't need to know how role resolution eventually gets implemented.
  */

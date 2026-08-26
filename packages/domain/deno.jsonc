@@ -1,0 +1,22 @@
+{
+	// packages/domain (design.md §3.1, §3.2). Pure TypeScript only — no
+	// Deno Deploy-specific API (Deno.cron, OIDC), no I/O. Imported by
+	// apps/control and apps/merger via relative path (design.md §17.1's own
+	// pattern), not a root Deno workspace — see plan notes for why.
+	"tasks": {
+		"check": "deno check mod.ts",
+		"test": "deno test -A",
+		"fmt": "deno fmt",
+		"lint": "deno lint"
+	},
+	"imports": {
+		"fast-check": "npm:fast-check@3",
+		"@std/assert": "jsr:@std/assert@^1"
+	},
+	"compilerOptions": {
+		"strict": true,
+		"noUncheckedIndexedAccess": true
+	},
+	"fmt": { "useTabs": true, "lineWidth": 100 },
+	"lint": { "rules": { "tags": ["recommended"] } }
+}

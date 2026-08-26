@@ -8,7 +8,7 @@ import {
 	prScopeRequirement,
 	pullRequestRevision,
 	repository,
-} from "../db/schema.ts";
+} from "@yoroi/postgres";
 import { json } from "../lib/http.ts";
 import { formatRelativeJa } from "../lib/format.ts";
 import { loadQueue } from "./queue.ts";

@@ -1,6 +1,6 @@
 import { asc } from "drizzle-orm";
 import { db } from "../db/client.ts";
-import { fleetHealthSnapshot } from "../db/schema.ts";
+import { fleetHealthSnapshot } from "@yoroi/postgres";
 import { json } from "../lib/http.ts";
 import type { RouteHandler } from "../app.ts";
 import type { HealthEntry } from "../domain/types.ts";

@@ -1,0 +1,24 @@
+{
+	// packages/evidence (design.md §12.1–12.2 Decision Envelope + signing,
+	// §6.7/AT-19 decision_event hash chain, §10.10 evidence export port).
+	// Imported by apps/control and apps/merger via relative path — see
+	// packages/domain/deno.jsonc's own comment for why this isn't a root Deno
+	// workspace member.
+	"tasks": {
+		"check": "deno check mod.ts",
+		"test": "deno test -A",
+		"fmt": "deno fmt",
+		"lint": "deno lint"
+	},
+	"imports": {
+		"@yoroi/domain": "../domain/mod.ts",
+		"zod": "npm:zod@3",
+		"@std/assert": "jsr:@std/assert@^1"
+	},
+	"compilerOptions": {
+		"strict": true,
+		"noUncheckedIndexedAccess": true
+	},
+	"fmt": { "useTabs": true, "lineWidth": 100 },
+	"lint": { "rules": { "tags": ["recommended"] } }
+}

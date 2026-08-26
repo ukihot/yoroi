@@ -11,7 +11,7 @@ import {
 	pullRequestRevision,
 	queueEntry,
 	repository,
-} from "./schema.ts";
+} from "@yoroi/postgres";
 import { getEnv } from "../env.ts";
 
 /**

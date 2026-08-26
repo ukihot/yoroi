@@ -1,6 +1,6 @@
 import { desc, eq } from "drizzle-orm";
 import { db } from "../db/client.ts";
-import { decisionEvent, repository } from "../db/schema.ts";
+import { decisionEvent, repository } from "@yoroi/postgres";
 import { json } from "../lib/http.ts";
 import type { RouteHandler } from "../app.ts";
 import type { AuditEntry } from "../domain/types.ts";

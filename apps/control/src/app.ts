@@ -8,6 +8,8 @@ import { handleFeedback, handlePrDetail, handleRecheck } from "./routes/pr.ts";
 import { handleHealth } from "./routes/health.ts";
 import { handleAudit } from "./routes/audit.ts";
 import { handleRole } from "./routes/role.ts";
+import { handleWebhook } from "./routes/webhook.ts";
+import { handleOutboxDrain, handleReconcile } from "./routes/internal.ts";
 
 export type RouteHandler = (
 	req: Request,
@@ -61,12 +63,37 @@ const routes: Route[] = [
 	{ method: "GET", pattern: new URLPattern({ pathname: "/api/health" }), handler: handleHealth },
 	{ method: "GET", pattern: new URLPattern({ pathname: "/api/audit" }), handler: handleAudit },
 	{ method: "GET", pattern: new URLPattern({ pathname: "/api/role" }), handler: handleRole },
+	// design.md §16: operator-only internal endpoints. MVP stand-in auth: the
+	// same console↔control shared bearer token as every /api/* route (see
+	// lib/auth.ts's own comment) — real per-actor operator RBAC is
+	// design.md §17.4/§24.4 future work, same gap that route already flags.
+	{
+		method: "POST",
+		pattern: new URLPattern({ pathname: "/internal/reconcile" }),
+		handler: handleReconcile,
+	},
+	{
+		method: "POST",
+		pattern: new URLPattern({ pathname: "/internal/outbox/drain" }),
+		handler: handleOutboxDrain,
+	},
 ];
 
 export function createApp(): (req: Request) => Promise<Response> {
 	return async function fetch(req: Request): Promise<Response> {
 		const url = new URL(req.url);
 		if (url.pathname === "/healthz") return new Response("ok");
+
+		// design.md §7.1: GitHub's HMAC signature is this route's own auth —
+		// it never goes through the console↔control bearer-token gate below.
+		if (url.pathname === "/github/webhook" && req.method === "POST") {
+			try {
+				return await handleWebhook(req);
+			} catch (error) {
+				console.error("[yoroi-control] POST /github/webhook failed:", error);
+				return new Response("internal error", { status: 500 });
+			}
+		}
 
 		const auth = authenticate(req);
 		if (!auth.ok) return auth.response;

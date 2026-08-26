@@ -8,7 +8,7 @@ import {
 	pullRequestRevision,
 	queueEntry,
 	repository,
-} from "../db/schema.ts";
+} from "@yoroi/postgres";
 import { json } from "../lib/http.ts";
 import { toEta } from "../lib/format.ts";
 import type { RouteHandler } from "../app.ts";

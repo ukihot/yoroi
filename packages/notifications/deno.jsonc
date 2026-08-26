@@ -1,0 +1,28 @@
+{
+	// packages/notifications (design.md §14 summary/check-run/coalescing, §15
+	// slash commands, §23 dashboard-taxonomy + carry-forward-explanation).
+	// Imported by apps/control via relative path, same pattern as the other
+	// packages/* — see packages/domain/deno.jsonc's comment. Deliberately has
+	// no @yoroi/postgres dependency: DB access for slash commands is injected
+	// as a `CommandPorts` interface (design.md §1.5 Ports at the Edges) rather
+	// than this package importing Drizzle schema directly, so it stays
+	// testable with fakes and apps/control owns all SQL (design.md §3.2).
+	"tasks": {
+		"check": "deno check mod.ts",
+		"test": "deno test -A",
+		"fmt": "deno fmt",
+		"lint": "deno lint"
+	},
+	"imports": {
+		"@yoroi/domain": "../domain/mod.ts",
+		"@yoroi/policy": "../policy/mod.ts",
+		"@yoroi/github": "../github/mod.ts",
+		"@std/assert": "jsr:@std/assert@^1"
+	},
+	"compilerOptions": {
+		"strict": true,
+		"noUncheckedIndexedAccess": true
+	},
+	"fmt": { "useTabs": true, "lineWidth": 100 },
+	"lint": { "rules": { "tags": ["recommended"] } }
+}

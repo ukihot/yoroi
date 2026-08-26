@@ -1,6 +1,6 @@
 import { asc, eq } from "drizzle-orm";
 import { db } from "../db/client.ts";
-import { repository } from "../db/schema.ts";
+import { repository } from "@yoroi/postgres";
 import { badRequest, json, notFound } from "../lib/http.ts";
 import type { RouteHandler } from "../app.ts";
 import type { RepoDetail, RepoSummary } from "../domain/types.ts";

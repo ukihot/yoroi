@@ -1,0 +1,23 @@
+{
+	"tasks": {
+		"check": "deno check mod.ts",
+		"test": "deno test -A",
+		"fmt": "deno fmt",
+		"lint": "deno lint"
+	},
+	"imports": {
+		"@yoroi/domain": "../domain/mod.ts",
+		"octokit": "npm:octokit@3",
+		"@octokit/plugin-throttling": "npm:@octokit/plugin-throttling@8",
+		"@octokit/plugin-retry": "npm:@octokit/plugin-retry@6",
+		"@octokit/auth-app": "npm:@octokit/auth-app@7",
+		"@std/assert": "jsr:@std/assert@^1",
+		"@std/testing/mock": "jsr:@std/testing@^1/mock"
+	},
+	"compilerOptions": {
+		"strict": true,
+		"noUncheckedIndexedAccess": true
+	},
+	"fmt": { "useTabs": true, "lineWidth": 100 },
+	"lint": { "rules": { "tags": ["recommended"] } }
+}

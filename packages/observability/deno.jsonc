@@ -1,0 +1,22 @@
+{
+	// packages/observability (design.md §18 OTel span wrapper). Imported by
+	// apps/control and apps/merger via relative path, same pattern as the
+	// other packages/* — see packages/domain/deno.jsonc's comment.
+	"tasks": {
+		"check": "deno check mod.ts",
+		"test": "deno test -A",
+		"fmt": "deno fmt",
+		"lint": "deno lint"
+	},
+	"imports": {
+		"@yoroi/domain": "../domain/mod.ts",
+		"@opentelemetry/api": "npm:@opentelemetry/api@1",
+		"@std/assert": "jsr:@std/assert@^1"
+	},
+	"compilerOptions": {
+		"strict": true,
+		"noUncheckedIndexedAccess": true
+	},
+	"fmt": { "useTabs": true, "lineWidth": 100 },
+	"lint": { "rules": { "tags": ["recommended"] } }
+}

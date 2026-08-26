@@ -1,10 +1,10 @@
--- yoroi-control initial schema. Hand-written to match src/db/schema.ts
--- (see that file's comments for which tables are design.md-verbatim vs. MVP
--- additions). Applied by src/db/migrate.ts, tracked in applied_migration.
+-- Dashboard/read-model projection tables. Hand-written to match
+-- src/schema.ts's first section. Applied by src/migrations/run.ts.
 
 CREATE TABLE IF NOT EXISTS repository (
   repo_id                text PRIMARY KEY,
   installation_id        bigint NOT NULL,
+  github_repository_id   bigint,
   name                    text NOT NULL,
   mode                    text NOT NULL,
   status                  text NOT NULL,
@@ -82,7 +82,8 @@ CREATE TABLE IF NOT EXISTS queue_entry (
   eta_from                timestamptz,
   eta_to                  timestamptz,
   eta_confidence          text,
-  state                   text NOT NULL DEFAULT 'waiting'
+  state                   text NOT NULL DEFAULT 'waiting',
+  UNIQUE (repo_id, pr_number)
 );
 CREATE INDEX IF NOT EXISTS idx_queue_order ON queue_entry (priority, enqueued_at);
 
@@ -122,7 +123,8 @@ CREATE TABLE IF NOT EXISTS blocked_entry (
   eta_from       timestamptz,
   eta_to         timestamptz,
   eta_confidence text,
-  created_at     timestamptz NOT NULL DEFAULT now()
+  created_at     timestamptz NOT NULL DEFAULT now(),
+  UNIQUE (repo_id, pr_number)
 );
 CREATE INDEX IF NOT EXISTS idx_blocked_responsibility ON blocked_entry (responsibility);
 
@@ -140,6 +142,7 @@ CREATE TABLE IF NOT EXISTS feedback_case (
 
 CREATE TABLE IF NOT EXISTS decision_event (
   seq             bigserial PRIMARY KEY,
+  operation_id    text,
   repo_id         text NOT NULL,
   pr_number       integer,
   actor_stable_id text,
@@ -152,6 +155,7 @@ CREATE TABLE IF NOT EXISTS decision_event (
   occurred_at     timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS idx_decision_event_occurred ON decision_event (occurred_at);
+CREATE INDEX IF NOT EXISTS idx_decision_event_operation ON decision_event (operation_id);
 
 CREATE TABLE IF NOT EXISTS fleet_health_snapshot (
   installation_id bigint NOT NULL,

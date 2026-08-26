@@ -1,6 +1,6 @@
 import { and, asc, desc, eq } from "drizzle-orm";
 import { db } from "../db/client.ts";
-import { pullRequestRevision, queueEntry, repository } from "../db/schema.ts";
+import { pullRequestRevision, queueEntry, repository } from "@yoroi/postgres";
 import { json } from "../lib/http.ts";
 import { minutesSince, toEta } from "../lib/format.ts";
 import type { RouteHandler } from "../app.ts";
