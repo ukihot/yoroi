@@ -90,7 +90,9 @@ GitHubの **Settings → Developer settings → GitHub Apps → New GitHub App**
   - **Pull requests**: Read and write(PRの読み取り、およびsummaryコメント投稿に必要)
   - **Checks**: Read and write(`yoroi/gate` Check Runの作成・更新に必要)
   - **Commit statuses**: Read-only
-- Subscribe to events(下の一覧にチェック — `apps/control/src/routes/webhook.ts` の
+  - **Issues**: Read-only(これを付けないと「Issue comment」がSubscribe to eventsの一覧に
+    出てこない — GitHubの仕様。`/yoroi`コマンドはPRコメント=issue commentとして届く)
+- Subscribe to events(Issues権限を付けた後に一覧へ出てくる — `apps/control/src/routes/webhook.ts` の
   `EVENT_ALLOWLIST` と一致させる):
   - Pull request
   - Pull request review
@@ -171,10 +173,12 @@ DATABASE_URL=...                    # yoroi-controlと同じPostgres
 MERGER_GITHUB_APP_ID=...            # Step 1-2で控えたもの
 MERGER_GITHUB_APP_PRIVATE_KEY=...   # Step 1-2で控えたpemの中身
 YOROI_MERGER_SHARED_TOKEN=...       # 上のyoroi-controlと全く同じ値
+YOROI_MERGER_PRODUCTION=1           # これが無いとmain.tsが起動を拒否する(下記参照)
 ```
 
-`YOROI_MERGER_DEV` は**本番では絶対に設定しない**(design.md §17.3 — 設定すると本番contextチェックを
-迂回してしまう)。
+`YOROI_MERGER_PRODUCTION=1` は**本番のProduction context secretsにのみ**設定する
+(`main.ts`の起動時ガード — design.md §17.3)。逆に `YOROI_MERGER_DEV` は**本番では絶対に設定しない**
+(ローカルテスト専用で、設定すると本番contextチェックを迂回してしまう)。この2つを同時に設定しないこと。
 
 **yoroi-console**(ルートの `.env.example` 参照):
 

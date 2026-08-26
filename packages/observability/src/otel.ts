@@ -49,12 +49,14 @@ function setYoroiAttributes(span: Span, attrs: SpanAttrs): void {
 	}
 
 	// design.md §17: Deno Deploy sets these at runtime; both are undefined
-	// (not required) outside Deno Deploy, e.g. local `deno task dev`. Context
-	// is `DENO_TIMELINE` (design.md §18.1's illustrative snippet says
-	// `DENO_DEPLOY_CONTEXT`, which isn't a real Deno Deploy env var — see
-	// apps/merger/main.ts's comment, which hit this in an actual failed
-	// production deploy and confirmed the real name against
-	// https://docs.deno.com/deploy/reference/env_vars_and_contexts/).
+	// (not required) outside Deno Deploy, e.g. local `deno task dev`.
+	// `yoroi.deno_context`'s source env var is unconfirmed: design.md §18.1's
+	// illustrative snippet says `DENO_DEPLOY_CONTEXT`, and Deno's own docs say
+	// `DENO_TIMELINE` — a real production deploy of apps/merger (see that
+	// app's main.ts) showed *neither* actually set, so this attribute is
+	// diagnostic-only and best-effort; nothing depends on it being present
+	// (unlike apps/merger's own production/development gate, which no longer
+	// relies on any platform-detected env var at all — see main.ts's comment).
 	const revisionId = envVarOrUndefined("DENO_DEPLOYMENT_ID");
 	if (revisionId !== undefined) span.setAttribute("yoroi.deno_revision_id", revisionId);
 	const timeline = envVarOrUndefined("DENO_TIMELINE");

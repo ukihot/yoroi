@@ -17,22 +17,28 @@ function mustGetEnv(name: string): string {
  * (kept lazy so local dev/testing works without live credentials — see
  * that app's `src/context.ts`), this app's *entire* purpose requires those
  * credentials — there's nothing useful to serve without them besides
- * `/healthz` — so it fails fast at startup instead: refuses to boot in a
- * non-production context unless `YOROI_MERGER_DEV=1` is set explicitly for
- * local testing.
+ * `/healthz` — so it fails fast at startup instead.
  *
- * `DENO_TIMELINE` (not `DENO_DEPLOY_CONTEXT` — design.md §18's illustrative
- * OTel snippet uses that name, but it isn't a real Deno Deploy env var; this
- * was caught by an actual failed production deploy, then confirmed against
- * https://docs.deno.com/deploy/reference/env_vars_and_contexts/) is
- * Production's own signal: its value is exactly `"production"` there,
- * `"git-branch/<branch>"` or `"preview/<revision-id>"` in Development, and
- * unset entirely during the Build context or outside Deno Deploy.
+ * This used to try auto-detecting "am I in Deno Deploy's Production
+ * context" from a platform-provided env var — first a name invented for
+ * design.md's illustrative OTel snippet (`DENO_DEPLOY_CONTEXT`), then
+ * `DENO_TIMELINE` per Deno's own docs
+ * (https://docs.deno.com/deploy/reference/env_vars_and_contexts/) — and
+ * *both* failed against an actual production deploy (the env var read back
+ * as unset either way). Rather than guess a third platform-internal name
+ * this session can't directly verify, the signal is now something fully
+ * within the operator's own control: an explicit `YOROI_MERGER_PRODUCTION=1`
+ * flag, set *only* as a Production-context secret in the Deno Deploy
+ * dashboard — never in Development. This is at least as safe as the
+ * platform-detection approach (design.md §17.3's actual requirement is that
+ * Production secrets never reach a non-production deployment, which this
+ * flag is itself one of), and doesn't depend on correctly naming a Deno
+ * Deploy internal.
  */
-const timeline = Deno.env.get("DENO_TIMELINE") ?? "unknown";
-if (timeline !== "production" && Deno.env.get("YOROI_MERGER_DEV") !== "1") {
+if (Deno.env.get("YOROI_MERGER_PRODUCTION") !== "1" && Deno.env.get("YOROI_MERGER_DEV") !== "1") {
 	throw new Error(
-		`yoroi-merger refuses to start on timeline "${timeline}" without YOROI_MERGER_DEV=1 (design.md §17.3)`,
+		"yoroi-merger refuses to start without YOROI_MERGER_PRODUCTION=1 (set only in the Production " +
+			"context's secrets) or YOROI_MERGER_DEV=1 (local testing only) — design.md §17.3",
 	);
 }
 
