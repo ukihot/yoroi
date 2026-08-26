@@ -35,7 +35,28 @@ function mustGetEnv(name: string): string {
  * flag is itself one of), and doesn't depend on correctly naming a Deno
  * Deploy internal.
  */
-if (Deno.env.get("YOROI_MERGER_PRODUCTION") !== "1" && Deno.env.get("YOROI_MERGER_DEV") !== "1") {
+/** Accepts "1"/"true" (any case), tolerating stray quotes/whitespace some
+ * env-var import paths leave in — an exact `=== "1"` string match already
+ * burned us twice on guessed Deno Deploy platform variable names (see the
+ * comment above), so this check is deliberately forgiving about *formatting*
+ * while still being strict about the operator having to set *something*
+ * truthy on purpose. */
+function isTruthyFlag(name: string): boolean {
+	const raw = Deno.env.get(name);
+	if (!raw) return false;
+	const normalized = raw.trim().replace(/^["']|["']$/g, "").toLowerCase();
+	return normalized === "1" || normalized === "true";
+}
+
+if (!isTruthyFlag("YOROI_MERGER_PRODUCTION") && !isTruthyFlag("YOROI_MERGER_DEV")) {
+	// Diagnostic: if this still fires, the raw value (not just the pass/fail
+	// verdict) is worth seeing — e.g. an accidentally-doubled quote pair from
+	// how the secret was pasted/imported would show up here as `"\"1\""`
+	// rather than `"1"`.
+	console.error(
+		"[yoroi-merger] YOROI_MERGER_PRODUCTION raw value:",
+		JSON.stringify(Deno.env.get("YOROI_MERGER_PRODUCTION") ?? null),
+	);
 	throw new Error(
 		"yoroi-merger refuses to start without YOROI_MERGER_PRODUCTION=1 (set only in the Production " +
 			"context's secrets) or YOROI_MERGER_DEV=1 (local testing only) — design.md §17.3",
