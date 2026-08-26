@@ -54,7 +54,7 @@ Deploy this directory (`apps/merger`) as its **own** Deno Deploy app — never c
 `apps/control` or `apps/console`. Set `DATABASE_URL`, `MERGER_GITHUB_APP_ID`,
 `MERGER_GITHUB_APP_PRIVATE_KEY`, and `YOROI_MERGER_SHARED_TOKEN` as **Production-context-only**
 secrets (design.md §17.3: none of these may exist in a Development/branch-preview context —
-`main.ts` refuses to boot outside `DENO_DEPLOY_CONTEXT=production` unless `YOROI_MERGER_DEV=1` is
-explicitly set, which itself must never be set in production). Register a separate Merger GitHub App
-with merge-only minimal permissions (design.md §13.10) — never reuse `yoroi-control`'s Observer App
-credentials here.
+`main.ts` refuses to boot unless Deno Deploy's `DENO_TIMELINE` env var reads exactly `production`,
+or `YOROI_MERGER_DEV=1` is explicitly set for local testing — which itself must never be set in
+production). Register a separate Merger GitHub App with merge-only minimal permissions (design.md
+§13.10) — never reuse `yoroi-control`'s Observer App credentials here.

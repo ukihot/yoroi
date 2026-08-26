@@ -20,11 +20,19 @@ function mustGetEnv(name: string): string {
  * `/healthz` — so it fails fast at startup instead: refuses to boot in a
  * non-production context unless `YOROI_MERGER_DEV=1` is set explicitly for
  * local testing.
+ *
+ * `DENO_TIMELINE` (not `DENO_DEPLOY_CONTEXT` — design.md §18's illustrative
+ * OTel snippet uses that name, but it isn't a real Deno Deploy env var; this
+ * was caught by an actual failed production deploy, then confirmed against
+ * https://docs.deno.com/deploy/reference/env_vars_and_contexts/) is
+ * Production's own signal: its value is exactly `"production"` there,
+ * `"git-branch/<branch>"` or `"preview/<revision-id>"` in Development, and
+ * unset entirely during the Build context or outside Deno Deploy.
  */
-const deployContext = Deno.env.get("DENO_DEPLOY_CONTEXT") ?? "development";
-if (deployContext !== "production" && Deno.env.get("YOROI_MERGER_DEV") !== "1") {
+const timeline = Deno.env.get("DENO_TIMELINE") ?? "unknown";
+if (timeline !== "production" && Deno.env.get("YOROI_MERGER_DEV") !== "1") {
 	throw new Error(
-		`yoroi-merger refuses to start in context "${deployContext}" without YOROI_MERGER_DEV=1 (design.md §17.3)`,
+		`yoroi-merger refuses to start on timeline "${timeline}" without YOROI_MERGER_DEV=1 (design.md §17.3)`,
 	);
 }
 
