@@ -12,44 +12,26 @@
 | [apps/merger](apps/merger/README.md)   | `yoroi-merger` — 署名済みDecision Envelopeを検証し、実際にmergeする唯一のアプリ | apps/merger/README.md  |
 
 3つは別々のDeno Deployアプリとしてデプロイし、`yoroi-merger`だけを別GitHub App・別権限にする(design.md §2.2)。
-本番へ出す手順は一番下の「[本番リリース手順](#本番リリース手順)」を参照。
 
----
+## 現在のデプロイ状態
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+| アプリ        | URL                                   | DBマイグレーション                                 |
+| ------------- | ------------------------------------- | -------------------------------------------------- |
+| yoroi-control | https://yoroi-control.vanjis.deno.net | 適用済み(`packages/postgres/src/migrations/`)      |
+| yoroi-merger  | https://yoroi-merger.vanjis.deno.net  | (yoroi-controlと同じDBを参照するのみ、独自DDLなし) |
+| yoroi-console | https://yoroi-console.vanjis.deno.net | 適用済み(`drizzle/`、Better Auth用)                |
 
-## Developing
+webhook受信先: `https://yoroi-control.vanjis.deno.net/github/webhook`(GitHub Observer Appに設定済み)
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+各アプリの本番シークレットは `apps/control/.env.production` / `apps/merger/.env.production` /
+`.env.production`(ルート、console用)にある。**すべて`.gitignore`の`.env.*`で除外済み**
+(`.env.example`/`.env.test`だけ例外)— コミットされない。中身は各Deno Deployアプリの
+Settings → Environment Variables(Production context)に貼り付け済みのものと同じ。
 
-```sh
-npm run dev
+**まだやっていないこと**: `yoroi-merger`に実マージ権限を渡す前提のShadow mode運用・Go/No-Go判定
+(下記「[安全に有効化する](#安全に有効化する)」参照)。現状は動作確認止まり。
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```sh
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
-
----
-
-## 本番リリース手順
-
-GitHubとDeno Deployで「何をどこにいくつ作るか」がわかりにくいので、上から順にやれば終わるように書く。
-**作るものは合計6つ**: GitHub App 2つ(Observer/Merger)、GitHub OAuth App 1つ(console ログイン用)、
-Deno Deployアプリ3つ(control/merger/console)。
-
-### 全体像
+## アーキテクチャ
 
 ```
 GitHub (Observer App) --webhook--> yoroi-control  --署名付きenvelope--> yoroi-merger --merge--> GitHub (Merger App)
@@ -58,31 +40,51 @@ GitHub (Observer App) --webhook--> yoroi-control  --署名付きenvelope--> yoro
                                     yoroi-console (人間がログインして見る画面)
 ```
 
-- `yoroi-control` と `yoroi-merger` は**別のGitHub App・別のDeno Deployアプリ**にする。同じにすると
-  「controlを乗っ取られたらmergeもできてしまう」構成になり、design.md が最重要視している分離が壊れる
+- `yoroi-control` と `yoroi-merger` は別のGitHub App・別のDeno Deployアプリ。同じにすると
+  「controlを乗っ取られたらmergeもできてしまう」構成になり、design.mdが最重要視している分離が壊れる
   (design.md §2.2, §19.3)。
-- 3アプリとも同じPostgreSQLに繋ぐが、`yoroi-console` だけは直接DBに繋がず、必ず `yoroi-control` のAPI経由。
+- 3アプリとも同じPostgreSQLに繋ぐが、`yoroi-console`だけは直接DBに繋がず、必ず`yoroi-control`のAPI経由
+  (design.md §2.2)。console自身のBetter Auth(ログイン)用DBだけは別。
+
+## ローカル開発
+
+```sh
+deno install               # 依存関係のインストール(package.jsonのnpmスクリプトも動く)
+cp .env.example .env       # DATABASE_URL / ORIGIN / BETTER_AUTH_SECRET / GITHUB_CLIENT_* を編集
+npm run dev                # consoleを起動(http://localhost:5173)
+npm run test                # vitest
+npm run check                # svelte-check
+npm run lint                 # prettier --check + eslint
+```
+
+`apps/control`・`apps/merger`はDenoアプリなので、それぞれのディレクトリで`deno task dev`/`deno task test`
+(詳細は各READMEを参照)。`packages/*`も同様に各ディレクトリ内で`deno task test`。
+
+## 本番リリース手順
+
+GitHubとDeno Deployで「何をどこにいくつ作るか」がわかりにくいので、上から順にやれば終わるように書く。
+**作るものは合計6つ**: GitHub App 2つ(Observer/Merger)、GitHub OAuth App 1つ(console ログイン用)、
+Deno Deployアプリ3つ(control/merger/console)。
 
 ### 事前に用意するもの
 
 - Yoroiを動かしたいGitHub Organization(またはユーザー)の管理者権限
 - [Deno Deploy](https://deno.com/deploy) のアカウント(このリポジトリをGitHub連携でデプロイできる状態)
-- 本番用PostgreSQL 1つ(Deno Deployダッシュボードから作れる組み込みPostgresでよい。design.md §22で
-  正式に採用が決まっている)
+- 本番用PostgreSQL 1つ(Deno Deployダッシュボードから作れる組み込みPostgres、または外部のPostgres
+  ホスティング。design.md §22は前者を正式採用としているが、外部でも動く)
 
 ### Step 1: GitHub Appを2つ作る
 
 GitHubの **Settings → Developer settings → GitHub Apps → New GitHub App** から作成する(Organizationで
 使うなら Organization の Settings から)。**2回**この作業をする。
 
-#### 1-1. Observer App(`yoroi-control` 用 — 読み取りと通知だけ)
+#### 1-1. Observer App(`yoroi-control`用 — 読み取りと通知だけ)
 
-- GitHub App name: 例 `yoroi-control` (グローバルで一意な名前が必要)
+- GitHub App name: 例 `yoroi-control`(グローバルで一意な名前が必要)
 - Homepage URL: 何でもよい(リポジトリのURLなど)
 - Webhook: **Active** にチェック
-  - Webhook URL: `https://<yoroi-controlをデプロイしたURL>/github/webhook`(Step 3でURLが決まってから
-    後で編集してもよい)
-  - Webhook secret: ランダムな文字列を生成して控える(→ `GITHUB_WEBHOOK_SECRET` に使う)。
+  - Webhook URL: `https://<yoroi-controlをデプロイしたURL>/github/webhook`
+  - Webhook secret: ランダムな文字列を生成して控える(→ `GITHUB_WEBHOOK_SECRET`)。
     `openssl rand -hex 32` などで作れる。
 - Permissions → Repository permissions:
   - **Contents**: Read-only
@@ -92,32 +94,22 @@ GitHubの **Settings → Developer settings → GitHub Apps → New GitHub App**
   - **Commit statuses**: Read-only
   - **Issues**: Read-only(これを付けないと「Issue comment」がSubscribe to eventsの一覧に
     出てこない — GitHubの仕様。`/yoroi`コマンドはPRコメント=issue commentとして届く)
-- Subscribe to events(Issues権限を付けた後に一覧へ出てくる — `apps/control/src/routes/webhook.ts` の
-  `EVENT_ALLOWLIST` と一致させる):
-  - Pull request
-  - Pull request review
-  - Issue comment
-  - Check run
-  - Check suite
-  - Status
-  - Push
+- Subscribe to events(Issues権限を付けた後に一覧へ出てくる — `apps/control/src/routes/webhook.ts`の
+  `EVENT_ALLOWLIST`と一致させる): Pull request / Pull request review / Issue comment / Check run /
+  Check suite / Status / Push
 - **Where can this GitHub App be installed?**: 自分のOrganizationのみでよければ "Only on this account"
-- 作成後、**Generate a private key** で `.pem` ファイルをダウンロードして控える(→
-  `GITHUB_APP_PRIVATE_KEY`)。App ID(ページ上部に表示)も控える(→ `GITHUB_APP_ID`)。
-- 作成後、対象リポジトリに **Install App** しておく。
+- 作成後、**Generate a private key** で`.pem`をダウンロードして控える(→ `GITHUB_APP_PRIVATE_KEY`)。
+  App ID(ページ上部)も控える(→ `GITHUB_APP_ID`)。対象リポジトリに **Install App** する。
 
-#### 1-2. Merger App(`yoroi-merger` 用 — mergeだけ、これ以外の権限を持たせない)
+#### 1-2. Merger App(`yoroi-merger`用 — mergeだけ、これ以外の権限を持たせない)
 
 同じ画面で、名前を変えてもう一つ作る。
 
 - GitHub App name: 例 `yoroi-merger`
 - Webhook: **Active のチェックを外す**(yoroi-mergerはwebhookを受け取らない。呼び出されるのは
   yoroi-controlからのみ)
-- Permissions → Repository permissions:
-  - **Contents**: Read and write(mergeの実行に必要)
-  - **Pull requests**: Read and write
-  - **Metadata**: Read-only(自動)
-  - これ以外は付けない
+- Permissions → Repository permissions: **Contents**: Read and write / **Pull requests**: Read and
+  write / **Metadata**: Read-only(自動)— これ以外は付けない
 - Subscribe to events: 何もチェックしない
 - Install App: Observer Appと同じリポジトリにインストール
 - Generate a private key → 控える(→ `MERGER_GITHUB_APP_PRIVATE_KEY`)。App IDも控える
@@ -128,118 +120,126 @@ GitHubの **Settings → Developer settings → GitHub Apps → New GitHub App**
 
 ### Step 2: console ログイン用のGitHub OAuth App(上の2つとは別物)
 
-`yoroi-console` のログイン(Better Auth)は GitHub App ではなく、**GitHub OAuth App** を使う。
+`yoroi-console`のログイン(Better Auth)はGitHub Appではなく、**GitHub OAuth App**を使う。
 **Settings → Developer settings → OAuth Apps → New OAuth App** で作成する。
 
-- Homepage URL: `https://<console をデプロイしたURL>`
-- Authorization callback URL: `https://<console をデプロイしたURL>/api/auth/callback/github`
-- 作成後、Client ID / Client secret を控える(→ ルートの `.env` の `GITHUB_CLIENT_ID` /
-  `GITHUB_CLIENT_SECRET`)
+- Homepage URL: `https://<consoleをデプロイしたURL>`
+- Authorization callback URL: `https://<consoleをデプロイしたURL>/api/auth/callback/github`
+- 作成後、Client ID / Client secret を控える(→ `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET`)
 
 ### Step 3: Deno Deployにアプリを3つ作る
 
-[Deno Deploy](https://dash.deno.com) にログインし、このGitHubリポジトリと連携する。**New App** を3回
-作成し、それぞれ Root directory(リポジトリ内のどのディレクトリを動かすか)を分ける。
+[Deno Deploy](https://dash.deno.com)にログインし、このGitHubリポジトリと連携する。**New App**を3回
+作成し、それぞれRoot directory(リポジトリ内のどのディレクトリを動かすか)を分ける。
 
-| Deno Deployアプリ | Root directory        | エントリポイント                  |
-| ----------------- | --------------------- | --------------------------------- |
-| yoroi-control     | `apps/control`        | `main.ts`                         |
-| yoroi-merger      | `apps/merger`         | `main.ts`                         |
-| yoroi-console     | `/`(リポジトリルート) | SvelteKit(要ビルド設定、下記参照) |
+| Deno Deployアプリ | Root directory         | エントリポイント |
+| ----------------- | ---------------------- | ---------------- |
+| yoroi-control     | `apps/control`         | `main.ts`        |
+| yoroi-merger      | `apps/merger`          | `main.ts`        |
+| yoroi-console     | `/`(リポジトリルート） | SvelteKit        |
 
-3アプリとも、Deno Deployダッシュボードの **Database** タブから同じPostgresデータベースを1つ紐付ける
-(design.md §22: Deno Deploy組み込みPostgresを採用)。`yoroi-console` は直接DBを使わないが、Better Auth用に
-別の(または同じ)Postgresが必要 — ルートの `drizzle.config.ts` が対象にしているDBを用意する。
+3アプリとも、Deno Deployダッシュボードの **Database** タブから同じPostgresを1つ紐付ける
+(design.md §22)。`yoroi-console`は直接DBを使わないが、Better Auth用に別の(または同じ)Postgresが必要。
 
-各アプリの **Settings → Environment Variables** で、**Production** contextに以下を設定する
-(`.env.example` に一覧あり)。
+各アプリの **Settings → Environment Variables** で、**Production** contextに以下を設定する。
 
-**yoroi-control**(`apps/control/.env.example` 参照):
+**yoroi-control**(詳細は`apps/control/.env.example`):
 
 ```
-DATABASE_URL=...          # Postgres接続文字列
-YOROI_CONTROL_API_TOKEN=... # consoleと共有する適当な長いランダム文字列
-GITHUB_APP_ID=...           # Step 1-1で控えたもの
-GITHUB_APP_PRIVATE_KEY=...  # Step 1-1で控えたpemの中身
-GITHUB_WEBHOOK_SECRET=...   # Step 1-1で決めたwebhook secret
+DATABASE_URL=...
+YOROI_CONTROL_API_TOKEN=...           # consoleと共有する長いランダム文字列
+GITHUB_APP_ID=...                     # Step 1-1
+GITHUB_APP_PRIVATE_KEY=...            # Step 1-1
+GITHUB_WEBHOOK_SECRET=...             # Step 1-1
 YOROI_MERGER_URL=https://<yoroi-mergerのURL>
-YOROI_MERGER_SHARED_TOKEN=... # yoroi-mergerと全く同じ値にする(下記)
+YOROI_MERGER_SHARED_TOKEN=...         # yoroi-mergerと全く同じ値(下記)
 ```
 
-**yoroi-merger**(`apps/merger/.env.example` 参照):
+**yoroi-merger**(詳細は`apps/merger/.env.example`):
 
 ```
-DATABASE_URL=...                    # yoroi-controlと同じPostgres
-MERGER_GITHUB_APP_ID=...            # Step 1-2で控えたもの
-MERGER_GITHUB_APP_PRIVATE_KEY=...   # Step 1-2で控えたpemの中身
-YOROI_MERGER_SHARED_TOKEN=...       # 上のyoroi-controlと全く同じ値
-YOROI_MERGER_PRODUCTION=1           # これが無いとmain.tsが起動を拒否する(下記参照)
+DATABASE_URL=...                      # yoroi-controlと同じPostgres
+MERGER_GITHUB_APP_ID=...              # Step 1-2
+MERGER_GITHUB_APP_PRIVATE_KEY=...     # Step 1-2
+YOROI_MERGER_SHARED_TOKEN=...         # 上のyoroi-controlと全く同じ値
+YOROI_MERGER_PRODUCTION=1             # 必須。無いとmain.tsが起動を拒否する(下記トラブルシューティング参照)
 ```
 
-`YOROI_MERGER_PRODUCTION=1` は**本番のProduction context secretsにのみ**設定する
-(`main.ts`の起動時ガード — design.md §17.3)。逆に `YOROI_MERGER_DEV` は**本番では絶対に設定しない**
-(ローカルテスト専用で、設定すると本番contextチェックを迂回してしまう)。この2つを同時に設定しないこと。
-
-**yoroi-console**(ルートの `.env.example` 参照):
+**yoroi-console**(詳細はルートの`.env.example`):
 
 ```
-DATABASE_URL=...              # Better Auth用のPostgres
-ORIGIN=https://<console のURL>
-BETTER_AUTH_SECRET=...        # ランダムな32文字以上
-GITHUB_CLIENT_ID=...          # Step 2
-GITHUB_CLIENT_SECRET=...      # Step 2
+DATABASE_URL=...                      # Better Auth用のPostgres(上記2つとは別のものでよい)
+ORIGIN=https://<consoleのURL>
+BETTER_AUTH_SECRET=...                # ランダムな32文字以上
+GITHUB_CLIENT_ID=...                  # Step 2
+GITHUB_CLIENT_SECRET=...              # Step 2
 YOROI_CONTROL_URL=https://<yoroi-controlのURL>
-YOROI_CONTROL_API_TOKEN=...   # yoroi-controlと全く同じ値
+YOROI_CONTROL_API_TOKEN=...           # yoroi-controlと全く同じ値
 ```
-
-> **consoleのビルドで `DATABASE_URL is not set` エラーが出る場合**: `vite.config.ts` は
-> `@sveltejs/adapter-auto` を使っており、ビルド時に「対応環境を検出できません」という**警告**を出すが、
-> これ自体はビルドを失敗させない(ローカルでも同じ警告が出た上でビルドは成功する)。実際にビルドを
-> 落としていたのは `src/lib/server/db/index.ts` が `DATABASE_URL` 未設定時に即座に`throw`していたこと ——
-> Deno DeployのBuildコンテキストにはProduction用のsecretが渡らない(design.md §17.3)ため、
-> `hooks.server.ts → $lib/server/auth → $lib/server/db` のimportチェーンがビルド中に評価された瞬間に
-> クラッシュしていた。この問題は修正済み(`DATABASE_URL`未設定時は例外を投げず、実際にクエリが飛ぶまで
-> 接続を先延ばしにする)。もしこの修正後もconsoleが実際に**起動・応答しない**(ビルドは通るがリクエストに
-> 応答しない)場合は、[SvelteKitのadapter一覧](https://svelte.dev/docs/kit/adapters)からDeno Deploy向け
-> (または `@sveltejs/adapter-node`)に明示的に切り替えることを検討する。
 
 ### Step 4: DBマイグレーション
 
-各アプリをデプロイ後、ローカルから本番の `DATABASE_URL` を指定して1回だけ実行する。
+各アプリをデプロイ後、ローカルから本番の`DATABASE_URL`を指定して実行する。**consoleは2段階ある**
+(Better Authのスキーマは自動生成されないため、忘れるとログインが動かない)。
 
 ```sh
 # yoroi-control / yoroi-merger が使う共通スキーマ(packages/postgres)
 cd apps/control
 DATABASE_URL="<本番のURL>" deno task migrate
 
-# console(Better Auth)側のスキーマ
+# console(Better Auth)側 — 初回だけ auth:schema が必要
 cd ../..
-DATABASE_URL="<本番のURL>" npx drizzle-kit migrate
+npm run auth:schema                              # src/lib/server/db/auth.schema.ts を生成(DB不要)
+DATABASE_URL="<consoleのURL>" npm run db:generate # drizzle/ にSQLを生成
+DATABASE_URL="<consoleのURL>" npm run db:migrate  # 本番DBに適用
 ```
+
+`auth:schema`は`src/lib/server/auth.ts`(Better Authの設定)を変更したときに再実行が必要。生成された
+`drizzle/*.sql`と`src/lib/server/db/auth.schema.ts`はコミット対象(secretは含まれない)。
 
 ### Step 5: webhookを有効化する
 
-Step 1-1のGitHub App設定画面に戻り、Webhook URLを実際にデプロイされた
-`https://<yoroi-control>/github/webhook` に更新する(仮のURLで作った場合はここで確定させる)。
+Step 1-1のGitHub App設定画面で、Webhook URLが実際にデプロイされたURLになっていることを確認する。
 
 ### Step 6: 動作確認
 
-1. `https://<yoroi-control>/healthz` が `ok` を返すこと
-2. `https://<yoroi-merger>/healthz` が `ok` を返すこと
-3. console にログインできること(GitHub OAuth)
-4. Observer Appをインストールしたリポジトリで適当にPRを開き、GitHub App の **Advanced** タブの
-   Recent Deliveries でwebhookが200/202で届いていること
-5. そのPRに `yoroi/gate` Check Runとsummaryコメントが付くこと
+1. `https://<yoroi-control>/healthz` と `https://<yoroi-merger>/healthz` が`ok`を返すこと
+2. consoleにログインできること(GitHub OAuth)
+3. Observer Appをインストールしたリポジトリで適当にPRを開き、GitHub Appの**Advanced**タブの
+   Recent Deliveriesでwebhookが200/202で届いていること
+4. そのPRに`yoroi/gate` Check Runとsummaryコメントが付くこと
 
-### Step 7: 安全に有効化する(ここが一番大事)
+### 安全に有効化する
 
-**この時点でMergerに実マージ権限を渡すべきではない。** design.md自身が要求している段取り:
+**動作確認が取れても、この時点でMergerに実マージ権限を渡すべきではない。**design.md自身が要求している
+段取り:
 
-1. しばらく **Observe/Shadow mode** で動かし、人間の判断とYoroiの判定のズレを観察する(design.md §1.3
-   の6番目の原則、90日間が目安)。
-2. requirements.md §20.2 の Go/No-Go 基準(重複webhook、順不同event、stale fencing tokenなど)を
-   満たすまで、`yoroi-merger` を実トラフィックに晒さない。
-3. 上記を満たしてから、対象リポジトリのRulesetで `yoroi/gate` を必須Checkにし、実運用へ切り替える。
+1. しばらく**Observe/Shadow mode**で動かし、人間の判断とYoroiの判定のズレを観察する(design.md §1.3の
+   6番目の原則、90日間が目安)。
+2. requirements.md §20.2のGo/No-Go基準(重複webhook、順不同event、stale fencing tokenなど)を満たす
+   まで、`yoroi-merger`を実トラフィックに晒さない。
+3. 上記を満たしてから、対象リポジトリのRulesetで`yoroi/gate`を必須Checkにし、実運用へ切り替える。
 
-焦って全部一度に有効化しないこと — 各Deno DeployアプリのSecretsを分けているのは、まさにこの「段階的に
-権限を広げる」ためにある。
+焦って全部一度に有効化しないこと — 各Deno DeployアプリのSecretsを分けているのは、まさにこの
+「段階的に権限を広げる」ためにある。
+
+## 運用・保守メモ(トラブルシューティング)
+
+デプロイ時に実際に踏んだ問題と対処。同じ症状が再発したら参照する。
+
+**consoleのビルドが`DATABASE_URL is not set`で失敗する** — Deno DeployのBuildコンテキストには
+Production用secretが渡らない(design.md §17.3)。`src/lib/server/db/index.ts`は`DATABASE_URL`未設定時
+に例外を投げず、実際にクエリが飛ぶまで接続を先延ばしにするよう修正済み。再発する場合はこのファイルの
+import chain(`hooks.server.ts → $lib/server/auth → $lib/server/db`)に新しい即時`throw`が入っていないか
+確認する。
+
+**yoroi-mergerが`refuses to start`で起動しない** — `YOROI_MERGER_PRODUCTION=1`をProduction context
+secretsに設定していない。`main.ts`は本番/開発の判定にDeno Deployの内部環境変数を使わず、この明示的な
+フラグだけを見る(`DENO_DEPLOY_CONTEXT`・`DENO_TIMELINE`はどちらも実機で試して当てにならなかった —
+詳細は`apps/merger/main.ts`のコメント)。
+
+**GitHub AppのSubscribe to eventsに「Issue comment」が出てこない** — Repository permissionsに
+**Issues: Read-only**を付けていない。GitHubは対応する権限を持たないeventを一覧に出さない。
+
+**consoleでログインできない/DBエラーが出る** — Better Authのテーブル(`user`/`session`/`account`/
+`verification`)が無い可能性が高い。Step 4の`auth:schema`→`db:generate`→`db:migrate`を実行したか確認。
