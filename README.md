@@ -243,3 +243,24 @@ secretsに設定していない。`main.ts`は本番/開発の判定にDeno Depl
 
 **consoleでログインできない/DBエラーが出る** — Better Authのテーブル(`user`/`session`/`account`/
 `verification`)が無い可能性が高い。Step 4の`auth:schema`→`db:generate`→`db:migrate`を実行したか確認。
+
+**Deno Deployの無料枠CPU Timeがすぐ90%に達する** — 稼働開始からわずか数時間で
+「used 90% of the included allocation of the CPU Time metric」警告が来た実績あり。無料枠の
+CPU Timeはネットワーク/DB待ち時間(I/O wait)を含まず、isolateのコールドスタートと実際の計算(モジュール
+評価・JSON処理・JWT署名などのcrypto)にしか課金されない([Deno Deployの料金ページ](https://docs.deno.com/deploy/pricing_and_limits/)より)。
+`Deno.cron`は登録1本ごとに別々のウェイクアップ機会になるため、`apps/control/main.ts`を以下のように
+見直した。
+
+- 毎分実行だった`outbox-sweep`と`ttl-expiry`を1本の`Deno.cron`にまとめ、毎分のコールドスタート回数を
+  半減。
+- `dashboard-rollup`(GitHub APIを叩いてJWT署名する、唯一CPU負荷の重いジョブ)を毎分→15分毎に変更。
+  ダッシュボードの健全性ゲージは毎分の鮮度を必要としないため。
+- 未実装のno-opである`approval-membership-scan`を15分毎→1時間毎に変更。
+
+この5つのCronスケジュールと関連するbudgetMsは、`apps/control/main.ts`への決め打ちではなく
+[apps/control/src/config.ts](apps/control/src/config.ts)に切り出し、環境変数で上書きできるように
+した(`YOROI_CRON_*` — 一覧は`.env.example`参照)。**それでも枠が厳しい場合は、コードを触らず
+Deno Deployダッシュボードでこれらの環境変数を設定するだけで頻度を下げられる**(再デプロイ不要)。
+逆に、Decision Envelopeの有効期限やrecheckのクールダウンなど安全性に関わる値はあえて
+環境変数化していない(`config.ts`のコメント参照) — 誤入力でセキュリティ境界が緩むのを防ぐため。
+最終手段としては有料プランで無料枠を100倍にする(カード登録)。
