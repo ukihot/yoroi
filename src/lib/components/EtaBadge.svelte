@@ -20,13 +20,13 @@
 		white-space: nowrap;
 	}
 	.eta-high {
-		color: var(--yoroi-status-green, #1a7f37);
+		color: var(--yoroi-status-green, #008000);
 	}
 	.eta-medium {
-		color: var(--yoroi-status-amber, #9a6700);
+		color: var(--yoroi-status-amber, #808000);
 	}
 	.eta-low,
 	.eta-unknown {
-		color: var(--yoroi-muted, #6e7781);
+		color: var(--yoroi-muted, #4d4d4d);
 	}
 </style>

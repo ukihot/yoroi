@@ -13,7 +13,10 @@ export const load: LayoutServerLoad = async ({ locals, url }) => {
 		return redirect(302, `/login?next=${encodeURIComponent(url.pathname)}`);
 	}
 
-	const [role, blocked] = await Promise.all([resolveRole(locals.user.id), controlApi.getBlockedEntries()]);
+	const [role, blocked] = await Promise.all([
+		resolveRole(locals.user.id),
+		controlApi.getBlockedEntries()
+	]);
 
 	return {
 		user: { id: locals.user.id, name: locals.user.name },

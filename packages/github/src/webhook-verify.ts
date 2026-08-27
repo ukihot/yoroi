@@ -2,22 +2,20 @@
 export async function verifyHmacSignature(
 	rawBody: Uint8Array,
 	signatureHeader: string | null,
-	secret: string,
+	secret: string
 ): Promise<boolean> {
-	if (!signatureHeader?.startsWith("sha256=")) return false;
+	if (!signatureHeader?.startsWith('sha256=')) return false;
 	const key = await crypto.subtle.importKey(
-		"raw",
+		'raw',
 		new TextEncoder().encode(secret),
-		{ name: "HMAC", hash: "SHA-256" },
+		{ name: 'HMAC', hash: 'SHA-256' },
 		false,
-		[
-			"verify",
-		],
+		['verify']
 	);
-	const signatureBytes = hexToBytes(signatureHeader.slice("sha256=".length));
+	const signatureBytes = hexToBytes(signatureHeader.slice('sha256='.length));
 	if (!signatureBytes) return false;
 	// crypto.subtle.verifyはHMAC検証を内部実装し、早期returnによるtiming leakを避ける設計になっている
-	return crypto.subtle.verify("HMAC", key, toDigestInput(signatureBytes), toDigestInput(rawBody));
+	return crypto.subtle.verify('HMAC', key, toDigestInput(signatureBytes), toDigestInput(rawBody));
 }
 
 function hexToBytes(hex: string): Uint8Array | null {

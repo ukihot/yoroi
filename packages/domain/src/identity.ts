@@ -5,17 +5,17 @@ import type {
 	RepositoryId,
 	ScopeId,
 	Sha,
-	Sha256Hex,
-} from "./ids.ts";
+	Sha256Hex
+} from './ids.ts';
 
 /** design.md §9.1's approval role vocabulary (policy YAML `role:` values). */
 export type ApproverRole =
-	| "reviewer"
-	| "scope-approver"
-	| "security-approver"
-	| "data-approver"
-	| "infra-approver"
-	| "org-governor";
+	| 'reviewer'
+	| 'scope-approver'
+	| 'security-approver'
+	| 'data-approver'
+	| 'infra-approver'
+	| 'org-governor';
 
 /**
  * design.md §4.2, verbatim. These two Identity types are **never mixed**

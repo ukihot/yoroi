@@ -13,7 +13,10 @@
 	let pauseOpen = $state(false);
 	let drainOpen = $state(false);
 
-	async function submitAction(action: 'pause' | 'drain', input: { reason: string; ticket: string }) {
+	async function submitAction(
+		action: 'pause' | 'drain',
+		input: { reason: string; ticket: string }
+	) {
 		const body = new FormData();
 		body.set('reason', input.reason);
 		body.set('ticket', input.ticket);
@@ -94,13 +97,20 @@
 		<dt>{m.repodetail_field_mode()}</dt>
 		<dd>{queueModeLabel(repo.mode)}</dd>
 		<dt>{m.repos_col_status()}</dt>
-		<dd><StatusBadge tone={repo.status === 'active' ? 'green' : repo.status === 'paused' ? 'amber' : 'neutral'} label={repoStatusLabel(repo.status)} /></dd>
+		<dd>
+			<StatusBadge
+				tone={repo.status === 'active' ? 'green' : repo.status === 'paused' ? 'amber' : 'neutral'}
+				label={repoStatusLabel(repo.status)}
+			/>
+		</dd>
 		<dt>{m.repodetail_field_target_branch()}</dt>
 		<dd>{repo.targetBranch}</dd>
 		<dt>{m.repodetail_field_policy_version()}</dt>
 		<dd>{repo.policyVersion}</dd>
 		<dt>{m.repodetail_field_ruleset()}</dt>
-		<dd>{repo.rulesetConsistent ? m.repodetail_ruleset_consistent() : m.repodetail_ruleset_drifted()}</dd>
+		<dd>
+			{repo.rulesetConsistent ? m.repodetail_ruleset_consistent() : m.repodetail_ruleset_drifted()}
+		</dd>
 		<dt>{m.repodetail_field_installation()}</dt>
 		<dd>{repo.installationOk ? m.common_yes() : m.common_no()}</dd>
 		<dt>{m.repodetail_field_last_webhook()}</dt>

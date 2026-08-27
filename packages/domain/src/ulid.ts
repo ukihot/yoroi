@@ -1,5 +1,5 @@
-import { decisionId, operationId } from "./ids.ts";
-import type { DecisionId, OperationId } from "./ids.ts";
+import { decisionId, operationId } from './ids.ts';
+import type { DecisionId, OperationId } from './ids.ts';
 
 /**
  * `OperationId`/`DecisionId` are ULIDs per this package's own ids.ts comment.
@@ -11,10 +11,10 @@ import type { DecisionId, OperationId } from "./ids.ts";
  * millisecond (randomness isn't seeded incrementally) — this codebase only
  * needs ULIDs as unique idempotency keys, never as a sort order.
  */
-const CROCKFORD_ALPHABET = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
+const CROCKFORD_ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
 
 function encodeTime(time: number, len: number): string {
-	let str = "";
+	let str = '';
 	let t = time;
 	for (let i = len - 1; i >= 0; i--) {
 		const mod = t % 32;
@@ -25,7 +25,7 @@ function encodeTime(time: number, len: number): string {
 }
 
 function encodeRandom(len: number): string {
-	let str = "";
+	let str = '';
 	const bytes = new Uint8Array(len);
 	crypto.getRandomValues(bytes);
 	for (let i = 0; i < len; i++) {

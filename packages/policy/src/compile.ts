@@ -1,7 +1,7 @@
-import type { PolicyDigest, ScopeId } from "@yoroi/domain";
-import { policyDigest as toPolicyDigest } from "@yoroi/domain";
-import { err, ok, type Result } from "@yoroi/domain";
-import { type PolicyDocument, PolicySchema, type ScopeRule } from "./schema.ts";
+import type { PolicyDigest, ScopeId } from '@yoroi/domain';
+import { policyDigest as toPolicyDigest } from '@yoroi/domain';
+import { err, ok, type Result } from '@yoroi/domain';
+import { type PolicyDocument, PolicySchema, type ScopeRule } from './schema.ts';
 
 export interface CompiledPolicy {
 	readonly digest: PolicyDigest;
@@ -10,9 +10,9 @@ export interface CompiledPolicy {
 }
 
 export type PolicyError =
-	| { readonly kind: "SCHEMA_INVALID"; readonly issues: unknown }
-	| { readonly kind: "CYCLIC_INHERITANCE" }
-	| { readonly kind: "EMPTY_REQUIRED_CHECK_SET" };
+	| { readonly kind: 'SCHEMA_INVALID'; readonly issues: unknown }
+	| { readonly kind: 'CYCLIC_INHERITANCE' }
+	| { readonly kind: 'EMPTY_REQUIRED_CHECK_SET' };
 
 /** Deep-merge with **explicit override**: a key present in the more specific
  * document replaces the less specific one (objects merge key-by-key
@@ -22,10 +22,10 @@ export type PolicyError =
 function mergeExplicit(base: unknown, override: unknown): unknown {
 	if (override === undefined) return base;
 	if (
-		typeof base === "object" &&
+		typeof base === 'object' &&
 		base !== null &&
 		!Array.isArray(base) &&
-		typeof override === "object" &&
+		typeof override === 'object' &&
 		override !== null &&
 		!Array.isArray(override)
 	) {
@@ -41,7 +41,7 @@ function mergeExplicit(base: unknown, override: unknown): unknown {
 function mergeWithExplicitOverride(
 	org: PolicyDocument,
 	repo: Partial<PolicyDocument> | null,
-	branch: Partial<PolicyDocument> | null,
+	branch: Partial<PolicyDocument> | null
 ): unknown {
 	let merged: unknown = org;
 	if (repo) merged = mergeExplicit(merged, repo);
@@ -63,7 +63,7 @@ function hasCyclicInheritance(_merged: unknown): boolean {
 
 function sortKeysDeep(value: unknown): unknown {
 	if (Array.isArray(value)) return value.map(sortKeysDeep);
-	if (value !== null && typeof value === "object") {
+	if (value !== null && typeof value === 'object') {
 		const sorted: Record<string, unknown> = {};
 		for (const key of Object.keys(value as Record<string, unknown>).sort()) {
 			sorted[key] = sortKeysDeep((value as Record<string, unknown>)[key]);
@@ -81,12 +81,12 @@ async function digestOf(canonicalJson: string): Promise<PolicyDigest> {
 	const bytes = new TextEncoder().encode(canonicalJson);
 	const buffer = bytes.buffer.slice(
 		bytes.byteOffset,
-		bytes.byteOffset + bytes.byteLength,
+		bytes.byteOffset + bytes.byteLength
 	) as ArrayBuffer;
-	const hash = await crypto.subtle.digest("SHA-256", buffer);
+	const hash = await crypto.subtle.digest('SHA-256', buffer);
 	const hex = Array.from(new Uint8Array(hash))
-		.map((b) => b.toString(16).padStart(2, "0"))
-		.join("");
+		.map((b) => b.toString(16).padStart(2, '0'))
+		.join('');
 	return toPolicyDigest(hex);
 }
 
@@ -102,22 +102,22 @@ function buildScopeIndex(scopes: readonly ScopeRule[]): ReadonlyMap<ScopeId, Sco
 export async function compilePolicy(
 	org: PolicyDocument,
 	repo: Partial<PolicyDocument> | null,
-	branch: Partial<PolicyDocument> | null,
+	branch: Partial<PolicyDocument> | null
 ): Promise<Result<CompiledPolicy, PolicyError>> {
 	const merged = mergeWithExplicitOverride(org, repo, branch);
 	const validation = PolicySchema.safeParse(merged);
-	if (!validation.success) return err({ kind: "SCHEMA_INVALID", issues: validation.error.issues });
+	if (!validation.success) return err({ kind: 'SCHEMA_INVALID', issues: validation.error.issues });
 
-	if (hasCyclicInheritance(merged)) return err({ kind: "CYCLIC_INHERITANCE" });
+	if (hasCyclicInheritance(merged)) return err({ kind: 'CYCLIC_INHERITANCE' });
 	if (validation.data.scopes.some((s) => s.require.checks?.length === 0)) {
-		return err({ kind: "EMPTY_REQUIRED_CHECK_SET" }); // FR-012: 空の必須check集合は安全側error
+		return err({ kind: 'EMPTY_REQUIRED_CHECK_SET' }); // FR-012: 空の必須check集合は安全側error
 	}
 
 	const canonicalJson = toCanonicalJson(validation.data);
 	return ok({
 		digest: await digestOf(canonicalJson),
 		raw: validation.data,
-		scopeIndex: buildScopeIndex(validation.data.scopes),
+		scopeIndex: buildScopeIndex(validation.data.scopes)
 	});
 }
 

@@ -6,4 +6,4 @@ export const task = pgTable('task', {
 	priority: integer('priority').notNull().default(1)
 });
 
-export *  from './auth.schema';
+export * from './auth.schema';

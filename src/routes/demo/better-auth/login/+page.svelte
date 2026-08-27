@@ -1,4 +1,4 @@
-<script lang='ts'>
+<script lang="ts">
 	import { enhance } from '$app/forms';
 	import type { ActionData } from './$types';
 
@@ -24,7 +24,7 @@
 </form>
 <p style="color: red">{form?.message ?? ''}</p>
 
-<hr  />
+<hr />
 
 <form method="post" action="?/signInSocial" use:enhance>
 	<input type="hidden" name="provider" value="github" />

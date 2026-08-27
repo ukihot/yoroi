@@ -1,4 +1,4 @@
-import type { ApproverRole, ScopeId } from "@yoroi/domain";
+import type { ApproverRole, ScopeId } from '@yoroi/domain';
 
 /** design.md §9.3/§14.2's ReasonGraphNode — also the shape yoroi-console's
  * PR detail screen renders directly (design.md §23.8). */
@@ -38,21 +38,21 @@ export function buildReasonGraph(parts: {
 
 	if (!parts.approvalResult.pass) {
 		children.push({
-			label: "G1 Identity / Approval未成立",
+			label: 'G1 Identity / Approval未成立',
 			children: parts.approvalResult.missing.map((m) => ({
 				label: `${m.scopeId} scopeの${m.role}承認が${m.need - m.have}件不足`,
-				children: [],
-			})),
+				children: []
+			}))
 		});
 	}
 
 	if (!parts.checkResult.pass) {
 		children.push({
-			label: "G3 Test Evidence未成立",
+			label: 'G3 Test Evidence未成立',
 			children: [
 				...parts.checkResult.failedJobs.map((j) => ({ label: `${j}が失敗`, children: [] })),
-				...parts.checkResult.pendingJobs.map((j) => ({ label: `${j}実行中`, children: [] })),
-			],
+				...parts.checkResult.pendingJobs.map((j) => ({ label: `${j}実行中`, children: [] }))
+			]
 		});
 	}
 
@@ -60,5 +60,5 @@ export function buildReasonGraph(parts: {
 		children.push({ label: parts.queueResult.reason, children: [] });
 	}
 
-	return { label: children.length === 0 ? "Merge可能" : "Merge不可", children };
+	return { label: children.length === 0 ? 'Merge可能' : 'Merge不可', children };
 }

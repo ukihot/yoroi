@@ -7,7 +7,7 @@
  * caller already loaded — no I/O happens in this file.
  */
 
-export type NotificationCategory = "blocker" | "action_required" | "informational";
+export type NotificationCategory = 'blocker' | 'action_required' | 'informational';
 
 export interface DraftNotificationInput {
 	readonly decisionId: string;
@@ -38,7 +38,7 @@ export interface NotificationRecord extends DraftNotificationInput {
 export function groupForDispatch(
 	pending: readonly NotificationRecord[],
 	coalesceWindowMs: number,
-	now: Date = new Date(),
+	now: Date = new Date()
 ): ReadonlyMap<string, readonly NotificationRecord[]> {
 	const byKey = new Map<string, NotificationRecord[]>();
 	for (const record of pending) {
@@ -52,7 +52,7 @@ export function groupForDispatch(
 	for (const [key, group] of byKey) {
 		const earliest = group.reduce(
 			(min, r) => (r.createdAt.getTime() < min ? r.createdAt.getTime() : min),
-			group[0]!.createdAt.getTime(),
+			group[0]!.createdAt.getTime()
 		);
 		if (now.getTime() - earliest >= coalesceWindowMs) due.set(key, group);
 	}

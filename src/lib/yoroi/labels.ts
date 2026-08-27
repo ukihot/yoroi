@@ -24,107 +24,101 @@ import type {
 } from '$lib/server/yoroi/types';
 
 export function stageLabel(stage: Stage): string {
-	return (
-		{
-			discovered: m.stage_discovered,
-			draft: m.stage_draft,
-			reviewing: m.stage_reviewing,
-			approval_covered: m.stage_approval_covered,
-			prechecked: m.stage_prechecked,
-			queued: m.stage_queued,
-			candidate_building: m.stage_candidate_building,
-			gate_passed: m.stage_gate_passed,
-			merging: m.stage_merging,
-			merged: m.stage_merged,
-			observing: m.stage_observing,
-			superseded: m.stage_superseded,
-			paused: m.stage_paused,
-			quarantined: m.stage_quarantined,
-			reverting: m.stage_reverting
-		}[stage]()
-	);
+	return {
+		discovered: m.stage_discovered,
+		draft: m.stage_draft,
+		reviewing: m.stage_reviewing,
+		approval_covered: m.stage_approval_covered,
+		prechecked: m.stage_prechecked,
+		queued: m.stage_queued,
+		candidate_building: m.stage_candidate_building,
+		gate_passed: m.stage_gate_passed,
+		merging: m.stage_merging,
+		merged: m.stage_merged,
+		observing: m.stage_observing,
+		superseded: m.stage_superseded,
+		paused: m.stage_paused,
+		quarantined: m.stage_quarantined,
+		reverting: m.stage_reverting
+	}[stage]();
 }
 
 export function responsibilityLabel(responsibility: Responsibility): string {
-	return (
-		{
-			your_action: m.responsibility_your_action,
-			other_reviewer: m.responsibility_other_reviewer,
-			ci: m.responsibility_ci,
-			queue: m.responsibility_queue,
-			yoroi_internal: m.responsibility_yoroi_internal,
-			github_outage: m.responsibility_github_outage,
-			policy_blocked: m.responsibility_policy_blocked,
-			needs_investigation: m.responsibility_needs_investigation
-		}[responsibility]()
-	);
+	return {
+		your_action: m.responsibility_your_action,
+		other_reviewer: m.responsibility_other_reviewer,
+		ci: m.responsibility_ci,
+		queue: m.responsibility_queue,
+		yoroi_internal: m.responsibility_yoroi_internal,
+		github_outage: m.responsibility_github_outage,
+		policy_blocked: m.responsibility_policy_blocked,
+		needs_investigation: m.responsibility_needs_investigation
+	}[responsibility]();
 }
 
 export function etaConfidenceLabel(confidence: EtaConfidence): string {
-	return (
-		{ low: m.eta_confidence_low, medium: m.eta_confidence_medium, high: m.eta_confidence_high }[confidence]()
-	);
+	return {
+		low: m.eta_confidence_low,
+		medium: m.eta_confidence_medium,
+		high: m.eta_confidence_high
+	}[confidence]();
 }
 
 export function healthStatusLabel(status: HealthStatus): string {
-	return { green: m.health_status_green, amber: m.health_status_amber, red: m.health_status_red }[status]();
+	return { green: m.health_status_green, amber: m.health_status_amber, red: m.health_status_red }[
+		status
+	]();
 }
 
 export function healthComponentLabel(component: HealthComponent): string {
-	return (
-		{
-			control: m.health_component_control,
-			merger: m.health_component_merger,
-			console: m.health_component_console,
-			github_api: m.health_component_github_api,
-			evidence_export: m.health_component_evidence_export
-		}[component]()
-	);
+	return {
+		control: m.health_component_control,
+		merger: m.health_component_merger,
+		console: m.health_component_console,
+		github_api: m.health_component_github_api,
+		evidence_export: m.health_component_evidence_export
+	}[component]();
 }
 
 export function roleLabel(role: Role): string {
-	return (
-		{
-			reviewer: m.role_reviewer,
-			scope_approver: m.role_scope_approver,
-			security_approver: m.role_security_approver,
-			data_approver: m.role_data_approver,
-			infra_approver: m.role_infra_approver,
-			governor: m.role_governor,
-			operator: m.role_operator,
-			maintainer: m.role_maintainer,
-			developer: m.role_developer
-		}[role]()
-	);
+	return {
+		reviewer: m.role_reviewer,
+		scope_approver: m.role_scope_approver,
+		security_approver: m.role_security_approver,
+		data_approver: m.role_data_approver,
+		infra_approver: m.role_infra_approver,
+		governor: m.role_governor,
+		operator: m.role_operator,
+		maintainer: m.role_maintainer,
+		developer: m.role_developer
+	}[role]();
 }
 
 export function queueModeLabel(mode: QueueMode): string {
-	return (
-		{
-			observe: m.mode_observe,
-			advisory: m.mode_advisory,
-			serial: m.mode_serial,
-			speculative: m.mode_speculative,
-			batch: m.mode_batch
-		}[mode]()
-	);
+	return {
+		observe: m.mode_observe,
+		advisory: m.mode_advisory,
+		serial: m.mode_serial,
+		speculative: m.mode_speculative,
+		batch: m.mode_batch
+	}[mode]();
 }
 
 export function repoStatusLabel(status: RepoStatus): string {
-	return (
-		{ active: m.repostatus_active, paused: m.repostatus_paused, draining: m.repostatus_draining }[status]()
-	);
+	return {
+		active: m.repostatus_active,
+		paused: m.repostatus_paused,
+		draining: m.repostatus_draining
+	}[status]();
 }
 
 export function laneLabel(lane: Lane): string {
-	return (
-		{
-			default: m.queue_lane_default,
-			hotfix: m.queue_lane_hotfix,
-			high_risk: m.queue_lane_high_risk,
-			mega: m.queue_lane_mega
-		}[lane]()
-	);
+	return {
+		default: m.queue_lane_default,
+		hotfix: m.queue_lane_hotfix,
+		high_risk: m.queue_lane_high_risk,
+		mega: m.queue_lane_mega
+	}[lane]();
 }
 
 export function riskLabel(risk: Risk): string {
@@ -132,31 +126,30 @@ export function riskLabel(risk: Risk): string {
 }
 
 export function gateStatusLabel(status: GateStatus): string {
-	return (
-		{
-			passed: m.gate_status_passed,
-			waiting: m.gate_status_waiting,
-			failed: m.gate_status_failed,
-			unknown: m.gate_status_unknown
-		}[status]()
-	);
+	return {
+		passed: m.gate_status_passed,
+		waiting: m.gate_status_waiting,
+		failed: m.gate_status_failed,
+		unknown: m.gate_status_unknown
+	}[status]();
 }
 
 export function checkConclusionLabel(conclusion: CheckConclusion): string {
-	return (
-		{
-			success: m.check_conclusion_success,
-			failure: m.check_conclusion_failure,
-			cancelled: m.check_conclusion_cancelled,
-			pending: m.check_conclusion_pending
-		}[conclusion]()
-	);
+	return {
+		success: m.check_conclusion_success,
+		failure: m.check_conclusion_failure,
+		cancelled: m.check_conclusion_cancelled,
+		pending: m.check_conclusion_pending
+	}[conclusion]();
 }
 
 export function gateName(gate: 'g1' | 'g2' | 'g3' | 'g4'): string {
-	return (
-		{ g1: m.prdetail_gate_g1, g2: m.prdetail_gate_g2, g3: m.prdetail_gate_g3, g4: m.prdetail_gate_g4 }[gate]()
-	);
+	return {
+		g1: m.prdetail_gate_g1,
+		g2: m.prdetail_gate_g2,
+		g3: m.prdetail_gate_g3,
+		g4: m.prdetail_gate_g4
+	}[gate]();
 }
 
 export type Tone = 'green' | 'amber' | 'red' | 'neutral';
@@ -180,7 +173,9 @@ export function gateStatusTone(status: GateStatus): Tone {
 }
 
 export function checkConclusionTone(conclusion: CheckConclusion): Tone {
-	return { success: 'green', failure: 'red', cancelled: 'neutral', pending: 'amber' }[conclusion] as Tone;
+	return { success: 'green', failure: 'red', cancelled: 'neutral', pending: 'amber' }[
+		conclusion
+	] as Tone;
 }
 
 export function riskTone(risk: Risk): Tone {
@@ -214,4 +209,43 @@ export function conclusionTone(conclusion: PrConclusion): Tone {
 		default:
 			return 'amber';
 	}
+}
+
+/**
+ * `flaky_test.status`/`merge_candidate.invalidation_reason` are plain `text`
+ * columns (design.md 6.7節), not closed union types like the enums above —
+ * only a couple of values exist in practice today
+ * (worker/slash-commands.ts, worker/serial-scheduler.ts in apps/control),
+ * but nothing guarantees that at the type level. Unlike every mapping above,
+ * these fall back to the raw value for anything not in the known-labels map
+ * instead of assuming exhaustiveness.
+ */
+export function flakyStatusLabel(status: string): string {
+	const known: Record<string, () => string> = {
+		observed: m.ci_status_observed,
+		quarantine_requested: m.ci_status_quarantine_requested
+	};
+	return (known[status] ?? (() => status))();
+}
+
+export function flakyStatusTone(status: string): Tone {
+	return status === 'quarantine_requested' ? 'amber' : 'neutral';
+}
+
+export function candidateInvalidationReasonLabel(reason: string): string {
+	const known: Record<string, () => string> = {
+		base_branch_advanced: m.ci_invalidation_reason_base_branch_advanced
+	};
+	return (known[reason] ?? (() => reason))();
+}
+
+export function policySourceLabel(source: 'published_bundle' | 'default_fallback'): string {
+	return {
+		published_bundle: m.policy_source_published_bundle,
+		default_fallback: m.policy_source_default_fallback
+	}[source]();
+}
+
+export function policySourceTone(source: 'published_bundle' | 'default_fallback'): Tone {
+	return source === 'published_bundle' ? 'green' : 'amber';
 }

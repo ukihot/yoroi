@@ -48,10 +48,10 @@ classification: Internal
 
 ### 1.2 対応範囲
 
-| 詳細度 | 対象フェーズ | 内容 |
-|---|---|---|
+| 詳細度   | 対象フェーズ                                                                    | 内容                                                                                                                                                                             |
+| -------- | ------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 詳細設計 | Phase 0〜3（Journey/Threat Design、Observe、Approval Continuity、Serial Merge） | Webhook ingestion、状態機械、scope change digest / context safety proof、Policy Engine、Serial merge、Branch Coordinator、Merger App、reason graph、`/yoroi recheck`・`feedback` |
-| 概要設計 | Phase 4〜6（Speculative/Batch、Org Governance、Advanced） | Speculative train、Batch/ddmin、Terraform drift連携、cross-repo DAG、auto-revert |
+| 概要設計 | Phase 4〜6（Speculative/Batch、Org Governance、Advanced）                       | Speculative train、Batch/ddmin、Terraform drift連携、cross-repo DAG、auto-revert                                                                                                 |
 
 MVPで見送る機能（Terraform apply、Speculative/Batch本実装、Merge権限付与）は、要件20章のGo/No-Go基準を満たすまでMergerへ本番merge権限を渡さない、という要件の意図をそのまま設計へ引き継ぐ。
 
@@ -132,11 +132,11 @@ flowchart TD
 
 要件13.2・13.10に従い、3つのDeno Deploy appへ分割する。IngressとControlは同一app（`yoroi-control`）に同居させ、最強権限を持つ`yoroi-merger`だけを別App/別GitHub App/別deploy権限にする。
 
-| App | 公開入口 | 保持する資格情報 | 主要モジュール |
-|---|---|---|---|
-| `yoroi-control` | `/github/webhook`、read系API、UI向けAPI | Webhook secret、Observer App key、PostgreSQL app role、Merger呼び出し用OIDC | ingress、state machine、policy evaluator、scheduler、notification、Cron |
-| `yoroi-merger` | OIDC保護された`/internal/merge` | Merger App key、envelope検証鍵 | envelope検証、fencing検証、GitHub再取得、merge実行のみ |
-| `yoroi-console` | SSO保護UI | 本番merge資格情報なし、PostgreSQL直接接続なし | SvelteKit UI、`yoroi-control`のread APIとrecheck/feedback呼び出し。管理者向けHome / Operations Health board等（23〜24章） |
+| App             | 公開入口                                | 保持する資格情報                                                            | 主要モジュール                                                                                                            |
+| --------------- | --------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `yoroi-control` | `/github/webhook`、read系API、UI向けAPI | Webhook secret、Observer App key、PostgreSQL app role、Merger呼び出し用OIDC | ingress、state machine、policy evaluator、scheduler、notification、Cron                                                   |
+| `yoroi-merger`  | OIDC保護された`/internal/merge`         | Merger App key、envelope検証鍵                                              | envelope検証、fencing検証、GitHub再取得、merge実行のみ                                                                    |
+| `yoroi-console` | SSO保護UI                               | 本番merge資格情報なし、PostgreSQL直接接続なし                               | SvelteKit UI、`yoroi-control`のread APIとrecheck/feedback呼び出し。管理者向けHome / Operations Health board等（23〜24章） |
 
 ### 2.3 主要シーケンス（Webhook → Decision → Merge）
 
@@ -247,22 +247,22 @@ yoroi/
 
 ```jsonc
 {
-  "workspace": ["apps/control", "apps/merger", "apps/console", "packages/*"],
-  "compilerOptions": {
-    "strict": true,
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true
-  },
-  "lock": true,
-  "fmt": { "lineWidth": 100 },
-  "lint": { "rules": { "tags": ["recommended"] } },
-  "tasks": {
-    "test": "deno test -A --parallel packages apps",
-    "test:property": "deno test -A tests/property",
-    "test:fault": "deno test -A tests/fault-injection",
-    "check": "deno check apps/**/main.ts packages/**/mod.ts",
-    "migrate": "deno run -A packages/postgres/src/migrations/run.ts"
-  }
+	"workspace": ["apps/control", "apps/merger", "apps/console", "packages/*"],
+	"compilerOptions": {
+		"strict": true,
+		"noUncheckedIndexedAccess": true,
+		"exactOptionalPropertyTypes": true
+	},
+	"lock": true,
+	"fmt": { "lineWidth": 100 },
+	"lint": { "rules": { "tags": ["recommended"] } },
+	"tasks": {
+		"test": "deno test -A --parallel packages apps",
+		"test:property": "deno test -A tests/property",
+		"test:fault": "deno test -A tests/fault-injection",
+		"check": "deno check apps/**/main.ts packages/**/mod.ts",
+		"migrate": "deno run -A packages/postgres/src/migrations/run.ts"
+	}
 }
 ```
 
@@ -282,17 +282,17 @@ yoroi/
 
 type Brand<Base, Tag extends string> = Base & { readonly __brand: Tag };
 
-export type InstallationId    = Brand<number, "InstallationId">;
-export type RepositoryId      = Brand<number, "RepositoryId">;
-export type PullRequestNumber = Brand<number, "PullRequestNumber">;
-export type Sha               = Brand<string, "Sha">;         // commit/tree/blob OID
-export type Sha256Hex         = Brand<string, "Sha256Hex">;   // digest全般
-export type OperationId       = Brand<string, "OperationId">; // ULID
-export type DecisionId        = Brand<string, "DecisionId">;  // ULID
-export type ActorStableId     = Brand<string, "ActorStableId">; // GitHub user node_id
-export type ScopeId           = Brand<string, "ScopeId">;
-export type FencingToken      = Brand<bigint, "FencingToken">;
-export type PolicyDigest      = Brand<string, "PolicyDigest">;
+export type InstallationId = Brand<number, 'InstallationId'>;
+export type RepositoryId = Brand<number, 'RepositoryId'>;
+export type PullRequestNumber = Brand<number, 'PullRequestNumber'>;
+export type Sha = Brand<string, 'Sha'>; // commit/tree/blob OID
+export type Sha256Hex = Brand<string, 'Sha256Hex'>; // digest全般
+export type OperationId = Brand<string, 'OperationId'>; // ULID
+export type DecisionId = Brand<string, 'DecisionId'>; // ULID
+export type ActorStableId = Brand<string, 'ActorStableId'>; // GitHub user node_id
+export type ScopeId = Brand<string, 'ScopeId'>;
+export type FencingToken = Brand<bigint, 'FencingToken'>;
+export type PolicyDigest = Brand<string, 'PolicyDigest'>;
 ```
 
 ### 4.2 二つの判定Identity（要件8.2の型化）
@@ -302,27 +302,27 @@ export type PolicyDigest      = Brand<string, "PolicyDigest">;
 
 /** 人のreview continuityを表す単位。rebase等で不変なら維持される (DP-13) */
 export interface ReviewIdentity {
-  readonly repositoryId: RepositoryId;
-  readonly pullRequestNumber: PullRequestNumber;
-  readonly scopeId: ScopeId;
-  readonly scopeChangeDigest: Sha256Hex;
-  readonly contextSafetyProofDigest: Sha256Hex;
-  readonly scopeMappingVersion: string;
-  readonly policyDigest: PolicyDigest;
-  readonly actorStableId: ActorStableId;
-  readonly actorRole: ApproverRole;
+	readonly repositoryId: RepositoryId;
+	readonly pullRequestNumber: PullRequestNumber;
+	readonly scopeId: ScopeId;
+	readonly scopeChangeDigest: Sha256Hex;
+	readonly contextSafetyProofDigest: Sha256Hex;
+	readonly scopeMappingVersion: string;
+	readonly policyDigest: PolicyDigest;
+	readonly actorStableId: ActorStableId;
+	readonly actorRole: ApproverRole;
 }
 
 /** 実行・merge権限に結合する単位。SHAが変われば必ず作り直す (DP-01) */
 export interface CandidateDecisionIdentity {
-  readonly repositoryId: RepositoryId;
-  readonly pullRequestNumber: PullRequestNumber;
-  readonly exactCandidateSha: Sha;
-  readonly headSha: Sha;
-  readonly baseSha: Sha;
-  readonly orderedDependencyShas: readonly Sha[];
-  readonly policyDigest: PolicyDigest;
-  readonly expectedCheckPlanDigest: Sha256Hex;
+	readonly repositoryId: RepositoryId;
+	readonly pullRequestNumber: PullRequestNumber;
+	readonly exactCandidateSha: Sha;
+	readonly headSha: Sha;
+	readonly baseSha: Sha;
+	readonly orderedDependencyShas: readonly Sha[];
+	readonly policyDigest: PolicyDigest;
+	readonly expectedCheckPlanDigest: Sha256Hex;
 }
 ```
 
@@ -334,48 +334,48 @@ export interface CandidateDecisionIdentity {
 
 ```typescript
 export interface PullRequestRevision {
-  readonly repositoryId: RepositoryId;
-  readonly pullRequestNumber: PullRequestNumber;
-  readonly headSha: Sha;
-  readonly baseSha: Sha;
-  readonly isDraft: boolean;
-  readonly authorStableId: ActorStableId;
-  readonly touchedScopes: readonly ScopeId[];
-  readonly sensitiveScopes: readonly ScopeId[];
+	readonly repositoryId: RepositoryId;
+	readonly pullRequestNumber: PullRequestNumber;
+	readonly headSha: Sha;
+	readonly baseSha: Sha;
+	readonly isDraft: boolean;
+	readonly authorStableId: ActorStableId;
+	readonly touchedScopes: readonly ScopeId[];
+	readonly sensitiveScopes: readonly ScopeId[];
 }
 
 export interface MergeCandidate {
-  readonly candidateSha: Sha;
-  readonly baseSha: Sha;
-  readonly orderedHeads: readonly Sha[];
-  readonly policyDigest: PolicyDigest;
-  readonly builtAt: Date;
-  readonly invalidatedAt: Date | null;
-  readonly invalidationReason: string | null;
+	readonly candidateSha: Sha;
+	readonly baseSha: Sha;
+	readonly orderedHeads: readonly Sha[];
+	readonly policyDigest: PolicyDigest;
+	readonly builtAt: Date;
+	readonly invalidatedAt: Date | null;
+	readonly invalidationReason: string | null;
 }
 
 export interface Approval {
-  readonly actorStableId: ActorStableId;
-  readonly role: ApproverRole;
-  readonly scopeId: ScopeId;
-  readonly scopeChangeDigest: Sha256Hex;
-  readonly contextProofPolicy: string;
-  readonly policyDigest: PolicyDigest;
-  readonly originalHeadSha: Sha;   // 監査文脈
-  readonly originalBaseSha: Sha;   // 監査文脈
-  readonly scopeResultDigest: Sha256Hex;
-  readonly approvedAt: Date;
+	readonly actorStableId: ActorStableId;
+	readonly role: ApproverRole;
+	readonly scopeId: ScopeId;
+	readonly scopeChangeDigest: Sha256Hex;
+	readonly contextProofPolicy: string;
+	readonly policyDigest: PolicyDigest;
+	readonly originalHeadSha: Sha; // 監査文脈
+	readonly originalBaseSha: Sha; // 監査文脈
+	readonly scopeResultDigest: Sha256Hex;
+	readonly approvedAt: Date;
 }
 
 export interface ApprovalCarryForward {
-  readonly originalReviewId: string;
-  readonly oldBaseSha: Sha;
-  readonly oldHeadSha: Sha;
-  readonly newBaseSha: Sha;
-  readonly newHeadSha: Sha;
-  readonly unchangedScopeIds: readonly ScopeId[];
-  readonly contextProofDigest: Sha256Hex;
-  readonly proofAlgorithm: string;
+	readonly originalReviewId: string;
+	readonly oldBaseSha: Sha;
+	readonly oldHeadSha: Sha;
+	readonly newBaseSha: Sha;
+	readonly newHeadSha: Sha;
+	readonly unchangedScopeIds: readonly ScopeId[];
+	readonly contextProofDigest: Sha256Hex;
+	readonly proofAlgorithm: string;
 }
 ```
 
@@ -393,30 +393,41 @@ export interface ApprovalCarryForward {
 // packages/domain/src/state-machine.ts
 
 export type PrState =
-  | "DISCOVERED" | "DRAFT" | "REVIEWING" | "APPROVAL_COVERED"
-  | "PRECHECKED" | "QUEUED" | "CANDIDATE_BUILDING" | "GATE_PASSED"
-  | "MERGING" | "MERGED" | "OBSERVING" | "SUPERSEDED"
-  | "PAUSED" | "QUARANTINED" | "REVERTING";
+	| 'DISCOVERED'
+	| 'DRAFT'
+	| 'REVIEWING'
+	| 'APPROVAL_COVERED'
+	| 'PRECHECKED'
+	| 'QUEUED'
+	| 'CANDIDATE_BUILDING'
+	| 'GATE_PASSED'
+	| 'MERGING'
+	| 'MERGED'
+	| 'OBSERVING'
+	| 'SUPERSEDED'
+	| 'PAUSED'
+	| 'QUARANTINED'
+	| 'REVERTING';
 
 const ALLOWED_TRANSITIONS: ReadonlyMap<PrState, ReadonlySet<PrState>> = new Map([
-  ["DISCOVERED",         new Set<PrState>(["DRAFT", "REVIEWING"])],
-  ["DRAFT",              new Set<PrState>(["REVIEWING"])],
-  ["REVIEWING",          new Set<PrState>(["APPROVAL_COVERED", "SUPERSEDED"])],
-  // 承認失効（FR-025）でREVIEWINGへ後退できる
-  ["APPROVAL_COVERED",   new Set<PrState>(["PRECHECKED", "REVIEWING"])],
-  ["PRECHECKED",         new Set<PrState>(["QUEUED", "REVIEWING"])],
-  ["QUEUED",             new Set<PrState>(["CANDIDATE_BUILDING", "PAUSED", "REVIEWING"])],
-  ["CANDIDATE_BUILDING", new Set<PrState>(["GATE_PASSED", "QUARANTINED", "QUEUED"])],
-  // GATE_PASSEDは期限付き（8.4）。base/head/policy更新やtree closeで候補側へ戻す
-  ["GATE_PASSED",        new Set<PrState>(["MERGING", "CANDIDATE_BUILDING"])],
-  // merge直前再検証（8.4 “MERGING直前”）が失敗した場合は候補作り直し
-  ["MERGING",            new Set<PrState>(["MERGED", "CANDIDATE_BUILDING"])],
-  ["MERGED",             new Set<PrState>(["OBSERVING"])],
-  ["OBSERVING",          new Set<PrState>(["REVERTING"])],
-  ["PAUSED",             new Set<PrState>(["QUEUED"])],
-  ["QUARANTINED",        new Set<PrState>(["CANDIDATE_BUILDING", "REVIEWING"])],
-  ["SUPERSEDED",         new Set<PrState>([])],
-  ["REVERTING",          new Set<PrState>([])],
+	['DISCOVERED', new Set<PrState>(['DRAFT', 'REVIEWING'])],
+	['DRAFT', new Set<PrState>(['REVIEWING'])],
+	['REVIEWING', new Set<PrState>(['APPROVAL_COVERED', 'SUPERSEDED'])],
+	// 承認失効（FR-025）でREVIEWINGへ後退できる
+	['APPROVAL_COVERED', new Set<PrState>(['PRECHECKED', 'REVIEWING'])],
+	['PRECHECKED', new Set<PrState>(['QUEUED', 'REVIEWING'])],
+	['QUEUED', new Set<PrState>(['CANDIDATE_BUILDING', 'PAUSED', 'REVIEWING'])],
+	['CANDIDATE_BUILDING', new Set<PrState>(['GATE_PASSED', 'QUARANTINED', 'QUEUED'])],
+	// GATE_PASSEDは期限付き（8.4）。base/head/policy更新やtree closeで候補側へ戻す
+	['GATE_PASSED', new Set<PrState>(['MERGING', 'CANDIDATE_BUILDING'])],
+	// merge直前再検証（8.4 “MERGING直前”）が失敗した場合は候補作り直し
+	['MERGING', new Set<PrState>(['MERGED', 'CANDIDATE_BUILDING'])],
+	['MERGED', new Set<PrState>(['OBSERVING'])],
+	['OBSERVING', new Set<PrState>(['REVERTING'])],
+	['PAUSED', new Set<PrState>(['QUEUED'])],
+	['QUARANTINED', new Set<PrState>(['CANDIDATE_BUILDING', 'REVIEWING'])],
+	['SUPERSEDED', new Set<PrState>([])],
+	['REVERTING', new Set<PrState>([])]
 ]);
 ```
 
@@ -424,44 +435,44 @@ const ALLOWED_TRANSITIONS: ReadonlyMap<PrState, ReadonlySet<PrState>> = new Map(
 
 ```typescript
 export interface PrStateRow {
-  readonly state: PrState;
-  readonly stateVersion: number;      // 楽観的並行制御（6章）
-  readonly headSha: Sha;
-  readonly candidateSha: Sha | null;
+	readonly state: PrState;
+	readonly stateVersion: number; // 楽観的並行制御（6章）
+	readonly headSha: Sha;
+	readonly candidateSha: Sha | null;
 }
 
 export interface StateEvent {
-  readonly operationId: OperationId;
-  readonly toState: PrState;
-  readonly actor: ActorRef;
-  readonly reasonCode: string;
-  readonly observedHeadSha: Sha;
-  readonly inputDigest: Sha256Hex;    // 何を根拠に遷移したか（監査・reason graph用）
-  readonly occurredAt: Date;
+	readonly operationId: OperationId;
+	readonly toState: PrState;
+	readonly actor: ActorRef;
+	readonly reasonCode: string;
+	readonly observedHeadSha: Sha;
+	readonly inputDigest: Sha256Hex; // 何を根拠に遷移したか（監査・reason graph用）
+	readonly occurredAt: Date;
 }
 
 export type TransitionRejected =
-  | { readonly kind: "STALE_SHA"; readonly observed: Sha; readonly current: Sha }
-  | { readonly kind: "ILLEGAL_TRANSITION"; readonly from: PrState; readonly to: PrState };
+	| { readonly kind: 'STALE_SHA'; readonly observed: Sha; readonly current: Sha }
+	| { readonly kind: 'ILLEGAL_TRANSITION'; readonly from: PrState; readonly to: PrState };
 
 export function reduce(
-  current: PrStateRow,
-  event: StateEvent,
+	current: PrStateRow,
+	event: StateEvent
 ): Result<PrStateRow, TransitionRejected> {
-  // P-05, 8.4: 古いSHAのeventで新しいSHAの状態を後退させない
-  if (isOlderOrEqualStaleSha(event.observedHeadSha, current)) {
-    return err({ kind: "STALE_SHA", observed: event.observedHeadSha, current: current.headSha });
-  }
-  const allowed = ALLOWED_TRANSITIONS.get(current.state) ?? new Set<PrState>();
-  if (!allowed.has(event.toState)) {
-    return err({ kind: "ILLEGAL_TRANSITION", from: current.state, to: event.toState });
-  }
-  return ok({
-    state: event.toState,
-    stateVersion: current.stateVersion + 1,
-    headSha: event.observedHeadSha,
-    candidateSha: current.candidateSha,
-  });
+	// P-05, 8.4: 古いSHAのeventで新しいSHAの状態を後退させない
+	if (isOlderOrEqualStaleSha(event.observedHeadSha, current)) {
+		return err({ kind: 'STALE_SHA', observed: event.observedHeadSha, current: current.headSha });
+	}
+	const allowed = ALLOWED_TRANSITIONS.get(current.state) ?? new Set<PrState>();
+	if (!allowed.has(event.toState)) {
+		return err({ kind: 'ILLEGAL_TRANSITION', from: current.state, to: event.toState });
+	}
+	return ok({
+		state: event.toState,
+		stateVersion: current.stateVersion + 1,
+		headSha: event.observedHeadSha,
+		candidateSha: current.candidateSha
+	});
 }
 ```
 
@@ -471,12 +482,12 @@ export function reduce(
 
 状態機械の遷移条件を4層ゲートへマップする。
 
-| 遷移 | 対応ゲート | 判定コンポーネント |
-|---|---|---|
-| `REVIEWING → APPROVAL_COVERED` | G1 Identity/Approval | Policy Engine（9章）+ Scope Change Digest（8章） |
-| `PRECHECKED → QUEUED` | G2先行判定 | Merge Scheduler（11章） |
-| `CANDIDATE_BUILDING → GATE_PASSED` | G2 + G3 | GitHub Adapter（13章）の`expected_check_plan`集約 |
-| `GATE_PASSED → MERGING → MERGED` | G4 | Branch Coordinator（10章）+ Merger（12章） |
+| 遷移                               | 対応ゲート           | 判定コンポーネント                                |
+| ---------------------------------- | -------------------- | ------------------------------------------------- |
+| `REVIEWING → APPROVAL_COVERED`     | G1 Identity/Approval | Policy Engine（9章）+ Scope Change Digest（8章）  |
+| `PRECHECKED → QUEUED`              | G2先行判定           | Merge Scheduler（11章）                           |
+| `CANDIDATE_BUILDING → GATE_PASSED` | G2 + G3              | GitHub Adapter（13章）の`expected_check_plan`集約 |
+| `GATE_PASSED → MERGING → MERGED`   | G4                   | Branch Coordinator（10章）+ Merger（12章）        |
 
 ---
 
@@ -759,49 +770,54 @@ CREATE TABLE feedback_case (
 // apps/control/routes/webhook.ts
 
 export async function handleWebhook(req: Request, ctx: ControlContext): Promise<Response> {
-  // 1) サイズ・content-type・event allowlistの検査 (FR-001)
-  const contentLength = Number(req.headers.get("content-length") ?? "0");
-  if (contentLength > MAX_PAYLOAD_BYTES) return new Response("payload too large", { status: 413 });
+	// 1) サイズ・content-type・event allowlistの検査 (FR-001)
+	const contentLength = Number(req.headers.get('content-length') ?? '0');
+	if (contentLength > MAX_PAYLOAD_BYTES) return new Response('payload too large', { status: 413 });
 
-  const eventType = req.headers.get("x-github-event");
-  if (!eventType || !EVENT_ALLOWLIST.has(eventType)) {
-    return new Response("unsupported event", { status: 202 }); // 未知eventは黙って受理しdrop
-  }
+	const eventType = req.headers.get('x-github-event');
+	if (!eventType || !EVENT_ALLOWLIST.has(eventType)) {
+		return new Response('unsupported event', { status: 202 }); // 未知eventは黙って受理しdrop
+	}
 
-  const rawBody = new Uint8Array(await req.arrayBuffer());
+	const rawBody = new Uint8Array(await req.arrayBuffer());
 
-  // 2) raw bodyのままtiming-safe HMAC検証 (SEC-007)
-  const signature = req.headers.get("x-hub-signature-256");
-  if (!(await verifyHmacSignature(rawBody, signature, ctx.webhookSecret))) {
-    return new Response("bad signature", { status: 401 });
-  }
+	// 2) raw bodyのままtiming-safe HMAC検証 (SEC-007)
+	const signature = req.headers.get('x-hub-signature-256');
+	if (!(await verifyHmacSignature(rawBody, signature, ctx.webhookSecret))) {
+		return new Response('bad signature', { status: 401 });
+	}
 
-  const deliveryId = req.headers.get("x-github-delivery")!;
-  const installationId = extractInstallationId(rawBody);
-  const repositoryId = extractRepositoryId(rawBody);
+	const deliveryId = req.headers.get('x-github-delivery')!;
+	const installationId = extractInstallationId(rawBody);
+	const repositoryId = extractRepositoryId(rawBody);
 
-  // 3) 一つのtransactionでinbox + outboxへcommit (FR-003)
-  const operationId = ulid();
-  await ctx.db.transaction(async (tx) => {
-    const inserted = await tx.insertInbox({
-      installationId, repositoryId, deliveryId, eventType,
-      payloadDigest: await sha256Hex(rawBody),
-      payloadEncrypted: shouldPersistRaw(eventType) ? await encrypt(rawBody, ctx.kmsKey) : null,
-      expiresAt: shouldPersistRaw(eventType) ? addHours(new Date(), 24) : null,
-    });
-    if (!inserted) return; // UNIQUE制約により重複delivery (FR-004)
-    await tx.insertOutbox({
-      operationId, installationId, repositoryId,
-      kind: routeEventToWorkKind(eventType),
-      payload: minimalEventFacts(eventType, rawBody), // 必要最小限のfactsのみ (FR-002)
-    });
-  });
+	// 3) 一つのtransactionでinbox + outboxへcommit (FR-003)
+	const operationId = ulid();
+	await ctx.db.transaction(async (tx) => {
+		const inserted = await tx.insertInbox({
+			installationId,
+			repositoryId,
+			deliveryId,
+			eventType,
+			payloadDigest: await sha256Hex(rawBody),
+			payloadEncrypted: shouldPersistRaw(eventType) ? await encrypt(rawBody, ctx.kmsKey) : null,
+			expiresAt: shouldPersistRaw(eventType) ? addHours(new Date(), 24) : null
+		});
+		if (!inserted) return; // UNIQUE制約により重複delivery (FR-004)
+		await tx.insertOutbox({
+			operationId,
+			installationId,
+			repositoryId,
+			kind: routeEventToWorkKind(eventType),
+			payload: minimalEventFacts(eventType, rawBody) // 必要最小限のfactsのみ (FR-002)
+		});
+	});
 
-  // 4) commit後、request budget内で現在eventを含む少数workをbounded drain
-  await boundedDrain(ctx, { seedOperationId: operationId, budgetMs: 6000 });
+	// 4) commit後、request budget内で現在eventを含む少数workをbounded drain
+	await boundedDrain(ctx, { seedOperationId: operationId, budgetMs: 6000 });
 
-  // 5) 10秒以内・内部目標p95 1秒以内に202
-  return new Response(null, { status: 202 });
+	// 5) 10秒以内・内部目標p95 1秒以内に202
+	return new Response(null, { status: 202 });
 }
 ```
 
@@ -831,22 +847,28 @@ COMMIT;
 ```
 
 ```typescript
-export async function claimOutboxBatch(db: PgClient, instanceId: string, limit = 20): Promise<OutboxWork[]> {
-  return db.transaction(async (tx) => {
-    const rows = await tx.query<OutboxRow>(
-      `SELECT id FROM work_outbox
+export async function claimOutboxBatch(
+	db: PgClient,
+	instanceId: string,
+	limit = 20
+): Promise<OutboxWork[]> {
+	return db.transaction(async (tx) => {
+		const rows = await tx.query<OutboxRow>(
+			`SELECT id FROM work_outbox
        WHERE state = 'pending' AND available_at <= now()
        ORDER BY priority DESC, created_at
-       FOR UPDATE SKIP LOCKED LIMIT $1`, [limit],
-    );
-    if (rows.length === 0) return [];
-    await tx.query(
-      `UPDATE work_outbox SET state = 'leased', lease_owner = $1,
+       FOR UPDATE SKIP LOCKED LIMIT $1`,
+			[limit]
+		);
+		if (rows.length === 0) return [];
+		await tx.query(
+			`UPDATE work_outbox SET state = 'leased', lease_owner = $1,
        lease_until = now() + interval '30 seconds', attempt = attempt + 1
-       WHERE id = ANY($2)`, [instanceId, rows.map((r) => r.id)],
-    );
-    return rows;
-  });
+       WHERE id = ANY($2)`,
+			[instanceId, rows.map((r) => r.id)]
+		);
+		return rows;
+	});
 }
 ```
 
@@ -856,12 +878,12 @@ export async function claimOutboxBatch(db: PgClient, instanceId: string, limit =
 
 要件13.3の禁止事項をコードレビュー観点でチェックリスト化する。
 
-| 禁止事項 | 実装上の担保 |
-|---|---|
-| `Response`後のdetached Promiseのみに処理継続を委ねない | `handleWebhook`はcommit＋bounded drainまで`await`し、レスポンス後の非同期継続を主要delivery経路にしない |
-| in-memory arrayをqueueと呼ばない | `work_outbox`はPostgreSQLテーブル。プロセス内queueはbounded drainのローカルバッファのみで、永続性を主張しない |
-| local filesystemをjournal/lock/evidence正本にしない | 全て`packages/postgres`経由。`Deno.writeFile`等をdomain/controlから使用禁止（lintルールで検知） |
-| Deno Cronのみへ低遅延処理を依存しない | Cronは`outbox-sweep`（1分粒度）の安全網に限定し、通常経路はwebhook受信時のbounded drain |
+| 禁止事項                                               | 実装上の担保                                                                                                  |
+| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| `Response`後のdetached Promiseのみに処理継続を委ねない | `handleWebhook`はcommit＋bounded drainまで`await`し、レスポンス後の非同期継続を主要delivery経路にしない       |
+| in-memory arrayをqueueと呼ばない                       | `work_outbox`はPostgreSQLテーブル。プロセス内queueはbounded drainのローカルバッファのみで、永続性を主張しない |
+| local filesystemをjournal/lock/evidence正本にしない    | 全て`packages/postgres`経由。`Deno.writeFile`等をdomain/controlから使用禁止（lintルールで検知）               |
+| Deno Cronのみへ低遅延処理を依存しない                  | Cronは`outbox-sweep`（1分粒度）の安全網に限定し、通常経路はwebhook受信時のbounded drain                       |
 
 ---
 
@@ -879,18 +901,18 @@ export async function claimOutboxBatch(db: PgClient, instanceId: string, limit =
  * subtreeを個別取得し完全集合を得るまで判定しない。
  */
 export async function fetchCompleteTree(
-  gh: GitHubAdapter,
-  repo: RepositoryId,
-  sha: Sha,
+	gh: GitHubAdapter,
+	repo: RepositoryId,
+	sha: Sha
 ): Promise<FetchedTree> {
-  const root = await gh.getTreeRecursive(repo, sha);
-  if (!root.truncated) return toFetchedTree(root);
+	const root = await gh.getTreeRecursive(repo, sha);
+	if (!root.truncated) return toFetchedTree(root);
 
-  const subtreeEntries = root.entries.filter((e) => e.type === "tree");
-  const subtrees = await Promise.all(
-    subtreeEntries.map((e) => fetchCompleteTree(gh, repo, e.sha as Sha)),
-  );
-  return mergeTreeWithSubtrees(root.entries, subtrees);
+	const subtreeEntries = root.entries.filter((e) => e.type === 'tree');
+	const subtrees = await Promise.all(
+		subtreeEntries.map((e) => fetchCompleteTree(gh, repo, e.sha as Sha))
+	);
+	return mergeTreeWithSubtrees(root.entries, subtrees);
 }
 ```
 
@@ -901,46 +923,46 @@ PR files APIは3,000ファイル上限があるため（S55）、大規模PRの�
 ```typescript
 // packages/domain/src/scope-digest.ts
 
-export type ChangeKind = "add" | "delete" | "modify" | "rename" | "mode";
+export type ChangeKind = 'add' | 'delete' | 'modify' | 'rename' | 'mode';
 
 export interface CanonicalChangeRecord {
-  readonly beforePath: string | null;
-  readonly afterPath: string | null;
-  readonly changeKind: ChangeKind;
-  readonly objectType: "blob" | "tree" | "commit"; // commit = submodule gitlink
-  readonly modeBefore: string | null;               // 例 "100644"
-  readonly modeAfter: string | null;
-  readonly exactChangeBytes: Uint8Array;             // whitespace保持、hunk位置のみ正規化
-  readonly binaryBeforeOid: Sha | null;
-  readonly binaryAfterOid: Sha | null;
+	readonly beforePath: string | null;
+	readonly afterPath: string | null;
+	readonly changeKind: ChangeKind;
+	readonly objectType: 'blob' | 'tree' | 'commit'; // commit = submodule gitlink
+	readonly modeBefore: string | null; // 例 "100644"
+	readonly modeAfter: string | null;
+	readonly exactChangeBytes: Uint8Array; // whitespace保持、hunk位置のみ正規化
+	readonly binaryBeforeOid: Sha | null;
+	readonly binaryAfterOid: Sha | null;
 }
 
 export interface ScopeChangeDigestInput {
-  readonly digestAlgorithmVersion: "scope-change-v1";
-  readonly scopeMappingVersion: string;
-  readonly scopeId: ScopeId;
-  readonly records: readonly CanonicalChangeRecord[];
+	readonly digestAlgorithmVersion: 'scope-change-v1';
+	readonly scopeMappingVersion: string;
+	readonly scopeId: ScopeId;
+	readonly records: readonly CanonicalChangeRecord[];
 }
 
 export async function computeScopeChangeDigest(input: ScopeChangeDigestInput): Promise<Sha256Hex> {
-  const sorted = [...input.records].sort(compareCanonicalChangeRecord);
-  // 各フィールドをlength-prefixed encodingで連結する。
-  // 単純な文字列連結は "ab"+"c" と "a"+"bc" が同一digestになる衝突を許すため禁止。
-  const material = concatBytes(
-    lengthPrefixed(utf8(input.digestAlgorithmVersion)),
-    lengthPrefixed(utf8(input.scopeMappingVersion)),
-    lengthPrefixed(utf8(input.scopeId)),
-    ...sorted.map(encodeCanonicalRecordLengthPrefixed),
-  );
-  return sha256Hex(material);
+	const sorted = [...input.records].sort(compareCanonicalChangeRecord);
+	// 各フィールドをlength-prefixed encodingで連結する。
+	// 単純な文字列連結は "ab"+"c" と "a"+"bc" が同一digestになる衝突を許すため禁止。
+	const material = concatBytes(
+		lengthPrefixed(utf8(input.digestAlgorithmVersion)),
+		lengthPrefixed(utf8(input.scopeMappingVersion)),
+		lengthPrefixed(utf8(input.scopeId)),
+		...sorted.map(encodeCanonicalRecordLengthPrefixed)
+	);
+	return sha256Hex(material);
 }
 
 export function computeScopeResultDigest(
-  entries: readonly { path: string; objectType: string; mode: string; oid: Sha }[],
+	entries: readonly { path: string; objectType: string; mode: string; oid: Sha }[]
 ): Promise<Sha256Hex> {
-  const sorted = [...entries].sort((a, b) => a.path.localeCompare(b.path));
-  const material = concatBytes(...sorted.map(encodeResultEntryLengthPrefixed));
-  return sha256Hex(material);
+	const sorted = [...entries].sort((a, b) => a.path.localeCompare(b.path));
+	const material = concatBytes(...sorted.map(encodeResultEntryLengthPrefixed));
+	return sha256Hex(material);
 }
 ```
 
@@ -952,113 +974,119 @@ export function computeScopeResultDigest(
 // packages/domain/src/context-proof.ts
 
 export interface DataOnlyApplyEngine {
-  /**
-   * old_base → old_head で観測されたCanonicalChangeRecord集合を
-   * new_baseのtreeへ純粋なデータ変換として適用する。
-   *
-   * 制約:
-   *  - 作業ディレクトリを持たない。checkoutしない。
-   *  - pre-commit等のhookを起動しない。
-   *  - submodule fetch, Git LFS smudge, 外部URL解決を行わない。
-   *  - GitHub Trees/Blobs APIで取得済みのオブジェクト集合のみを入力とする。
-   */
-  apply(
-    newBaseTree: FetchedTree,
-    records: readonly CanonicalChangeRecord[],
-  ): Result<SyntheticResultTree, ApplyConflict>;
+	/**
+	 * old_base → old_head で観測されたCanonicalChangeRecord集合を
+	 * new_baseのtreeへ純粋なデータ変換として適用する。
+	 *
+	 * 制約:
+	 *  - 作業ディレクトリを持たない。checkoutしない。
+	 *  - pre-commit等のhookを起動しない。
+	 *  - submodule fetch, Git LFS smudge, 外部URL解決を行わない。
+	 *  - GitHub Trees/Blobs APIで取得済みのオブジェクト集合のみを入力とする。
+	 */
+	apply(
+		newBaseTree: FetchedTree,
+		records: readonly CanonicalChangeRecord[]
+	): Result<SyntheticResultTree, ApplyConflict>;
 }
 
 export interface ContextSafetyProof {
-  readonly scopeId: ScopeId;
-  readonly oldBaseSha: Sha;
-  readonly oldHeadSha: Sha;
-  readonly newBaseSha: Sha;
-  readonly proofAlgorithm: "deterministic-replay-v1";
-  readonly oldScopeChangeDigest: Sha256Hex;
-  readonly newScopeChangeDigestOfBaseDelta: Sha256Hex; // AT-04E判定用
-  readonly replayedResultDigest: Sha256Hex;
-  readonly newHeadResultDigest: Sha256Hex;
-  readonly sensitivePathOverlap: boolean;
-  readonly outcome: "carried_forward" | "requires_context_reapproval" | "invalidate_indeterminate";
-  readonly reason: string;
+	readonly scopeId: ScopeId;
+	readonly oldBaseSha: Sha;
+	readonly oldHeadSha: Sha;
+	readonly newBaseSha: Sha;
+	readonly proofAlgorithm: 'deterministic-replay-v1';
+	readonly oldScopeChangeDigest: Sha256Hex;
+	readonly newScopeChangeDigestOfBaseDelta: Sha256Hex; // AT-04E判定用
+	readonly replayedResultDigest: Sha256Hex;
+	readonly newHeadResultDigest: Sha256Hex;
+	readonly sensitivePathOverlap: boolean;
+	readonly outcome: 'carried_forward' | 'requires_context_reapproval' | 'invalidate_indeterminate';
+	readonly reason: string;
 }
 
 export async function evaluateContextSafety(
-  gh: GitHubAdapter,
-  engine: DataOnlyApplyEngine,
-  input: {
-    scopeId: ScopeId;
-    oldBaseSha: Sha; oldHeadSha: Sha; newBaseSha: Sha; newHeadSha: Sha;
-    scopeMappingVersion: string;
-    sensitivePaths: ReadonlySet<string>;
-  },
+	gh: GitHubAdapter,
+	engine: DataOnlyApplyEngine,
+	input: {
+		scopeId: ScopeId;
+		oldBaseSha: Sha;
+		oldHeadSha: Sha;
+		newBaseSha: Sha;
+		newHeadSha: Sha;
+		scopeMappingVersion: string;
+		sensitivePaths: ReadonlySet<string>;
+	}
 ): Promise<ContextSafetyProof> {
-  // 手順1: old/new baseとheadの完全なtree/blob集合を取得
-  const [oldBase, oldHead, newBase, newHead] = await Promise.all([
-    fetchCompleteTree(gh, input.repositoryId, input.oldBaseSha),
-    fetchCompleteTree(gh, input.repositoryId, input.oldHeadSha),
-    fetchCompleteTree(gh, input.repositoryId, input.newBaseSha),
-    fetchCompleteTree(gh, input.repositoryId, input.newHeadSha),
-  ]);
+	// 手順1: old/new baseとheadの完全なtree/blob集合を取得
+	const [oldBase, oldHead, newBase, newHead] = await Promise.all([
+		fetchCompleteTree(gh, input.repositoryId, input.oldBaseSha),
+		fetchCompleteTree(gh, input.repositoryId, input.oldHeadSha),
+		fetchCompleteTree(gh, input.repositoryId, input.newBaseSha),
+		fetchCompleteTree(gh, input.repositoryId, input.newHeadSha)
+	]);
 
-  const oldRecords = diffToCanonicalRecords(oldBase, oldHead, input.scopeId);
-  const oldDigest = await computeScopeChangeDigest({
-    digestAlgorithmVersion: "scope-change-v1",
-    scopeMappingVersion: input.scopeMappingVersion,
-    scopeId: input.scopeId,
-    records: oldRecords,
-  });
+	const oldRecords = diffToCanonicalRecords(oldBase, oldHead, input.scopeId);
+	const oldDigest = await computeScopeChangeDigest({
+		digestAlgorithmVersion: 'scope-change-v1',
+		scopeMappingVersion: input.scopeMappingVersion,
+		scopeId: input.scopeId,
+		records: oldRecords
+	});
 
-  // 手順3: 決定論的data-only engineで新baseへ再適用
-  const replay = engine.apply(newBase, oldRecords);
-  if (!replay.ok) {
-    // rename曖昧・submodule・LFS・生成物不整合等は安全側に失効 (7.2)
-    return indeterminate(input, oldDigest, replay.error);
-  }
+	// 手順3: 決定論的data-only engineで新baseへ再適用
+	const replay = engine.apply(newBase, oldRecords);
+	if (!replay.ok) {
+		// rename曖昧・submodule・LFS・生成物不整合等は安全側に失効 (7.2)
+		return indeterminate(input, oldDigest, replay.error);
+	}
 
-  const replayedResultDigest = await computeScopeResultDigest(replay.value.entries);
-  const newHeadResultDigest = await computeScopeResultDigest(
-    extractScopeEntries(newHead, input.scopeId),
-  );
+	const replayedResultDigest = await computeScopeResultDigest(replay.value.entries);
+	const newHeadResultDigest = await computeScopeResultDigest(
+		extractScopeEntries(newHead, input.scopeId)
+	);
 
-  // 手順4: 再適用結果とnew headの結果が一致するか
-  if (replayedResultDigest !== newHeadResultDigest) {
-    return invalidated(input, oldDigest, "result_digest_mismatch");
-  }
+	// 手順4: 再適用結果とnew headの結果が一致するか
+	if (replayedResultDigest !== newHeadResultDigest) {
+		return invalidated(input, oldDigest, 'result_digest_mismatch');
+	}
 
-  // 手順5: new baseが同じ高感度pathを変更していたらcontext re-review要求 (AT-04E)
-  const overlap = hasSensitivePathOverlap(oldBase, newBase, input.sensitivePaths);
+	// 手順5: new baseが同じ高感度pathを変更していたらcontext re-review要求 (AT-04E)
+	const overlap = hasSensitivePathOverlap(oldBase, newBase, input.sensitivePaths);
 
-  return {
-    scopeId: input.scopeId,
-    oldBaseSha: input.oldBaseSha, oldHeadSha: input.oldHeadSha, newBaseSha: input.newBaseSha,
-    proofAlgorithm: "deterministic-replay-v1",
-    oldScopeChangeDigest: oldDigest,
-    newScopeChangeDigestOfBaseDelta: await computeScopeChangeDigest({
-      digestAlgorithmVersion: "scope-change-v1",
-      scopeMappingVersion: input.scopeMappingVersion,
-      scopeId: input.scopeId,
-      records: diffToCanonicalRecords(newBase, newHead, input.scopeId),
-    }),
-    replayedResultDigest, newHeadResultDigest,
-    sensitivePathOverlap: overlap,
-    outcome: overlap ? "requires_context_reapproval" : "carried_forward",
-    reason: overlap
-      ? "new baseが承認対象scopeと重なる高感度pathを変更したため、context再承認を要求する"
-      : "scope内変更が同一であり、新base上の適用結果がnew headと一致した",
-  };
+	return {
+		scopeId: input.scopeId,
+		oldBaseSha: input.oldBaseSha,
+		oldHeadSha: input.oldHeadSha,
+		newBaseSha: input.newBaseSha,
+		proofAlgorithm: 'deterministic-replay-v1',
+		oldScopeChangeDigest: oldDigest,
+		newScopeChangeDigestOfBaseDelta: await computeScopeChangeDigest({
+			digestAlgorithmVersion: 'scope-change-v1',
+			scopeMappingVersion: input.scopeMappingVersion,
+			scopeId: input.scopeId,
+			records: diffToCanonicalRecords(newBase, newHead, input.scopeId)
+		}),
+		replayedResultDigest,
+		newHeadResultDigest,
+		sensitivePathOverlap: overlap,
+		outcome: overlap ? 'requires_context_reapproval' : 'carried_forward',
+		reason: overlap
+			? 'new baseが承認対象scopeと重なる高感度pathを変更したため、context再承認を要求する'
+			: 'scope内変更が同一であり、新base上の適用結果がnew headと一致した'
+	};
 }
 ```
 
 ### 8.4 安全側失効となるケース（AT-04C対応）
 
-| 条件 | 実装での検出方法 | 結果 |
-|---|---|---|
-| truncated tree未解消 | `fetchCompleteTree`が`truncated`を再帰的に解消できない（GitHub API失敗含む） | `indeterminate_invalidate` |
-| submodule（gitlink）を含む | `objectType === "commit"`のCanonicalChangeRecordが存在 | policyで許可されない限り`indeterminate_invalidate` |
-| Git LFS pointer | blob内容が`version https://git-lfs...`パターンに一致 | pointer先実体を検証できないため`indeterminate_invalidate` |
-| rename類似度のみでの同一判定 | before/after内容比較を必須化し、類似度スコアのみでの同一視を禁止 | 内容不一致なら`invalidate` |
-| 生成物のsource対応不明 | policyで明示された決定論的transformer+AST/byte evidenceがない限り非semantic差分も`invalidate` | `invalidate` |
+| 条件                         | 実装での検出方法                                                                              | 結果                                                      |
+| ---------------------------- | --------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| truncated tree未解消         | `fetchCompleteTree`が`truncated`を再帰的に解消できない（GitHub API失敗含む）                  | `indeterminate_invalidate`                                |
+| submodule（gitlink）を含む   | `objectType === "commit"`のCanonicalChangeRecordが存在                                        | policyで許可されない限り`indeterminate_invalidate`        |
+| Git LFS pointer              | blob内容が`version https://git-lfs...`パターンに一致                                          | pointer先実体を検証できないため`indeterminate_invalidate` |
+| rename類似度のみでの同一判定 | before/after内容比較を必須化し、類似度スコアのみでの同一視を禁止                              | 内容不一致なら`invalidate`                                |
+| 生成物のsource対応不明       | policyで明示された決定論的transformer+AST/byte evidenceがない限り非semantic差分も`invalidate` | `invalidate`                                              |
 
 ### 8.5 whitespace変更の扱い（AT-04D）
 
@@ -1074,54 +1102,78 @@ export async function evaluateContextSafety(
 
 ```typescript
 // packages/policy/src/schema.ts
-import { z } from "npm:zod@3";
+import { z } from 'npm:zod@3';
 
 const ApprovalRuleSchema = z.object({
-  role: z.enum(["reviewer", "scope-approver", "security-approver", "data-approver", "infra-approver", "org-governor"]),
-  count: z.number().int().positive(),
-  distinct_teams: z.boolean().optional(),
+	role: z.enum([
+		'reviewer',
+		'scope-approver',
+		'security-approver',
+		'data-approver',
+		'infra-approver',
+		'org-governor'
+	]),
+	count: z.number().int().positive(),
+	distinct_teams: z.boolean().optional()
 });
 
 const ScopeRuleSchema = z.object({
-  id: z.string(),
-  match: z.array(z.string()),           // glob pattern
-  require: z.object({
-    approvals: z.array(ApprovalRuleSchema),
-    checks: z.array(z.string()).optional(),
-    trusted_pipeline: z.boolean().optional(),
-    prohibit_self_weakening: z.boolean().optional(),
-  }),
+	id: z.string(),
+	match: z.array(z.string()), // glob pattern
+	require: z.object({
+		approvals: z.array(ApprovalRuleSchema),
+		checks: z.array(z.string()).optional(),
+		trusted_pipeline: z.boolean().optional(),
+		prohibit_self_weakening: z.boolean().optional()
+	})
 });
 
 export const PolicySchema = z.object({
-  version: z.literal("yoroi/v2"),
-  defaults: z.object({
-    gate_check: z.literal("yoroi/gate"),
-    queue: z.object({ mode: z.enum(["observe", "advisory", "serial", "speculative", "batch"]), aging: z.string() }),
-    approval_continuity: z.object({
-      algorithm: z.literal("scope-change-v1"),
-      whitespace: z.literal("exact"),
-      context_proof: z.literal("deterministic-replay"),
-      high_risk_base_overlap: z.enum(["reapprove", "notify_only"]),
-      ambiguous: z.literal("invalidate-affected"),
-    }),
-    draft: z.object({ candidate: z.literal("disabled"), checks: z.array(z.string()) }),
-    questionnaire: z.object({ mode: z.literal("triggered") }),
-    notifications: z.object({ mutable_summary: z.boolean(), coalesce: z.string() }),
-  }),
-  scopes: z.array(ScopeRuleSchema),
-  risk: z.record(z.string(), z.object({ queue: z.object({ mode: z.string() }), prohibit_batch: z.boolean().optional() })).optional(),
-  self_service: z.object({
-    recheck: z.object({ enabled: z.boolean(), cooldown: z.string(), policy_mutation: z.literal(false) }),
-    flaky_report: z.object({ enabled: z.boolean(), quarantine_requires_approval: z.literal(true) }),
-  }).optional(),
-  break_glass: z.object({
-    approvals: z.number().int().min(2),
-    distinct_actors: z.literal(true),
-    max_ttl: z.string(),
-    require_ticket: z.literal(true),
-    require_post_review: z.literal(true),
-  }),
+	version: z.literal('yoroi/v2'),
+	defaults: z.object({
+		gate_check: z.literal('yoroi/gate'),
+		queue: z.object({
+			mode: z.enum(['observe', 'advisory', 'serial', 'speculative', 'batch']),
+			aging: z.string()
+		}),
+		approval_continuity: z.object({
+			algorithm: z.literal('scope-change-v1'),
+			whitespace: z.literal('exact'),
+			context_proof: z.literal('deterministic-replay'),
+			high_risk_base_overlap: z.enum(['reapprove', 'notify_only']),
+			ambiguous: z.literal('invalidate-affected')
+		}),
+		draft: z.object({ candidate: z.literal('disabled'), checks: z.array(z.string()) }),
+		questionnaire: z.object({ mode: z.literal('triggered') }),
+		notifications: z.object({ mutable_summary: z.boolean(), coalesce: z.string() })
+	}),
+	scopes: z.array(ScopeRuleSchema),
+	risk: z
+		.record(
+			z.string(),
+			z.object({ queue: z.object({ mode: z.string() }), prohibit_batch: z.boolean().optional() })
+		)
+		.optional(),
+	self_service: z
+		.object({
+			recheck: z.object({
+				enabled: z.boolean(),
+				cooldown: z.string(),
+				policy_mutation: z.literal(false)
+			}),
+			flaky_report: z.object({
+				enabled: z.boolean(),
+				quarantine_requires_approval: z.literal(true)
+			})
+		})
+		.optional(),
+	break_glass: z.object({
+		approvals: z.number().int().min(2),
+		distinct_actors: z.literal(true),
+		max_ttl: z.string(),
+		require_ticket: z.literal(true),
+		require_post_review: z.literal(true)
+	})
 });
 export type PolicyDocument = z.infer<typeof PolicySchema>;
 ```
@@ -1134,30 +1186,32 @@ export type PolicyDocument = z.infer<typeof PolicySchema>;
 // packages/policy/src/compile.ts
 
 export interface CompiledPolicy {
-  readonly digest: PolicyDigest;         // canonical JSON → SHA-256 (FR-011)
-  readonly raw: PolicyDocument;
-  readonly scopeIndex: ReadonlyMap<ScopeId, PolicyDocument["scopes"][number]>;
+	readonly digest: PolicyDigest; // canonical JSON → SHA-256 (FR-011)
+	readonly raw: PolicyDocument;
+	readonly scopeIndex: ReadonlyMap<ScopeId, PolicyDocument['scopes'][number]>;
 }
 
 export function compilePolicy(
-  org: PolicyDocument, repo: PolicyDocument | null, branch: PolicyDocument | null,
+	org: PolicyDocument,
+	repo: PolicyDocument | null,
+	branch: PolicyDocument | null
 ): Result<CompiledPolicy, PolicyError> {
-  // 継承: org → repo → branch。暗黙のlast-match-winsに依存しない (P-08)
-  const merged = mergeWithExplicitOverride(org, repo, branch);
-  const validation = PolicySchema.safeParse(merged);
-  if (!validation.success) return err({ kind: "SCHEMA_INVALID", issues: validation.error.issues });
+	// 継承: org → repo → branch。暗黙のlast-match-winsに依存しない (P-08)
+	const merged = mergeWithExplicitOverride(org, repo, branch);
+	const validation = PolicySchema.safeParse(merged);
+	if (!validation.success) return err({ kind: 'SCHEMA_INVALID', issues: validation.error.issues });
 
-  if (hasCyclicInheritance(merged)) return err({ kind: "CYCLIC_INHERITANCE" });
-  if (merged.scopes.some((s) => s.require.checks?.length === 0)) {
-    return err({ kind: "EMPTY_REQUIRED_CHECK_SET" }); // FR-012: 空の必須check集合は安全側error
-  }
+	if (hasCyclicInheritance(merged)) return err({ kind: 'CYCLIC_INHERITANCE' });
+	if (merged.scopes.some((s) => s.require.checks?.length === 0)) {
+		return err({ kind: 'EMPTY_REQUIRED_CHECK_SET' }); // FR-012: 空の必須check集合は安全側error
+	}
 
-  const canonicalJson = toCanonicalJson(validation.data);
-  return ok({
-    digest: sha256HexSync(canonicalJson) as PolicyDigest,
-    raw: validation.data,
-    scopeIndex: buildScopeIndex(validation.data.scopes),
-  });
+	const canonicalJson = toCanonicalJson(validation.data);
+	return ok({
+		digest: sha256HexSync(canonicalJson) as PolicyDigest,
+		raw: validation.data,
+		scopeIndex: buildScopeIndex(validation.data.scopes)
+	});
 }
 ```
 
@@ -1167,28 +1221,34 @@ export function compilePolicy(
 // packages/policy/src/evaluate.ts
 
 export interface EvaluationInput {
-  readonly candidate: MergeCandidateFacts;
-  readonly approvals: readonly ApprovalFact[];
-  readonly checks: readonly CheckFact[];
-  readonly queue: QueueFacts;
+	readonly candidate: MergeCandidateFacts;
+	readonly approvals: readonly ApprovalFact[];
+	readonly checks: readonly CheckFact[];
+	readonly queue: QueueFacts;
 }
 
 export interface EvaluationResult {
-  readonly gateConclusion: "PASS" | "BLOCKED" | "PENDING";
-  readonly reasonGraph: ReasonGraphNode;
+	readonly gateConclusion: 'PASS' | 'BLOCKED' | 'PENDING';
+	readonly reasonGraph: ReasonGraphNode;
 }
 
 /** 純粋関数。I/Oを含まない (FR-011: 同じ入力→同じ判定+reason graph) */
 export function evaluate(input: EvaluationInput, policy: CompiledPolicy): EvaluationResult {
-  const approvalResult = evaluateApprovalCoverage(input, policy);
-  const checkResult = evaluateExpectedChecks(input, policy);
-  const queueResult = evaluateQueueEligibility(input, policy);
+	const approvalResult = evaluateApprovalCoverage(input, policy);
+	const checkResult = evaluateExpectedChecks(input, policy);
+	const queueResult = evaluateQueueEligibility(input, policy);
 
-  const conclusion = (approvalResult.pass && checkResult.pass && queueResult.pass)
-    ? "PASS"
-    : (checkResult.pending && approvalResult.pass) ? "PENDING" : "BLOCKED";
+	const conclusion =
+		approvalResult.pass && checkResult.pass && queueResult.pass
+			? 'PASS'
+			: checkResult.pending && approvalResult.pass
+				? 'PENDING'
+				: 'BLOCKED';
 
-  return { gateConclusion: conclusion, reasonGraph: buildReasonGraph({ approvalResult, checkResult, queueResult }) };
+	return {
+		gateConclusion: conclusion,
+		reasonGraph: buildReasonGraph({ approvalResult, checkResult, queueResult })
+	};
 }
 ```
 
@@ -1198,12 +1258,12 @@ export function evaluate(input: EvaluationInput, policy: CompiledPolicy): Evalua
 
 ```typescript
 export function resolvePolicyForEvaluation(
-  currentEffectivePolicy: CompiledPolicy,
-  candidatePolicyChangeScopes: ReadonlySet<ScopeId>,
+	currentEffectivePolicy: CompiledPolicy,
+	candidatePolicyChangeScopes: ReadonlySet<ScopeId>
 ): CompiledPolicy {
-  // policy自身への変更を含むPRであっても、承認要件の判定には
-  // "変更前" のpolicyを使う (P-12, CFG-007)
-  return currentEffectivePolicy;
+	// policy自身への変更を含むPRであっても、承認要件の判定には
+	// "変更前" のpolicyを使う (P-12, CFG-007)
+	return currentEffectivePolicy;
 }
 ```
 
@@ -1231,16 +1291,19 @@ RETURNING fencing_token;
 // packages/postgres/src/branch-coordinator.ts
 
 export async function acquireLease(
-  db: PgClient,
-  key: { installationId: InstallationId; repositoryId: RepositoryId; targetBranch: string },
-  operationId: OperationId,
-  expectedBaseSha: Sha,
+	db: PgClient,
+	key: { installationId: InstallationId; repositoryId: RepositoryId; targetBranch: string },
+	operationId: OperationId,
+	expectedBaseSha: Sha
 ): Promise<Result<FencingToken, LeaseUnavailable>> {
-  const row = await db.queryOne<{ fencing_token: bigint }>(
-    LEASE_ACQUIRE_SQL,
-    [operationId, expectedBaseSha, key.installationId, key.repositoryId, key.targetBranch],
-  );
-  return row ? ok(row.fencing_token as FencingToken) : err({ kind: "LEASE_HELD_BY_OTHER" });
+	const row = await db.queryOne<{ fencing_token: bigint }>(LEASE_ACQUIRE_SQL, [
+		operationId,
+		expectedBaseSha,
+		key.installationId,
+		key.repositoryId,
+		key.targetBranch
+	]);
+	return row ? ok(row.fencing_token as FencingToken) : err({ kind: 'LEASE_HELD_BY_OTHER' });
 }
 ```
 
@@ -1265,30 +1328,34 @@ export async function acquireLease(
 // packages/domain/src/scheduler/serial.ts
 
 export async function runSerialCycle(ctx: SchedulerContext, repo: RepositoryTarget): Promise<void> {
-  const lease = await acquireLease(ctx.db, repo.leaseKey, ctx.operationId, repo.latestMainSha);
-  if (!lease.ok) return; // 他instanceが処理中
+	const lease = await acquireLease(ctx.db, repo.leaseKey, ctx.operationId, repo.latestMainSha);
+	if (!lease.ok) return; // 他instanceが処理中
 
-  const next = await selectNextEligiblePr(ctx.db, repo); // 14.5のqueue score順
-  if (!next) return;
+	const next = await selectNextEligiblePr(ctx.db, repo); // 14.5のqueue score順
+	if (!next) return;
 
-  const candidateSha = await buildCandidate(ctx.github, repo.latestMainSha, next.headSha);
-  await recordMergeCandidate(ctx.db, { candidateSha, baseSha: repo.latestMainSha, orderedHeads: [next.headSha] });
+	const candidateSha = await buildCandidate(ctx.github, repo.latestMainSha, next.headSha);
+	await recordMergeCandidate(ctx.db, {
+		candidateSha,
+		baseSha: repo.latestMainSha,
+		orderedHeads: [next.headSha]
+	});
 
-  const plan = await buildExpectedCheckPlan(ctx.policy, next);
-  await dispatchChecks(ctx.github, candidateSha, plan);
+	const plan = await buildExpectedCheckPlan(ctx.policy, next);
+	await dispatchChecks(ctx.github, candidateSha, plan);
 
-  const gate = await waitForGateOrTimeout(ctx.db, candidateSha, plan);
-  if (gate.conclusion !== "PASS") {
-    await recordInvalidation(ctx.db, candidateSha, gate.reason);
-    return; // rebuild or stop (14.1)
-  }
+	const gate = await waitForGateOrTimeout(ctx.db, candidateSha, plan);
+	if (gate.conclusion !== 'PASS') {
+		await recordInvalidation(ctx.db, candidateSha, gate.reason);
+		return; // rebuild or stop (14.1)
+	}
 
-  if (await mainAdvanced(ctx.github, repo, repo.latestMainSha)) {
-    await recordInvalidation(ctx.db, candidateSha, "base_advanced");
-    return; // FR-051: base更新時は候補を再生成
-  }
+	if (await mainAdvanced(ctx.github, repo, repo.latestMainSha)) {
+		await recordInvalidation(ctx.db, candidateSha, 'base_advanced');
+		return; // FR-051: base更新時は候補を再生成
+	}
 
-  await submitToMerger(ctx, buildDecisionEnvelope(next, candidateSha, lease.value));
+	await submitToMerger(ctx, buildDecisionEnvelope(next, candidateSha, lease.value));
 }
 ```
 
@@ -1296,19 +1363,22 @@ export async function runSerialCycle(ctx: SchedulerContext, repo: RepositoryTarg
 
 ```typescript
 export interface Lane {
-  readonly laneId: string;
-  readonly cumulativeHeads: readonly Sha[];  // [A], [A,B], [A,B,C]
-  readonly candidateSha: Sha | null;
-  readonly status: "pending" | "running" | "passed" | "failed" | "ejected" | "invalidated";
+	readonly laneId: string;
+	readonly cumulativeHeads: readonly Sha[]; // [A], [A,B], [A,B,C]
+	readonly candidateSha: Sha | null;
+	readonly status: 'pending' | 'running' | 'passed' | 'failed' | 'ejected' | 'invalidated';
 }
 
-export function rebuildAfterEjection(lanes: readonly Lane[], ejectedIndex: number): readonly Lane[] {
-  // ejectedIndexより後続のlaneを、ejected分を除いた累積candidateへ作り直す (14.2: "M + A + C")
-  return lanes.map((lane, i) => {
-    if (i <= ejectedIndex) return lane;
-    const rebuiltHeads = lane.cumulativeHeads.filter((_, idx) => idx !== ejectedIndex);
-    return { ...lane, cumulativeHeads: rebuiltHeads, candidateSha: null, status: "pending" };
-  });
+export function rebuildAfterEjection(
+	lanes: readonly Lane[],
+	ejectedIndex: number
+): readonly Lane[] {
+	// ejectedIndexより後続のlaneを、ejected分を除いた累積candidateへ作り直す (14.2: "M + A + C")
+	return lanes.map((lane, i) => {
+		if (i <= ejectedIndex) return lane;
+		const rebuiltHeads = lane.cumulativeHeads.filter((_, idx) => idx !== ejectedIndex);
+		return { ...lane, cumulativeHeads: rebuiltHeads, candidateSha: null, status: 'pending' };
+	});
 }
 ```
 
@@ -1318,20 +1388,24 @@ Bが失敗した際は再構築の理由（先行PR B由来であること、旧
 
 ```typescript
 export async function isolateFailureSet(
-  batch: readonly PrId[],
-  runCandidate: (subset: readonly PrId[]) => Promise<"pass" | "fail">,
+	batch: readonly PrId[],
+	runCandidate: (subset: readonly PrId[]) => Promise<'pass' | 'fail'>
 ): Promise<readonly PrId[]> {
-  // 単純化したddmin。同一batchの無限再試行を避ける (FR-059)
-  if (batch.length <= 1) return batch;
-  const [left, right] = splitInHalf(batch);
-  const [leftResult, rightResult] = await Promise.all([runCandidate(left), runCandidate(right)]);
-  if (leftResult === "fail" && rightResult === "pass") return isolateFailureSet(left, runCandidate);
-  if (leftResult === "pass" && rightResult === "fail") return isolateFailureSet(right, runCandidate);
-  if (leftResult === "fail" && rightResult === "fail") {
-    return [...await isolateFailureSet(left, runCandidate), ...await isolateFailureSet(right, runCandidate)];
-  }
-  // 両方pass = 相互作用障害。最小反例をpair-wiseで絞る (AT-08)
-  return findInteractionPair(left, right, runCandidate);
+	// 単純化したddmin。同一batchの無限再試行を避ける (FR-059)
+	if (batch.length <= 1) return batch;
+	const [left, right] = splitInHalf(batch);
+	const [leftResult, rightResult] = await Promise.all([runCandidate(left), runCandidate(right)]);
+	if (leftResult === 'fail' && rightResult === 'pass') return isolateFailureSet(left, runCandidate);
+	if (leftResult === 'pass' && rightResult === 'fail')
+		return isolateFailureSet(right, runCandidate);
+	if (leftResult === 'fail' && rightResult === 'fail') {
+		return [
+			...(await isolateFailureSet(left, runCandidate)),
+			...(await isolateFailureSet(right, runCandidate))
+		];
+	}
+	// 両方pass = 相互作用障害。最小反例をpair-wiseで絞る (AT-08)
+	return findInteractionPair(left, right, runCandidate);
 }
 ```
 
@@ -1340,16 +1414,24 @@ circuit breakerは`(batch_fingerprint, failure_fingerprint)`をキーに再試�
 ### 11.4 ETA計算
 
 ```typescript
-export function estimateEta(lane: LaneStats, position: number): { p50: Date; p90: Date; confidence: "low" | "medium" | "high" } {
-  const remaining = lane.ewmaServiceTime * position;
-  const buildTime = lane.candidateBuildTimeQuantiles;
-  const checkTime = lane.selectedCheckDurationQuantiles;
-  const rebuildPenalty = lane.recentRebuildRate * lane.avgRebuildCost;
-  return {
-    p50: addMs(new Date(), remaining + buildTime.p50 + checkTime.p50 + rebuildPenalty),
-    p90: addMs(new Date(), remaining + buildTime.p90 + checkTime.p90 + rebuildPenalty * 2),
-    confidence: lane.flakyRate > 0.1 || lane.githubOutageSuspected ? "low" : lane.sampleSize > 30 ? "high" : "medium",
-  };
+export function estimateEta(
+	lane: LaneStats,
+	position: number
+): { p50: Date; p90: Date; confidence: 'low' | 'medium' | 'high' } {
+	const remaining = lane.ewmaServiceTime * position;
+	const buildTime = lane.candidateBuildTimeQuantiles;
+	const checkTime = lane.selectedCheckDurationQuantiles;
+	const rebuildPenalty = lane.recentRebuildRate * lane.avgRebuildCost;
+	return {
+		p50: addMs(new Date(), remaining + buildTime.p50 + checkTime.p50 + rebuildPenalty),
+		p90: addMs(new Date(), remaining + buildTime.p90 + checkTime.p90 + rebuildPenalty * 2),
+		confidence:
+			lane.flakyRate > 0.1 || lane.githubOutageSuspected
+				? 'low'
+				: lane.sampleSize > 30
+					? 'high'
+					: 'medium'
+	};
 }
 ```
 
@@ -1363,27 +1445,32 @@ export function estimateEta(lane: LaneStats, position: number): { p50: Date; p90
 
 ```typescript
 // packages/evidence/src/envelope.ts
-import { z } from "npm:zod@3";
+import { z } from 'npm:zod@3';
 
 export const DecisionEnvelopeSchema = z.object({
-  operationId: z.string().uuid(),
-  installationId: z.number(),
-  repositoryId: z.number(),
-  pullRequestNumber: z.number(),
-  headSha: z.string().length(40),
-  baseSha: z.string().length(40),
-  dependencyShas: z.array(z.string().length(40)),
-  candidateSha: z.string().length(40),
-  scopeReviewProofs: z.record(z.string(), z.object({
-    changeDigest: z.string(), resultDigest: z.string(), contextProofDigest: z.string(),
-  })),
-  policyDigest: z.string(),
-  approvalDigest: z.string(),
-  checkPlanDigest: z.string(),
-  evidenceDigest: z.string(),
-  fencingToken: z.string(), // bigintをstringでシリアライズ
-  denoRevisionId: z.string(),
-  expiresAt: z.string().datetime(),
+	operationId: z.string().uuid(),
+	installationId: z.number(),
+	repositoryId: z.number(),
+	pullRequestNumber: z.number(),
+	headSha: z.string().length(40),
+	baseSha: z.string().length(40),
+	dependencyShas: z.array(z.string().length(40)),
+	candidateSha: z.string().length(40),
+	scopeReviewProofs: z.record(
+		z.string(),
+		z.object({
+			changeDigest: z.string(),
+			resultDigest: z.string(),
+			contextProofDigest: z.string()
+		})
+	),
+	policyDigest: z.string(),
+	approvalDigest: z.string(),
+	checkPlanDigest: z.string(),
+	evidenceDigest: z.string(),
+	fencingToken: z.string(), // bigintをstringでシリアライズ
+	denoRevisionId: z.string(),
+	expiresAt: z.string().datetime()
 });
 export type DecisionEnvelope = z.infer<typeof DecisionEnvelopeSchema>;
 ```
@@ -1393,25 +1480,31 @@ export type DecisionEnvelope = z.infer<typeof DecisionEnvelopeSchema>;
 ```typescript
 // packages/evidence/src/sign.ts
 
-export async function signEnvelope(envelope: DecisionEnvelope, signingKey: CryptoKey): Promise<string> {
-  const canonical = toCanonicalJson(envelope);
-  const signature = await crypto.subtle.sign(
-    { name: "HMAC" }, // MVP: HMAC-SHA256共有鍵。高保証構成ではEd25519 + KMS sign-only (10.2, SEC-006)
-    signingKey,
-    new TextEncoder().encode(canonical),
-  );
-  return base64url(new Uint8Array(signature));
+export async function signEnvelope(
+	envelope: DecisionEnvelope,
+	signingKey: CryptoKey
+): Promise<string> {
+	const canonical = toCanonicalJson(envelope);
+	const signature = await crypto.subtle.sign(
+		{ name: 'HMAC' }, // MVP: HMAC-SHA256共有鍵。高保証構成ではEd25519 + KMS sign-only (10.2, SEC-006)
+		signingKey,
+		new TextEncoder().encode(canonical)
+	);
+	return base64url(new Uint8Array(signature));
 }
 
 export async function verifyEnvelopeSignature(
-  envelope: DecisionEnvelope, signatureB64: string, verifyKey: CryptoKey,
+	envelope: DecisionEnvelope,
+	signatureB64: string,
+	verifyKey: CryptoKey
 ): Promise<boolean> {
-  const canonical = toCanonicalJson(envelope);
-  return crypto.subtle.verify(
-    { name: "HMAC" }, verifyKey,
-    base64urlDecode(signatureB64),
-    new TextEncoder().encode(canonical),
-  ); // subtle.verifyはtiming-safeな比較を提供する
+	const canonical = toCanonicalJson(envelope);
+	return crypto.subtle.verify(
+		{ name: 'HMAC' },
+		verifyKey,
+		base64urlDecode(signatureB64),
+		new TextEncoder().encode(canonical)
+	); // subtle.verifyはtiming-safeな比較を提供する
 }
 ```
 
@@ -1421,49 +1514,52 @@ export async function verifyEnvelopeSignature(
 // apps/merger/handler.ts
 
 export async function handleMergeRequest(req: Request, ctx: MergerContext): Promise<Response> {
-  // 1) Deno OIDC tokenの検証 (SEC-034): aud/iss/exp/org/app/context claimを厳密にpinする
-  const idToken = req.headers.get("x-deno-oidc-token");
-  const claims = await ctx.oidcVerifier.verify(idToken, {
-    audience: "yoroi-merger",
-    allowedCallerApp: "yoroi-control",
-    requiredContext: "production", // development/branch tokenを拒否
-  });
-  if (!claims.ok) return new Response("unauthorized", { status: 401 });
+	// 1) Deno OIDC tokenの検証 (SEC-034): aud/iss/exp/org/app/context claimを厳密にpinする
+	const idToken = req.headers.get('x-deno-oidc-token');
+	const claims = await ctx.oidcVerifier.verify(idToken, {
+		audience: 'yoroi-merger',
+		allowedCallerApp: 'yoroi-control',
+		requiredContext: 'production' // development/branch tokenを拒否
+	});
+	if (!claims.ok) return new Response('unauthorized', { status: 401 });
 
-  // 2) envelope本体の検証
-  const body = await req.json();
-  const parsed = DecisionEnvelopeSchema.safeParse(body.envelope);
-  if (!parsed.success) return new Response("bad envelope", { status: 400 });
-  const envelope = parsed.data;
+	// 2) envelope本体の検証
+	const body = await req.json();
+	const parsed = DecisionEnvelopeSchema.safeParse(body.envelope);
+	if (!parsed.success) return new Response('bad envelope', { status: 400 });
+	const envelope = parsed.data;
 
-  if (!(await verifyEnvelopeSignature(envelope, body.signature, ctx.signingPublicKey))) {
-    return new Response("bad signature", { status: 401 });
-  }
-  if (new Date(envelope.expiresAt).getTime() < Date.now()) {
-    return new Response("envelope expired", { status: 409 });
-  }
+	if (!(await verifyEnvelopeSignature(envelope, body.signature, ctx.signingPublicKey))) {
+		return new Response('bad signature', { status: 401 });
+	}
+	if (new Date(envelope.expiresAt).getTime() < Date.now()) {
+		return new Response('envelope expired', { status: 409 });
+	}
 
-  // 3) fencing token検証 (AT-34)
-  const currentToken = await ctx.db.getCurrentFencingToken(envelope.repositoryId, envelope.baseBranch);
-  if (String(currentToken) !== envelope.fencingToken) {
-    return new Response("stale fencing token", { status: 409 });
-  }
+	// 3) fencing token検証 (AT-34)
+	const currentToken = await ctx.db.getCurrentFencingToken(
+		envelope.repositoryId,
+		envelope.baseBranch
+	);
+	if (String(currentToken) !== envelope.fencingToken) {
+		return new Response('stale fencing token', { status: 409 });
+	}
 
-  // 4) merge直前の権威ある再取得 (8.4 "MERGING直前")
-  const fresh = await ctx.github.refetchAuthoritativeState(envelope);
-  const revalidation = revalidateBeforeMerge(envelope, fresh);
-  if (!revalidation.ok) return new Response(revalidation.reason, { status: 409 });
+	// 4) merge直前の権威ある再取得 (8.4 "MERGING直前")
+	const fresh = await ctx.github.refetchAuthoritativeState(envelope);
+	const revalidation = revalidateBeforeMerge(envelope, fresh);
+	if (!revalidation.ok) return new Response(revalidation.reason, { status: 409 });
 
-  // 5) merge実行。operation_idでidempotent (FR-061)
-  const result = await ctx.github.mergePullRequest({
-    repositoryId: envelope.repositoryId,
-    pullRequestNumber: envelope.pullRequestNumber,
-    candidateSha: envelope.candidateSha,
-    idempotencyOperationId: envelope.operationId,
-  });
+	// 5) merge実行。operation_idでidempotent (FR-061)
+	const result = await ctx.github.mergePullRequest({
+		repositoryId: envelope.repositoryId,
+		pullRequestNumber: envelope.pullRequestNumber,
+		candidateSha: envelope.candidateSha,
+		idempotencyOperationId: envelope.operationId
+	});
 
-  await ctx.db.appendDecisionEvent(toDecisionEvent(envelope, result));
-  return Response.json(result);
+	await ctx.db.appendDecisionEvent(toDecisionEvent(envelope, result));
+	return Response.json(result);
 }
 ```
 
@@ -1479,15 +1575,17 @@ export async function handleMergeRequest(req: Request, ctx: MergerContext): Prom
 // packages/github/src/adapter.ts
 
 export interface GitHubAdapter {
-  getTreeRecursive(repo: RepositoryId, sha: Sha): Promise<TreeResponse>;
-  compareCommits(repo: RepositoryId, base: Sha, head: Sha): Promise<CompareResponse>;
-  listPullRequestFiles(repo: RepositoryId, pr: PullRequestNumber): Promise<FileEntry[]>;
-  createCheckRun(repo: RepositoryId, input: CheckRunInput): Promise<CheckRun>;
-  updateCheckRun(repo: RepositoryId, checkRunId: number, input: CheckRunUpdate): Promise<CheckRun>;
-  mergePullRequest(input: MergeInput): Promise<MergeResult>;
-  mintInstallationToken(
-    installationId: InstallationId, repositoryIds: readonly RepositoryId[], permissions: Permissions,
-  ): Promise<InstallationToken>;
+	getTreeRecursive(repo: RepositoryId, sha: Sha): Promise<TreeResponse>;
+	compareCommits(repo: RepositoryId, base: Sha, head: Sha): Promise<CompareResponse>;
+	listPullRequestFiles(repo: RepositoryId, pr: PullRequestNumber): Promise<FileEntry[]>;
+	createCheckRun(repo: RepositoryId, input: CheckRunInput): Promise<CheckRun>;
+	updateCheckRun(repo: RepositoryId, checkRunId: number, input: CheckRunUpdate): Promise<CheckRun>;
+	mergePullRequest(input: MergeInput): Promise<MergeResult>;
+	mintInstallationToken(
+		installationId: InstallationId,
+		repositoryIds: readonly RepositoryId[],
+		permissions: Permissions
+	): Promise<InstallationToken>;
 }
 ```
 
@@ -1495,22 +1593,27 @@ export interface GitHubAdapter {
 
 ```typescript
 // packages/github/src/octokit-adapter.ts
-import { Octokit } from "npm:octokit@3";
-import { throttling } from "npm:@octokit/plugin-throttling@9";
-import { retry } from "npm:@octokit/plugin-retry@6";
+import { Octokit } from 'npm:octokit@3';
+import { throttling } from 'npm:@octokit/plugin-throttling@9';
+import { retry } from 'npm:@octokit/plugin-retry@6';
 
 const ThrottledOctokit = Octokit.plugin(throttling, retry);
 
-export function createOctokitAdapter(appId: string, privateKeySource: PrivateKeySource): GitHubAdapter {
-  const app = new ThrottledOctokit({
-    authStrategy: createAppAuth,
-    auth: { appId, privateKey: privateKeySource },
-    throttle: {
-      onRateLimit: (retryAfter, options) => shouldRetryConsideringBudget(retryAfter, options), // FR-008
-      onSecondaryRateLimit: (retryAfter) => true,
-    },
-  });
-  return { /* ...インターフェース実装。installation token生成時にrepo/permissionをさらに限定 (SEC-002) */ };
+export function createOctokitAdapter(
+	appId: string,
+	privateKeySource: PrivateKeySource
+): GitHubAdapter {
+	const app = new ThrottledOctokit({
+		authStrategy: createAppAuth,
+		auth: { appId, privateKey: privateKeySource },
+		throttle: {
+			onRateLimit: (retryAfter, options) => shouldRetryConsideringBudget(retryAfter, options), // FR-008
+			onSecondaryRateLimit: (retryAfter) => true
+		}
+	});
+	return {
+		/* ...インターフェース実装。installation token生成時にrepo/permissionをさらに限定 (SEC-002) */
+	};
 }
 ```
 
@@ -1549,27 +1652,34 @@ CREATE TABLE notification_anchor (
 // packages/notifications/src/summary.ts
 
 export interface SummaryState {
-  readonly stage: "review" | "queue" | "ci" | "block" | "merged";
-  readonly reasonHeadline: string;
-  readonly nextActor: "author" | "reviewer" | "yoroi" | "operator";
-  readonly etaRange: readonly [Date, Date] | null;
-  readonly confidence: "low" | "medium" | "high" | null;
+	readonly stage: 'review' | 'queue' | 'ci' | 'block' | 'merged';
+	readonly reasonHeadline: string;
+	readonly nextActor: 'author' | 'reviewer' | 'yoroi' | 'operator';
+	readonly etaRange: readonly [Date, Date] | null;
+	readonly confidence: 'low' | 'medium' | 'high' | null;
 }
 
 export async function upsertSummary(
-  gh: GitHubAdapter, anchor: NotificationAnchor, state: SummaryState, reasonGraph: ReasonGraphNode,
+	gh: GitHubAdapter,
+	anchor: NotificationAnchor,
+	state: SummaryState,
+	reasonGraph: ReasonGraphNode
 ): Promise<void> {
-  const markdown = renderSummaryMarkdown(state, reasonGraph); // 8.1節の4問へ翻訳
-  const reasonHash = await sha256Hex(new TextEncoder().encode(markdown));
-  if (reasonHash === anchor.lastReasonHash) return; // 変化なしなら更新しない (NFR-021)
+	const markdown = renderSummaryMarkdown(state, reasonGraph); // 8.1節の4問へ翻訳
+	const reasonHash = await sha256Hex(new TextEncoder().encode(markdown));
+	if (reasonHash === anchor.lastReasonHash) return; // 変化なしなら更新しない (NFR-021)
 
-  if (anchor.summaryCommentId) {
-    await gh.updateComment(anchor.repositoryId, anchor.summaryCommentId, markdown);
-  } else {
-    const comment = await gh.createComment(anchor.repositoryId, anchor.pullRequestNumber, markdown);
-    await persistAnchorCommentId(anchor, comment.id);
-  }
-  await gh.updateCheckRun(anchor.repositoryId, anchor.checkRunId, buildCheckRunOutput(state, reasonGraph));
+	if (anchor.summaryCommentId) {
+		await gh.updateComment(anchor.repositoryId, anchor.summaryCommentId, markdown);
+	} else {
+		const comment = await gh.createComment(anchor.repositoryId, anchor.pullRequestNumber, markdown);
+		await persistAnchorCommentId(anchor, comment.id);
+	}
+	await gh.updateCheckRun(
+		anchor.repositoryId,
+		anchor.checkRunId,
+		buildCheckRunOutput(state, reasonGraph)
+	);
 }
 ```
 
@@ -1577,14 +1687,14 @@ export async function upsertSummary(
 
 ```typescript
 export function renderSummaryMarkdown(state: SummaryState, reasonGraph: ReasonGraphNode): string {
-  return [
-    `**今どこか**: ${STAGE_LABEL_JA[state.stage]}`,
-    `**なぜか**: ${state.reasonHeadline}`,
-    `**次に誰が何をするか**: ${ACTOR_LABEL_JA[state.nextActor]}`,
-    `**いつ頃か**: ${state.etaRange ? formatEtaRangeJa(state.etaRange, state.confidence) : "推定不能（理由: " + reasonGraph.rootCause + "）"}`,
-    "",
-    renderReasonGraphMarkdown(reasonGraph),
-  ].join("\n");
+	return [
+		`**今どこか**: ${STAGE_LABEL_JA[state.stage]}`,
+		`**なぜか**: ${state.reasonHeadline}`,
+		`**次に誰が何をするか**: ${ACTOR_LABEL_JA[state.nextActor]}`,
+		`**いつ頃か**: ${state.etaRange ? formatEtaRangeJa(state.etaRange, state.confidence) : '推定不能（理由: ' + reasonGraph.rootCause + '）'}`,
+		'',
+		renderReasonGraphMarkdown(reasonGraph)
+	].join('\n');
 }
 ```
 
@@ -1618,38 +1728,79 @@ CREATE INDEX idx_notification_coalesce ON notification (coalesce_key, dispatched
 // packages/notifications/src/commands/registry.ts
 
 export interface SlashCommandSpec {
-  readonly name: string;
-  readonly minPermission: "read" | "write" | "author" | "operator";
-  readonly sideEffecting: boolean;
-  readonly idempotent: boolean;
-  readonly rateLimitKey: (ctx: CommandContext) => string;
-  readonly handler: (ctx: CommandContext, args: readonly string[]) => Promise<CommandResult>;
+	readonly name: string;
+	readonly minPermission: 'read' | 'write' | 'author' | 'operator';
+	readonly sideEffecting: boolean;
+	readonly idempotent: boolean;
+	readonly rateLimitKey: (ctx: CommandContext) => string;
+	readonly handler: (ctx: CommandContext, args: readonly string[]) => Promise<CommandResult>;
 }
 
 export const COMMANDS: readonly SlashCommandSpec[] = [
-  { name: "status", minPermission: "read", sideEffecting: false, idempotent: true,
-    rateLimitKey: (c) => `status:${c.actorId}`, handler: handleStatus },
-  { name: "why", minPermission: "read", sideEffecting: false, idempotent: true,
-    rateLimitKey: (c) => `why:${c.actorId}`, handler: handleWhy },
-  { name: "recheck", minPermission: "write", sideEffecting: true, idempotent: true,
-    rateLimitKey: (c) => `recheck:${c.repositoryId}:${c.pullRequestNumber}:${c.observedHeadSha}`,
-    handler: handleRecheck },
-  { name: "queue", minPermission: "write", sideEffecting: false, idempotent: true,
-    rateLimitKey: (c) => `queue:${c.actorId}`, handler: handleQueue },
-  { name: "flaky", minPermission: "write", sideEffecting: true, idempotent: false,
-    rateLimitKey: (c) => `flaky:${c.actorId}`, handler: handleFlakySubcommand },
-  { name: "feedback", minPermission: "read", sideEffecting: true, idempotent: false,
-    rateLimitKey: (c) => `feedback:${c.actorId}`, handler: handleFeedback },
-  { name: "help", minPermission: "read", sideEffecting: false, idempotent: true,
-    rateLimitKey: (c) => `help:${c.actorId}`, handler: handleHelp },
+	{
+		name: 'status',
+		minPermission: 'read',
+		sideEffecting: false,
+		idempotent: true,
+		rateLimitKey: (c) => `status:${c.actorId}`,
+		handler: handleStatus
+	},
+	{
+		name: 'why',
+		minPermission: 'read',
+		sideEffecting: false,
+		idempotent: true,
+		rateLimitKey: (c) => `why:${c.actorId}`,
+		handler: handleWhy
+	},
+	{
+		name: 'recheck',
+		minPermission: 'write',
+		sideEffecting: true,
+		idempotent: true,
+		rateLimitKey: (c) => `recheck:${c.repositoryId}:${c.pullRequestNumber}:${c.observedHeadSha}`,
+		handler: handleRecheck
+	},
+	{
+		name: 'queue',
+		minPermission: 'write',
+		sideEffecting: false,
+		idempotent: true,
+		rateLimitKey: (c) => `queue:${c.actorId}`,
+		handler: handleQueue
+	},
+	{
+		name: 'flaky',
+		minPermission: 'write',
+		sideEffecting: true,
+		idempotent: false,
+		rateLimitKey: (c) => `flaky:${c.actorId}`,
+		handler: handleFlakySubcommand
+	},
+	{
+		name: 'feedback',
+		minPermission: 'read',
+		sideEffecting: true,
+		idempotent: false,
+		rateLimitKey: (c) => `feedback:${c.actorId}`,
+		handler: handleFeedback
+	},
+	{
+		name: 'help',
+		minPermission: 'read',
+		sideEffecting: false,
+		idempotent: true,
+		rateLimitKey: (c) => `help:${c.actorId}`,
+		handler: handleHelp
+	}
 ];
 
 const COMMAND_PATTERN = /^\/yoroi\s+([a-z-]+)(?:\s+(.*))?$/;
 
 export function parseCommand(commentBody: string): { name: string; args: string[] } | null {
-  const match = COMMAND_PATTERN.exec(commentBody.trim());
-  if (!match) return null;
-  return { name: match[1], args: (match[2] ?? "").split(/\s+/).filter(Boolean) };
+	const match = COMMAND_PATTERN.exec(commentBody.trim());
+	if (!match) return null;
+	return { name: match[1], args: (match[2] ?? '').split(/\s+/).filter(Boolean) };
 }
 ```
 
@@ -1659,22 +1810,31 @@ export function parseCommand(commentBody: string): { name: string; args: string[
 
 ```typescript
 export async function handleRecheck(ctx: CommandContext): Promise<CommandResult> {
-  const coalesceKey = `recheck:${ctx.repositoryId}:${ctx.pullRequestNumber}:${ctx.observedHeadSha}`;
-  const cooldownOk = await ctx.rateLimiter.tryAcquire(coalesceKey, { cooldownSeconds: 60 });
-  if (!cooldownOk) return alreadyPending(coalesceKey);
+	const coalesceKey = `recheck:${ctx.repositoryId}:${ctx.pullRequestNumber}:${ctx.observedHeadSha}`;
+	const cooldownOk = await ctx.rateLimiter.tryAcquire(coalesceKey, { cooldownSeconds: 60 });
+	if (!cooldownOk) return alreadyPending(coalesceKey);
 
-  const fresh = await ctx.github.refetchAuthoritativeState({
-    repositoryId: ctx.repositoryId, pullRequestNumber: ctx.pullRequestNumber,
-  });
-  // 実行中にheadが変わっていたら、古い結果を公開せず新headをpendingにする
-  if (fresh.headSha !== ctx.observedHeadSha) {
-    return pendingNewHead(fresh.headSha);
-  }
-  const result = await ctx.policyEvaluator.evaluate(buildEvaluationInput(fresh), ctx.effectivePolicy);
-  await ctx.audit.record({ kind: "recheck", actor: ctx.actorId, before: ctx.previousResult, after: result });
-  return result.gateConclusion === ctx.previousResult?.gateConclusion
-    ? unchanged(result)
-    : changed(result, diffGitHubFacts(ctx.previousFacts, fresh));
+	const fresh = await ctx.github.refetchAuthoritativeState({
+		repositoryId: ctx.repositoryId,
+		pullRequestNumber: ctx.pullRequestNumber
+	});
+	// 実行中にheadが変わっていたら、古い結果を公開せず新headをpendingにする
+	if (fresh.headSha !== ctx.observedHeadSha) {
+		return pendingNewHead(fresh.headSha);
+	}
+	const result = await ctx.policyEvaluator.evaluate(
+		buildEvaluationInput(fresh),
+		ctx.effectivePolicy
+	);
+	await ctx.audit.record({
+		kind: 'recheck',
+		actor: ctx.actorId,
+		before: ctx.previousResult,
+		after: result
+	});
+	return result.gateConclusion === ctx.previousResult?.gateConclusion
+		? unchanged(result)
+		: changed(result, diffGitHubFacts(ctx.previousFacts, fresh));
 }
 ```
 
@@ -1684,20 +1844,20 @@ export async function handleRecheck(ctx: CommandContext): Promise<CommandResult>
 
 要件16.3の表をエンドポイント設計として詳細化する。全エンドポイントで`installation_id`/`repository_id`をリソースIDに含め（16.4）、mutationには`Idempotency-Key`ヘッダを必須にする。
 
-| Method / Path | 認証 | Request（要旨） | Response（要旨） |
-|---|---|---|---|
-| `POST /github/webhook` | GitHub HMAC | raw body | `202` |
-| `GET /api/repos/{repositoryId}/queue` | SSO/OIDC + read | – | `QueueEntry[]`（ETA range含む） |
-| `GET /api/decisions/{operationId}` | SSO/OIDC + audit | – | reason graph + evidence links |
-| `POST /api/pr/{repositoryId}/{prNumber}/recheck` | SSO/OIDC + author/write | `Idempotency-Key` | recheck結果 or `pending` |
-| `POST /api/pr/{repositoryId}/{prNumber}/feedback` | SSO/OIDC + contributor | `{category, description}` | `FeedbackCase` |
-| `POST /api/flaky/reports` | SSO/OIDC + CI read | `{testId, runUrl}` | flaky evidence |
-| `POST /api/repos/{repositoryId}/pause` | operator + re-auth | `{reason, ticket, ttl}` | `202` |
-| `POST /api/repos/{repositoryId}/drain` | operator + re-auth | `{reason}` | `202` |
-| `POST /api/pr/{repositoryId}/{prNumber}/break-glass` | proposal作成のみ | `{reason, ticket, ttl}` | 二段階承認workflow開始 |
-| `POST /internal/merge` | Deno OIDC + signed envelope | `{envelope, signature}` | `MergeResult` |
-| `POST /internal/reconcile` | Deno Cron / operator / self-service | `{scope}` | reconcile結果 |
-| `POST /internal/outbox/drain` | same-app scheduler | `{budgetMs}` | 処理件数 |
+| Method / Path                                        | 認証                                | Request（要旨）           | Response（要旨）                |
+| ---------------------------------------------------- | ----------------------------------- | ------------------------- | ------------------------------- |
+| `POST /github/webhook`                               | GitHub HMAC                         | raw body                  | `202`                           |
+| `GET /api/repos/{repositoryId}/queue`                | SSO/OIDC + read                     | –                         | `QueueEntry[]`（ETA range含む） |
+| `GET /api/decisions/{operationId}`                   | SSO/OIDC + audit                    | –                         | reason graph + evidence links   |
+| `POST /api/pr/{repositoryId}/{prNumber}/recheck`     | SSO/OIDC + author/write             | `Idempotency-Key`         | recheck結果 or `pending`        |
+| `POST /api/pr/{repositoryId}/{prNumber}/feedback`    | SSO/OIDC + contributor              | `{category, description}` | `FeedbackCase`                  |
+| `POST /api/flaky/reports`                            | SSO/OIDC + CI read                  | `{testId, runUrl}`        | flaky evidence                  |
+| `POST /api/repos/{repositoryId}/pause`               | operator + re-auth                  | `{reason, ticket, ttl}`   | `202`                           |
+| `POST /api/repos/{repositoryId}/drain`               | operator + re-auth                  | `{reason}`                | `202`                           |
+| `POST /api/pr/{repositoryId}/{prNumber}/break-glass` | proposal作成のみ                    | `{reason, ticket, ttl}`   | 二段階承認workflow開始          |
+| `POST /internal/merge`                               | Deno OIDC + signed envelope         | `{envelope, signature}`   | `MergeResult`                   |
+| `POST /internal/reconcile`                           | Deno Cron / operator / self-service | `{scope}`                 | reconcile結果                   |
+| `POST /internal/outbox/drain`                        | same-app scheduler                  | `{budgetMs}`              | 処理件数                        |
 
 管理者ダッシュボード（`yoroi-console`）向けの横断集計・運用API（`/api/fleet/*`、`/api/health/yoroi`、`/api/my-work`等）は本表のエンドポイントを`installation_id`横断でUNIONする薄い集約層として追加する。一覧は24.2節を正とする（本表との重複記載はしない）。
 
@@ -1705,11 +1865,11 @@ export async function handleRecheck(ctx: CommandContext): Promise<CommandResult>
 
 ```typescript
 export interface ApiErrorBody {
-  readonly code: string;          // 機械可読 (例: "STALE_FENCING_TOKEN")
-  readonly humanReason: string;   // 人向け文
-  readonly evidenceLink: string | null;
-  readonly selfServiceAction: string | null;   // "/yoroi recheck" 等
-  readonly escalationTo: string | null;
+	readonly code: string; // 機械可読 (例: "STALE_FENCING_TOKEN")
+	readonly humanReason: string; // 人向け文
+	readonly evidenceLink: string | null;
+	readonly selfServiceAction: string | null; // "/yoroi recheck" 等
+	readonly escalationTo: string | null;
 }
 ```
 
@@ -1724,21 +1884,21 @@ FR-104（block理由は人向け文・機械code・根拠link・self-service act
 ```jsonc
 // apps/control/deno.jsonc
 {
-  "tasks": {
-    "dev": "deno run --watch --env-file=.env.development main.ts",
-    "check": "deno check main.ts"
-  },
-  "imports": {
-    "@yoroi/domain": "../../packages/domain/mod.ts",
-    "@yoroi/github": "../../packages/github/mod.ts",
-    "@yoroi/postgres": "../../packages/postgres/mod.ts",
-    "@yoroi/policy": "../../packages/policy/mod.ts",
-    "@yoroi/notifications": "../../packages/notifications/mod.ts",
-    "@yoroi/observability": "../../packages/observability/mod.ts",
-    "zod": "npm:zod@3",
-    "octokit": "npm:octokit@3",
-    "postgres": "npm:postgres@3"
-  }
+	"tasks": {
+		"dev": "deno run --watch --env-file=.env.development main.ts",
+		"check": "deno check main.ts"
+	},
+	"imports": {
+		"@yoroi/domain": "../../packages/domain/mod.ts",
+		"@yoroi/github": "../../packages/github/mod.ts",
+		"@yoroi/postgres": "../../packages/postgres/mod.ts",
+		"@yoroi/policy": "../../packages/policy/mod.ts",
+		"@yoroi/notifications": "../../packages/notifications/mod.ts",
+		"@yoroi/observability": "../../packages/observability/mod.ts",
+		"zod": "npm:zod@3",
+		"octokit": "npm:octokit@3",
+		"postgres": "npm:postgres@3"
+	}
 }
 ```
 
@@ -1746,23 +1906,23 @@ FR-104（block理由は人向け文・機械code・根拠link・self-service act
 
 ```typescript
 // apps/control/main.ts
-import { createApp } from "./app.ts";
-import { mustGetEnv } from "@yoroi/domain";
+import { createApp } from './app.ts';
+import { mustGetEnv } from '@yoroi/domain';
 
 const app = createApp({
-  db: connectPostgres(mustGetEnv("DATABASE_URL")),               // production context secret
-  github: createOctokitAdapter(mustGetEnv("GITHUB_APP_ID"), await loadPrivateKey()),
-  webhookSecret: mustGetEnv("GITHUB_WEBHOOK_SECRET"),
-  mergerBaseUrl: mustGetEnv("YOROI_MERGER_URL"),
+	db: connectPostgres(mustGetEnv('DATABASE_URL')), // production context secret
+	github: createOctokitAdapter(mustGetEnv('GITHUB_APP_ID'), await loadPrivateKey()),
+	webhookSecret: mustGetEnv('GITHUB_WEBHOOK_SECRET'),
+	mergerBaseUrl: mustGetEnv('YOROI_MERGER_URL')
 });
 
 // 17.3節: 最小構成の6 Cron jobへ集約 (Free planのrevisionあたり上限を考慮)
-Deno.cron("outbox-sweep", "* * * * *", () => sweepOutbox(app));
-Deno.cron("github-reconcile", "*/5 * * * *", () => reconcileWithGitHub(app));
-Deno.cron("approval-membership-scan", "*/15 * * * *", () => rescanMembership(app));
-Deno.cron("evidence-completeness", "0 3 * * *", () => checkEvidenceCompleteness(app));
-Deno.cron("ttl-expiry", "* * * * *", () => expireTtls(app));
-Deno.cron("dashboard-rollup", "*/1 * * * *", () => refreshFleetHealthSnapshot(app)); // 24.7節
+Deno.cron('outbox-sweep', '* * * * *', () => sweepOutbox(app));
+Deno.cron('github-reconcile', '*/5 * * * *', () => reconcileWithGitHub(app));
+Deno.cron('approval-membership-scan', '*/15 * * * *', () => rescanMembership(app));
+Deno.cron('evidence-completeness', '0 3 * * *', () => checkEvidenceCompleteness(app));
+Deno.cron('ttl-expiry', '* * * * *', () => expireTtls(app));
+Deno.cron('dashboard-rollup', '*/1 * * * *', () => refreshFleetHealthSnapshot(app)); // 24.7節
 
 Deno.serve(app.fetch);
 ```
@@ -1771,11 +1931,11 @@ Deno.serve(app.fetch);
 
 ### 17.3 Context / 環境変数
 
-| Context | 用途 | 保持するsecret |
-|---|---|---|
-| Production | 本番稼働 | `GITHUB_WEBHOOK_SECRET`、Observer App key、`DATABASE_URL`（本番） |
+| Context     | 用途                | 保持するsecret                                                                                 |
+| ----------- | ------------------- | ---------------------------------------------------------------------------------------------- |
+| Production  | 本番稼働            | `GITHUB_WEBHOOK_SECRET`、Observer App key、`DATABASE_URL`（本番）                              |
 | Development | ローカル/branch開発 | 開発用DB URL、テスト用Webhook secret。**Merger keyと本番DB credentialは存在しない**（CFG-013） |
-| Build | build-time | lockfile検証用のみ。ランタイムsecretなし |
+| Build       | build-time          | lockfile検証用のみ。ランタイムsecretなし                                                       |
 
 `yoroi-merger`は別App・別deploy権限とし、Production contextにのみ`MERGER_APP_PRIVATE_KEY`と`ENVELOPE_VERIFY_KEY`を保持する（SEC-030）。
 
@@ -1787,15 +1947,18 @@ Deno Deploy OIDCの実際のトークン取得・JWKS検証APIはプラットフ
 // packages/domain/src/identity-issuer.ts
 
 export interface IdentityIssuer {
-  getOidcToken(audience: string): Promise<string>;
+	getOidcToken(audience: string): Promise<string>;
 }
 
 export interface OidcVerifier {
-  verify(token: string | null, expected: {
-    audience: string;
-    allowedCallerApp: string;
-    requiredContext: "production";
-  }): Promise<Result<OidcClaims, OidcVerificationError>>;
+	verify(
+		token: string | null,
+		expected: {
+			audience: string;
+			allowedCallerApp: string;
+			requiredContext: 'production';
+		}
+	): Promise<Result<OidcClaims, OidcVerificationError>>;
 }
 ```
 
@@ -1805,13 +1968,13 @@ export interface OidcVerifier {
 
 要件13.12の表を実装方針へ落とす。
 
-| 制約 | 設計対応 |
-|---|---|
-| managed Queueなし | 6〜7章のtransactional inbox/outbox。`Deno.cron`は安全網のみ |
-| instance間でmemory非共有 | 10章のPostgreSQL lease/fencingを直列化の唯一の根拠にする。`globalThis`へ状態を置くコードをlintで禁止 |
-| scale-to-zero / cold start | グローバル初期化を軽量化（DB接続はlazy connect）。outbox workは30秒以内に完了する単位に分割 |
-| 1 app = 1 DB instance | `yoroi-control`と`yoroi-merger`は論理的に同じPostgreSQLを指すが、**接続情報は別contextのsecretとして個別管理**し、Mergerは自分のcredentialでのみ接続する（最小権限のDB roleを分離） |
-| preview DB共有 | tenant prefix（`preview_<revision_id>_`）でテーブル/スキーマを分離し、production fallbackを禁止するguardをconnect時に検証 |
+| 制約                       | 設計対応                                                                                                                                                                            |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| managed Queueなし          | 6〜7章のtransactional inbox/outbox。`Deno.cron`は安全網のみ                                                                                                                         |
+| instance間でmemory非共有   | 10章のPostgreSQL lease/fencingを直列化の唯一の根拠にする。`globalThis`へ状態を置くコードをlintで禁止                                                                                |
+| scale-to-zero / cold start | グローバル初期化を軽量化（DB接続はlazy connect）。outbox workは30秒以内に完了する単位に分割                                                                                         |
+| 1 app = 1 DB instance      | `yoroi-control`と`yoroi-merger`は論理的に同じPostgreSQLを指すが、**接続情報は別contextのsecretとして個別管理**し、Mergerは自分のcredentialでのみ接続する（最小権限のDB roleを分離） |
+| preview DB共有             | tenant prefix（`preview_<revision_id>_`）でテーブル/スキーマを分離し、production fallbackを禁止するguardをconnect時に検証                                                           |
 
 ---
 
@@ -1821,40 +1984,40 @@ export interface OidcVerifier {
 
 ```typescript
 // packages/observability/src/otel.ts
-import { trace } from "npm:@opentelemetry/api@1";
+import { trace } from 'npm:@opentelemetry/api@1';
 
-const tracer = trace.getTracer("yoroi-control");
+const tracer = trace.getTracer('yoroi-control');
 
 export interface SpanAttrs {
-  readonly operationId: OperationId;
-  readonly repositoryId: RepositoryId;
-  readonly headSha?: Sha;
-  readonly candidateSha?: Sha;
-  readonly policyDigest?: PolicyDigest;
-  readonly fencingToken?: FencingToken;
+	readonly operationId: OperationId;
+	readonly repositoryId: RepositoryId;
+	readonly headSha?: Sha;
+	readonly candidateSha?: Sha;
+	readonly policyDigest?: PolicyDigest;
+	readonly fencingToken?: FencingToken;
 }
 
 export function withSpan<T>(name: string, attrs: SpanAttrs, fn: () => Promise<T>): Promise<T> {
-  return tracer.startActiveSpan(name, async (span) => {
-    span.setAttributes({
-      "yoroi.operation_id": attrs.operationId,
-      "yoroi.repository_id": attrs.repositoryId,
-      "yoroi.head_sha": attrs.headSha ?? "",
-      "yoroi.candidate_sha": attrs.candidateSha ?? "",
-      "yoroi.policy_digest": attrs.policyDigest ?? "",
-      "yoroi.fencing_token": attrs.fencingToken?.toString() ?? "",
-      "yoroi.deno_revision_id": Deno.env.get("DENO_DEPLOYMENT_ID") ?? "unknown",
-      "yoroi.deno_context": Deno.env.get("DENO_DEPLOY_CONTEXT") ?? "unknown",
-    });
-    try {
-      return await fn();
-    } catch (e) {
-      span.recordException(e as Error);
-      throw e;
-    } finally {
-      span.end();
-    }
-  });
+	return tracer.startActiveSpan(name, async (span) => {
+		span.setAttributes({
+			'yoroi.operation_id': attrs.operationId,
+			'yoroi.repository_id': attrs.repositoryId,
+			'yoroi.head_sha': attrs.headSha ?? '',
+			'yoroi.candidate_sha': attrs.candidateSha ?? '',
+			'yoroi.policy_digest': attrs.policyDigest ?? '',
+			'yoroi.fencing_token': attrs.fencingToken?.toString() ?? '',
+			'yoroi.deno_revision_id': Deno.env.get('DENO_DEPLOYMENT_ID') ?? 'unknown',
+			'yoroi.deno_context': Deno.env.get('DENO_DEPLOY_CONTEXT') ?? 'unknown'
+		});
+		try {
+			return await fn();
+		} catch (e) {
+			span.recordException(e as Error);
+			throw e;
+		} finally {
+			span.end();
+		}
+	});
 }
 ```
 
@@ -1879,32 +2042,38 @@ GitHub delivery -> inbox transaction -> policy evaluation -> Check Run update
 // packages/github/src/webhook-verify.ts
 
 export async function verifyHmacSignature(
-  rawBody: Uint8Array, signatureHeader: string | null, secret: string,
+	rawBody: Uint8Array,
+	signatureHeader: string | null,
+	secret: string
 ): Promise<boolean> {
-  if (!signatureHeader?.startsWith("sha256=")) return false;
-  const key = await crypto.subtle.importKey(
-    "raw", new TextEncoder().encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["verify"],
-  );
-  const signatureBytes = hexToBytes(signatureHeader.slice("sha256=".length));
-  // crypto.subtle.verifyはHMAC検証を内部実装し、早期returnによるtiming leakを避ける設計になっている
-  return crypto.subtle.verify("HMAC", key, signatureBytes, rawBody);
+	if (!signatureHeader?.startsWith('sha256=')) return false;
+	const key = await crypto.subtle.importKey(
+		'raw',
+		new TextEncoder().encode(secret),
+		{ name: 'HMAC', hash: 'SHA-256' },
+		false,
+		['verify']
+	);
+	const signatureBytes = hexToBytes(signatureHeader.slice('sha256='.length));
+	// crypto.subtle.verifyはHMAC検証を内部実装し、早期returnによるtiming leakを避ける設計になっている
+	return crypto.subtle.verify('HMAC', key, signatureBytes, rawBody);
 }
 ```
 
 ### 19.2 SEC要件と実装コンポーネントの対応
 
-| SEC-ID | 実装コンポーネント |
-|---|---|
-| SEC-001〜003 | 13.3節 Installation Tokenキャッシュ。PAT不使用、repo/permission限定生成 |
-| SEC-004〜006 | 17.3節 Context別secret配置。高保証構成では`IdentityIssuer`をKMS sign-only実装へ差し替え |
-| SEC-007〜008 | 19.1節 HMAC検証、7.1節 delivery ID unique制約によるreplay/重複制御 |
-| SEC-009〜012 | fork/untrusted CIはGitHub Actions側のephemeral runnerで実行し、Deno Deploy信頼核内では一切の外部コードを実行しない（2.1節のアーキテクチャで構造的に分離） |
-| SEC-018 | 5章・9章・11章のすべての判定関数がResult型で`err`を返した場合、状態機械はmerge方向へ進めない（fail-closedをコンパイル時の型で強制） |
-| SEC-019 | 4.1節branded type + 6章全テーブルの`installation_id`/`repository_id`複合key |
-| SEC-020、SEC-034 | 17.4節OIDC検証interface |
-| SEC-030〜032 | 2.2節App分割、17.5節memory非共有への対応 |
-| SEC-033 | 10章fencing token |
-| SEC-038 | 3.3節`deno.lock` commit必須 |
+| SEC-ID           | 実装コンポーネント                                                                                                                                        |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| SEC-001〜003     | 13.3節 Installation Tokenキャッシュ。PAT不使用、repo/permission限定生成                                                                                   |
+| SEC-004〜006     | 17.3節 Context別secret配置。高保証構成では`IdentityIssuer`をKMS sign-only実装へ差し替え                                                                   |
+| SEC-007〜008     | 19.1節 HMAC検証、7.1節 delivery ID unique制約によるreplay/重複制御                                                                                        |
+| SEC-009〜012     | fork/untrusted CIはGitHub Actions側のephemeral runnerで実行し、Deno Deploy信頼核内では一切の外部コードを実行しない（2.1節のアーキテクチャで構造的に分離） |
+| SEC-018          | 5章・9章・11章のすべての判定関数がResult型で`err`を返した場合、状態機械はmerge方向へ進めない（fail-closedをコンパイル時の型で強制）                       |
+| SEC-019          | 4.1節branded type + 6章全テーブルの`installation_id`/`repository_id`複合key                                                                               |
+| SEC-020、SEC-034 | 17.4節OIDC検証interface                                                                                                                                   |
+| SEC-030〜032     | 2.2節App分割、17.5節memory非共有への対応                                                                                                                  |
+| SEC-033          | 10章fencing token                                                                                                                                         |
+| SEC-038          | 3.3節`deno.lock` commit必須                                                                                                                               |
 
 ### 19.3 最重要の信頼境界（12章要件）の実装配置
 
@@ -1932,50 +2101,57 @@ Merger App keyとfork PRコードは物理的に別app（別Deno Deployプロジ
 
 ### 20.1 レイヤー別方針
 
-| レイヤー | 手法 | 対象 |
-|---|---|---|
-| Unit | `Deno.test` | digest算出、policy evaluator、reason graph builder |
-| Property-based | `npm:fast-check` | 状態機械の遷移網羅、digest算出の順序非依存性 |
-| Integration | testcontainers相当のPostgreSQL | inbox/outbox transaction、lease/fencing並行性 |
-| Fault injection | 20.2節 | AT-01〜AT-40の受入シナリオ |
-| Contract | recorded GitHub API fixture | GitHub Adapterのスキーマ変更検知 |
+| レイヤー        | 手法                           | 対象                                               |
+| --------------- | ------------------------------ | -------------------------------------------------- |
+| Unit            | `Deno.test`                    | digest算出、policy evaluator、reason graph builder |
+| Property-based  | `npm:fast-check`               | 状態機械の遷移網羅、digest算出の順序非依存性       |
+| Integration     | testcontainers相当のPostgreSQL | inbox/outbox transaction、lease/fencing並行性      |
+| Fault injection | 20.2節                         | AT-01〜AT-40の受入シナリオ                         |
+| Contract        | recorded GitHub API fixture    | GitHub Adapterのスキーマ変更検知                   |
 
 ### 20.2 Property-basedテスト例
 
 ```typescript
-Deno.test("ScopeChangeDigestは要素順序に依存しない", () => {
-  fc.assert(fc.property(canonicalChangeRecordListArb, async (records) => {
-    const d1 = await computeScopeChangeDigest({ ...base, records });
-    const d2 = await computeScopeChangeDigest({ ...base, records: shuffle(records) });
-    assertEquals(d1, d2); // 内部でsortしているため
-  }));
+Deno.test('ScopeChangeDigestは要素順序に依存しない', () => {
+	fc.assert(
+		fc.property(canonicalChangeRecordListArb, async (records) => {
+			const d1 = await computeScopeChangeDigest({ ...base, records });
+			const d2 = await computeScopeChangeDigest({ ...base, records: shuffle(records) });
+			assertEquals(d1, d2); // 内部でsortしているため
+		})
+	);
 });
 
-Deno.test("状態機械は許可された遷移のみ受理する", () => {
-  fc.assert(fc.property(prStateArb, prStateArb, (from, to) => {
-    const allowed = ALLOWED_TRANSITIONS.get(from)!.has(to);
-    const result = reduce(rowWith(from), eventTo(to));
-    assertEquals(result.ok, allowed);
-  }));
+Deno.test('状態機械は許可された遷移のみ受理する', () => {
+	fc.assert(
+		fc.property(prStateArb, prStateArb, (from, to) => {
+			const allowed = ALLOWED_TRANSITIONS.get(from)!.has(to);
+			const result = reduce(rowWith(from), eventTo(to));
+			assertEquals(result.ok, allowed);
+		})
+	);
 });
 ```
 
 ### 20.3 Fault injectionテスト例（AT-34対応）
 
 ```typescript
-Deno.test("stale fencing tokenによるmerge試行は拒否される (AT-34)", async () => {
-  const pg = await startPostgresTestContainer();
-  const tokenA = await acquireLease(pg, branchKey, opA, baseSha);
-  await simulateInstanceTermination(); // Aのプロセスは死ぬがlease行は残る
-  const tokenB = await acquireLease(pg, branchKey, opB, baseSha); // 新instanceが取得
-  assert(tokenB.value > tokenA.value);
+Deno.test('stale fencing tokenによるmerge試行は拒否される (AT-34)', async () => {
+	const pg = await startPostgresTestContainer();
+	const tokenA = await acquireLease(pg, branchKey, opA, baseSha);
+	await simulateInstanceTermination(); // Aのプロセスは死ぬがlease行は残る
+	const tokenB = await acquireLease(pg, branchKey, opB, baseSha); // 新instanceが取得
+	assert(tokenB.value > tokenA.value);
 
-  const staleEnvelope = buildEnvelope({ ...base, fencingToken: tokenA.value });
-  const response = await callMergerHandler(staleEnvelope);
-  assertEquals(response.status, 409);
+	const staleEnvelope = buildEnvelope({ ...base, fencingToken: tokenA.value });
+	const response = await callMergerHandler(staleEnvelope);
+	assertEquals(response.status, 409);
 
-  const events = await pg.query("SELECT * FROM decision_event WHERE operation_id = $1", [opA]);
-  assertEquals(events.some((e) => e.to_state === "MERGED"), false); // 二重merge 0
+	const events = await pg.query('SELECT * FROM decision_event WHERE operation_id = $1', [opA]);
+	assertEquals(
+		events.some((e) => e.to_state === 'MERGED'),
+		false
+	); // 二重merge 0
 });
 ```
 
@@ -1989,15 +2165,15 @@ Merge権限をMergerへ渡す前に、要件20.2章の注入リストを`tests/f
 
 要件20章の段階導入ロードマップに、本設計のどのコンポーネントが対応するかを示す。
 
-| 段階 | 主要デリバラブル（要件20章） | 対応する設計コンポーネント |
-|---|---|---|
-| 0. Journey/Threat Design | journey map、UI prototype、App権限表、Deno ADR | 2章アーキテクチャ、19章脅威境界 |
-| 1. Observe | control app、inbox/outbox、initial summary、reason graph、recheck、feedback | 6〜7章DB/ingestion、9章policy(shadow)、14〜15章notification/command |
-| 2. Approval Continuity | ownership graph、scope digest、carry-forward、coalescing、`yoroi/gate` | 8章digest/proof、6.5節approvalテーブル、9章policy |
-| 3. Serial Merge | exact candidate、lease/fencing、別Merger app、pause、recovery、ETA | 10章coordinator、11.1節Serial、12章envelope/merger |
-| 4. Speculative/Batch | 累積候補、adaptive window、rebuild通知、flaky self-service | 11.2〜11.3節（概要設計、実装時に詳細化） |
-| 5. Org Governance | Terraform drift、dual control、policy simulator | 本書では未詳細化。次版で17章のCFG要件と合わせて設計する |
-| 6. Advanced | cross-repo DAG、auto-bisect、auto-revert、external KMS | 12.2節のsign-only KMS拡張ポイント、11.3節ddminを土台に拡張 |
+| 段階                     | 主要デリバラブル（要件20章）                                                | 対応する設計コンポーネント                                          |
+| ------------------------ | --------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| 0. Journey/Threat Design | journey map、UI prototype、App権限表、Deno ADR                              | 2章アーキテクチャ、19章脅威境界                                     |
+| 1. Observe               | control app、inbox/outbox、initial summary、reason graph、recheck、feedback | 6〜7章DB/ingestion、9章policy(shadow)、14〜15章notification/command |
+| 2. Approval Continuity   | ownership graph、scope digest、carry-forward、coalescing、`yoroi/gate`      | 8章digest/proof、6.5節approvalテーブル、9章policy                   |
+| 3. Serial Merge          | exact candidate、lease/fencing、別Merger app、pause、recovery、ETA          | 10章coordinator、11.1節Serial、12章envelope/merger                  |
+| 4. Speculative/Batch     | 累積候補、adaptive window、rebuild通知、flaky self-service                  | 11.2〜11.3節（概要設計、実装時に詳細化）                            |
+| 5. Org Governance        | Terraform drift、dual control、policy simulator                             | 本書では未詳細化。次版で17章のCFG要件と合わせて設計する             |
+| 6. Advanced              | cross-repo DAG、auto-bisect、auto-revert、external KMS                      | 12.2節のsign-only KMS拡張ポイント、11.3節ddminを土台に拡張          |
 
 ---
 
@@ -2005,13 +2181,13 @@ Merge権限をMergerへ渡す前に、要件20.2章の注入リストを`tests/f
 
 要件23章の未決事項のうち、設計へ影響するものへの対応方針を示す。経営判断そのものは本書のスコープ外。
 
-| 未決事項 | 設計上の対応 |
-|---|---|
-| private keyのDeno Production secret vs 外部KMS sign-only | 17.4節`IdentityIssuer`をinterfaceとして抽象化済み。決定後は実装差し替えのみで済む |
-| 本番PostgreSQLの提供形態 | **決定（2026-08-25）**：自前調達せず、Deno Deploy標準装備のPostgresを採用し、Drizzle（`drizzle-orm/postgres-js`）で扱う。`apps/control`は接続文字列（`DATABASE_URL`、Productionコンテキストのsecret）のみに依存するため、この決定は実装差し替え不要で反映済み（`apps/control/README.md`参照） |
-| Deno KV採用可否 | 6章のテーブル設計はPostgreSQL前提。KV版は別adapter（`EventStore`実装）として`packages/postgres`と同じinterfaceで用意し、本体ロジックへ影響させない |
-| scope digestアルゴリズムの適用範囲（symlink/submodule/LFS等） | 8.4節の「安全側失効テーブル」を初版の既定挙動とし、policy拡張ポイント（`formatter_exception`等）で段階的に緩和できる構造にした |
-| GHES対応 | 13章`GitHubAdapter`インターフェースをGitHub.com/GHESで共通化し、差異はadapter実装内に閉じる |
+| 未決事項                                                      | 設計上の対応                                                                                                                                                                                                                                                                                  |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| private keyのDeno Production secret vs 外部KMS sign-only      | 17.4節`IdentityIssuer`をinterfaceとして抽象化済み。決定後は実装差し替えのみで済む                                                                                                                                                                                                             |
+| 本番PostgreSQLの提供形態                                      | **決定（2026-08-25）**：自前調達せず、Deno Deploy標準装備のPostgresを採用し、Drizzle（`drizzle-orm/postgres-js`）で扱う。`apps/control`は接続文字列（`DATABASE_URL`、Productionコンテキストのsecret）のみに依存するため、この決定は実装差し替え不要で反映済み（`apps/control/README.md`参照） |
+| Deno KV採用可否                                               | 6章のテーブル設計はPostgreSQL前提。KV版は別adapter（`EventStore`実装）として`packages/postgres`と同じinterfaceで用意し、本体ロジックへ影響させない                                                                                                                                            |
+| scope digestアルゴリズムの適用範囲（symlink/submodule/LFS等） | 8.4節の「安全側失効テーブル」を初版の既定挙動とし、policy拡張ポイント（`formatter_exception`等）で段階的に緩和できる構造にした                                                                                                                                                                |
+| GHES対応                                                      | 13章`GitHubAdapter`インターフェースをGitHub.com/GHESで共通化し、差異はadapter実装内に閉じる                                                                                                                                                                                                   |
 
 ---
 
@@ -2023,24 +2199,24 @@ Merge権限をMergerへ渡す前に、要件20.2章の注入リストを`tests/f
 
 GitHubのPR一覧をもう一つ作っても価値がないため、ダッシュボードは**GitHubだけでは分かりにくい「全体状況・停止理由・次の行動・将来予測」**にだけ集中する。答えるべき問いは以下の5つで、1〜4は14.2節でPR単位のsummaryへ翻訳している4問の横断版、5だけが本章で新規に設計する領域である。
 
-| # | 問い | PR単位（14.2節・既存） | 横断ダッシュボード（本章・新規） |
-|---|---|---|---|
-| 1 | 今、何が止まっているか | `SummaryState.stage` | Home：ブロック中PRを全repo横断で一覧化し、責任領域別に分類（FR-074、23.4節） |
-| 2 | なぜ止まっているか | `reasonHeadline` + reason graph | 同じreason graphを原因カテゴリ・root cause fingerprint（14.3節）でグルーピング表示（23.8節） |
-| 3 | 次に誰が何をすればよいか | `nextActor` | My Work：担当者別のaction-required一覧、escalation導線（FR-075、23.5節） |
-| 4 | いつ頃マージできそうか | `etaRange` + `confidence` | Merge Queue：ETA分布、lane別throughput、aging（FR-092、FR-074、23.7節） |
-| 5 | Yoroi自身は正常に動いているか | （PR単位には存在しない概念） | Operations：Health board（新規、23.12節・24.7節） |
+| #   | 問い                          | PR単位（14.2節・既存）          | 横断ダッシュボード（本章・新規）                                                             |
+| --- | ----------------------------- | ------------------------------- | -------------------------------------------------------------------------------------------- |
+| 1   | 今、何が止まっているか        | `SummaryState.stage`            | Home：ブロック中PRを全repo横断で一覧化し、責任領域別に分類（FR-074、23.4節）                 |
+| 2   | なぜ止まっているか            | `reasonHeadline` + reason graph | 同じreason graphを原因カテゴリ・root cause fingerprint（14.3節）でグルーピング表示（23.8節） |
+| 3   | 次に誰が何をすればよいか      | `nextActor`                     | My Work：担当者別のaction-required一覧、escalation導線（FR-075、23.5節）                     |
+| 4   | いつ頃マージできそうか        | `etaRange` + `confidence`       | Merge Queue：ETA分布、lane別throughput、aging（FR-092、FR-074、23.7節）                      |
+| 5   | Yoroi自身は正常に動いているか | （PR単位には存在しない概念）    | Operations：Health board（新規、23.12節・24.7節）                                            |
 
 ### 23.2 想定利用者とトップ画面
 
 全員へ同じダッシュボードを見せるのではなく、役割別に最初に見る内容を変える。ログイン直後は「すべて」ではなく**Needs your attention**（自分の責任範囲で対応が必要なものだけ）を優先表示する。
 
-| 利用者 | 最初に見たいもの | 対応する要件ロール（FR-022、SEC-015） |
-|---|---|---|
-| 開発者 | 自分のPR、対応が必要なレビュー、CI失敗、マージ見込み | Reviewer／Scope・Security・Data・Infra Approver（自分が承認者側のとき） |
-| Maintainer | 担当repoのqueue、長時間停止、承認待ち、競合、flaky | Scope Approverのうちrepo全体をownする者、またはGitHub repo管理者権限を持つactor（新しいバックエンドロールは作らず既存ロールの組み合わせで解決する） |
-| Operator | 全repoの稼働状況、詰まり、障害、dead-letter、API制限 | Operator |
-| Governor / 管理者 | 高リスク変更、例外申請、policy drift、権限変更、監査証跡 | Org Governor |
+| 利用者            | 最初に見たいもの                                         | 対応する要件ロール（FR-022、SEC-015）                                                                                                               |
+| ----------------- | -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 開発者            | 自分のPR、対応が必要なレビュー、CI失敗、マージ見込み     | Reviewer／Scope・Security・Data・Infra Approver（自分が承認者側のとき）                                                                             |
+| Maintainer        | 担当repoのqueue、長時間停止、承認待ち、競合、flaky       | Scope Approverのうちrepo全体をownする者、またはGitHub repo管理者権限を持つactor（新しいバックエンドロールは作らず既存ロールの組み合わせで解決する） |
+| Operator          | 全repoの稼働状況、詰まり、障害、dead-letter、API制限     | Operator                                                                                                                                            |
+| Governor / 管理者 | 高リスク変更、例外申請、policy drift、権限変更、監査証跡 | Org Governor                                                                                                                                        |
 
 「Blocked 12件」のような件数だけでは行動につながらないため、Home・My Workのどちらも**誰の責任領域で止まっているか**で必ず分類する。分類軸は9章Policy Engine／14章SummaryStateの`reasonCode`・`nextActor`をそのまま再利用した固定集合とし、ダッシュボード独自の新しい判定を持ち込まない。
 
@@ -2048,20 +2224,22 @@ GitHubのPR一覧をもう一つ作っても価値がないため、ダッシュ
 // packages/notifications/src/dashboard-taxonomy.ts（23.4節・23.5節で共通利用）
 
 export type BlockedResponsibility =
-  | "your_action"         // あなたの対応待ち
-  | "other_reviewer"      // 他のReviewer待ち
-  | "ci"                  // CI待ち
-  | "queue"               // Queue待ち
-  | "yoroi_internal"      // Yoroi内部処理待ち（outbox lag等）
-  | "github_outage"       // GitHub障害待ち
-  | "policy_blocked"      // Policyにより停止
-  | "needs_investigation"; // 原因調査が必要（indeterminate、8.4節の安全側失効等）
+	| 'your_action' // あなたの対応待ち
+	| 'other_reviewer' // 他のReviewer待ち
+	| 'ci' // CI待ち
+	| 'queue' // Queue待ち
+	| 'yoroi_internal' // Yoroi内部処理待ち（outbox lag等）
+	| 'github_outage' // GitHub障害待ち
+	| 'policy_blocked' // Policyにより停止
+	| 'needs_investigation'; // 原因調査が必要（indeterminate、8.4節の安全側失効等）
 
 /** SummaryStateのnextActor・reasonCodeから責任分類を導出する純粋関数 (1.5節 Functional Core) */
 export function classifyResponsibility(
-  state: SummaryState, reasonGraph: ReasonGraphNode, viewer: ActorRef,
+	state: SummaryState,
+	reasonGraph: ReasonGraphNode,
+	viewer: ActorRef
 ): BlockedResponsibility {
-  /* ... state.nextActor / reasonGraph.rootCause を固定ルールで分類する。
+	/* ... state.nextActor / reasonGraph.rootCause を固定ルールで分類する。
      9章evaluate()の出力のみを入力とし、新たな判定を行わない ... */
 }
 ```
@@ -2125,9 +2303,9 @@ GitHub通知よりも「次にYoroi上でやるべきこと」だけに絞った
 // packages/notifications/src/carry-forward-explanation.ts
 
 export function explainCarryForward(cf: ApprovalCarryForward): string {
-  // 例: 「認証scopeの再承認が必要です。前回承認後にsrc/auth/session.tsの動作が変更されました。
-  //       DB scopeの承認は維持されています。」
-  return renderCarryForwardTemplateJa(cf); // oldHeadSha/newHeadSha/unchangedScopeIdsをそのまま埋め込む
+	// 例: 「認証scopeの再承認が必要です。前回承認後にsrc/auth/session.tsの動作が変更されました。
+	//       DB scopeの承認は維持されています。」
+	return renderCarryForwardTemplateJa(cf); // oldHeadSha/newHeadSha/unchangedScopeIdsをそのまま埋め込む
 }
 ```
 
@@ -2155,12 +2333,12 @@ GitHubのPR画面からdeep linkする、Yoroiの判定説明画面。最上部�
 
 **4ゲートの状態**（5.3節の対応表をそのまま画面へ写す）
 
-| ゲート | 対応章 | 画面で示す内容 |
-|---|---|---|
-| G1 Identity / Approval | 9章＋8章 | Passed/Waiting/Failed/Unknown、判定理由、使用データ、次の行動、対応待ちの人 |
-| G2 Candidate Integrity | 13章 | 同上 |
-| G3 Test Evidence | 13章 | 同上 |
-| G4 Merge Authorization | 10章＋12章 | 同上 |
+| ゲート                 | 対応章     | 画面で示す内容                                                              |
+| ---------------------- | ---------- | --------------------------------------------------------------------------- |
+| G1 Identity / Approval | 9章＋8章   | Passed/Waiting/Failed/Unknown、判定理由、使用データ、次の行動、対応待ちの人 |
+| G2 Candidate Integrity | 13章       | 同上                                                                        |
+| G3 Test Evidence       | 13章       | 同上                                                                        |
+| G4 Merge Authorization | 10章＋12章 | 同上                                                                        |
 
 **承認状況**：検出されたscope、scopeごとの必要ロール・人数、承認者、承認時点のchange digest、維持された承認と失効した承認・失効理由（8.3節outcome）、context safety proof（8.3節`ContextSafetyProof`）。
 
@@ -2226,12 +2404,12 @@ Yoroi自身が信用できる状態かを示す画面。表示するのは技術
 
 表示だけに限定せず、状況に応じた操作を置く。ただし常に同じ巨大な操作メニューを出さず、23.2節のペルソナごとに出し分ける。
 
-| ペルソナ | 提供する操作 | 実行される既存API・章 |
-|---|---|---|
-| 一般開発者 | Recheck、Feedback送信、flaky報告、GitHubへのリンク、Reviewerへ再依頼、通知設定 | 15章`recheck`・`feedback`・`flaky`コマンドと同じAPI（16章） |
-| Maintainer | Queueから一時離脱／再投入、dependency確認、priority変更・quarantine化の申請 | `POST /api/pr/{repositoryId}/{prNumber}/queue`（離脱／再投入、24.2節新規）。priority変更・quarantineは15.1節の通り一般公開せず、申請はFR-099のfeedback導線を経由してOperatorへ回付する |
-| Operator | Repo pause、Drain、Reconcile、Dead-letter再投入、Circuit breaker解除、Incident開始、Policy変更案の作成 | 16章`pause`/`drain`/`reconcile`（operator + re-auth）、24.2節で追加する運用系endpoint |
-| Governor | Break-glass承認、Policy弱体化の承認、高権限変更の承認、例外延長・終了、事後レビューの完了 | FR-064 break-glass二名承認フロー、9.4節self-weakening防止の枠内 |
+| ペルソナ   | 提供する操作                                                                                           | 実行される既存API・章                                                                                                                                                                  |
+| ---------- | ------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 一般開発者 | Recheck、Feedback送信、flaky報告、GitHubへのリンク、Reviewerへ再依頼、通知設定                         | 15章`recheck`・`feedback`・`flaky`コマンドと同じAPI（16章）                                                                                                                            |
+| Maintainer | Queueから一時離脱／再投入、dependency確認、priority変更・quarantine化の申請                            | `POST /api/pr/{repositoryId}/{prNumber}/queue`（離脱／再投入、24.2節新規）。priority変更・quarantineは15.1節の通り一般公開せず、申請はFR-099のfeedback導線を経由してOperatorへ回付する |
+| Operator   | Repo pause、Drain、Reconcile、Dead-letter再投入、Circuit breaker解除、Incident開始、Policy変更案の作成 | 16章`pause`/`drain`/`reconcile`（operator + re-auth）、24.2節で追加する運用系endpoint                                                                                                  |
+| Governor   | Break-glass承認、Policy弱体化の承認、高権限変更の承認、例外延長・終了、事後レビューの完了              | FR-064 break-glass二名承認フロー、9.4節self-weakening防止の枠内                                                                                                                        |
 
 危険な操作には必ず以下を確認画面として表示し、実行前にユーザーへ明示する。これは新しいUIパターンではなく、FR-063（理由・対象・actor・期限を要求する）とFR-064（break-glassへ二名承認・ticket・TTL・事後reviewを要求する）を**画面として具現化したもの**である。
 
@@ -2239,12 +2417,12 @@ Yoroi自身が信用できる状態かを示す画面。表示するのは技術
 // packages/notifications/src/dangerous-action-confirmation.ts
 
 export interface DangerousActionConfirmation {
-  readonly whatChanges: string;             // 何が変わるか
-  readonly affectedScope: { repos: readonly RepositoryId[]; prs: readonly PullRequestNumber[] };
-  readonly whatBecomesUnsafe: string;       // 何が安全でなくなるか
-  readonly expiresAt: Date | null;          // 有効期限 (TTL、FR-064)
-  readonly additionalApproversRequired: number; // 追加承認者 (break-glassは2名以上、FR-064)
-  readonly rollbackProcedure: string;       // Rollback方法
+	readonly whatChanges: string; // 何が変わるか
+	readonly affectedScope: { repos: readonly RepositoryId[]; prs: readonly PullRequestNumber[] };
+	readonly whatBecomesUnsafe: string; // 何が安全でなくなるか
+	readonly expiresAt: Date | null; // 有効期限 (TTL、FR-064)
+	readonly additionalApproversRequired: number; // 追加承認者 (break-glassは2名以上、FR-064)
+	readonly rollbackProcedure: string; // Rollback方法
 }
 ```
 
@@ -2254,11 +2432,11 @@ export interface DangerousActionConfirmation {
 
 最初から全画面を作らない。21章の段階導入ロードマップと対応させる。
 
-| 範囲 | 内容 | 対応する21章の段階 |
-|---|---|---|
-| MVP | GitHubログイン、My Work、Home、Repositories一覧、Merge Queue、PR判定詳細（4ゲート・停止理由・CI結果・ETA）、Operations（Health board基本）、Recheck、Repo pause／drain、Audit検索 | 0. Journey/Threat Design 〜 3. Serial Merge |
-| 次段階 | CI Reliability／flaky分析、Reviews（Reviewer負荷）、Policy & Drift（Policy部分）、Speculative trainの可視化、通知設定、Break-glass workflow | 3〜4. Serial Merge／Speculative/Batch |
-| 発展機能 | Policy simulator、Cross-repo DAG、CI費用分析、Queue条件の仮想シミュレーション、AIによる失敗要約、ボトルネック改善提案 | 5〜6. Org Governance／Advanced（22章・21章で「本書では未詳細化」としている範囲と一致） |
+| 範囲     | 内容                                                                                                                                                                              | 対応する21章の段階                                                                     |
+| -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| MVP      | GitHubログイン、My Work、Home、Repositories一覧、Merge Queue、PR判定詳細（4ゲート・停止理由・CI結果・ETA）、Operations（Health board基本）、Recheck、Repo pause／drain、Audit検索 | 0. Journey/Threat Design 〜 3. Serial Merge                                            |
+| 次段階   | CI Reliability／flaky分析、Reviews（Reviewer負荷）、Policy & Drift（Policy部分）、Speculative trainの可視化、通知設定、Break-glass workflow                                       | 3〜4. Serial Merge／Speculative/Batch                                                  |
+| 発展機能 | Policy simulator、Cross-repo DAG、CI費用分析、Queue条件の仮想シミュレーション、AIによる失敗要約、ボトルネック改善提案                                                             | 5〜6. Org Governance／Advanced（22章・21章で「本書では未詳細化」としている範囲と一致） |
 
 一番大事なのは、ダッシュボードを開いた瞬間に単なる緑・赤の二値ではなく、**何が止まり、なぜ止まり、誰が動けば、いつ進むか**（23.1節の5問）が分かることであり、これがGitHub上のsummary（14章）だけでは代替できないYoroiバックエンドの価値である。
 
@@ -2288,20 +2466,20 @@ facts (yoroi-controlのread APIレスポンス)
 
 `yoroi-console`は独自のBFF集計ロジックやDBクエリを持たず、`yoroi-control`が公開するAPIのレスポンスをそのまま描画する薄いクライアントとする。16章の主要表に加え、ダッシュボード専用のAPIを以下にまとめる（認証・エラー設計は16章の規約をそのまま継承する）。
 
-| Method / Path | 認証 | Request | Response |
-|---|---|---|---|
-| `GET /api/fleet/overview` | SSO/OIDC + read | `?org=`, `?teams=` | Home向け横断集計（FR-074） |
-| `GET /api/fleet/blocked` | SSO/OIDC + read | `?responsibility=`（23.2節`BlockedResponsibility`） | ブロック中PR一覧 |
-| `GET /api/my-work` | SSO/OIDC + read | – | 自分が作成／レビュー依頼されているPRの一覧（23.5節） |
-| `GET /api/repos/{repositoryId}` | SSO/OIDC + read | – | Repo詳細＋健康指標（23.6節） |
-| `GET /api/ci/reliability` | SSO/OIDC + read | `?repositoryId=` | CI Reliability画面向け集計（23.9節） |
-| `GET /api/reviewers/load` | SSO/OIDC + read | `?repositoryId=` | Reviews画面向け集計（23.10節） |
-| `GET /api/policy/drift` | SSO/OIDC + read | `?repositoryId=` | Policy & Drift画面向け（23.11節、9.2節`CompiledPolicy`＋6.7節`config_snapshot`） |
-| `GET /api/health/yoroi` | SSO/OIDC + read | – | `fleet_health_snapshot`（24.7節）の最新スナップショット |
-| `GET /api/audit/search` | SSO/OIDC + audit | FR-083検索キー一式 | `decision_event`のread-only射影 |
-| `POST /api/pr/{repositoryId}/{prNumber}/queue` | SSO/OIDC + Maintainer以上 | `{action: "leave" \| "rejoin", reason}` | Maintainer操作（23.14節） |
-| `POST /api/repos/{repositoryId}/incident` | operator + re-auth | `{reason, ticket}` | Incident開始（23.14節、FR-063） |
-| `POST /api/policy/{repositoryId}/proposals` | operator + re-auth | `{diff, reason, ticket}` | Policy変更案作成（9.4節のself-weakening防止の枠内。適用はGovernor承認後） |
+| Method / Path                                  | 認証                      | Request                                             | Response                                                                         |
+| ---------------------------------------------- | ------------------------- | --------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `GET /api/fleet/overview`                      | SSO/OIDC + read           | `?org=`, `?teams=`                                  | Home向け横断集計（FR-074）                                                       |
+| `GET /api/fleet/blocked`                       | SSO/OIDC + read           | `?responsibility=`（23.2節`BlockedResponsibility`） | ブロック中PR一覧                                                                 |
+| `GET /api/my-work`                             | SSO/OIDC + read           | –                                                   | 自分が作成／レビュー依頼されているPRの一覧（23.5節）                             |
+| `GET /api/repos/{repositoryId}`                | SSO/OIDC + read           | –                                                   | Repo詳細＋健康指標（23.6節）                                                     |
+| `GET /api/ci/reliability`                      | SSO/OIDC + read           | `?repositoryId=`                                    | CI Reliability画面向け集計（23.9節）                                             |
+| `GET /api/reviewers/load`                      | SSO/OIDC + read           | `?repositoryId=`                                    | Reviews画面向け集計（23.10節）                                                   |
+| `GET /api/policy/drift`                        | SSO/OIDC + read           | `?repositoryId=`                                    | Policy & Drift画面向け（23.11節、9.2節`CompiledPolicy`＋6.7節`config_snapshot`） |
+| `GET /api/health/yoroi`                        | SSO/OIDC + read           | –                                                   | `fleet_health_snapshot`（24.7節）の最新スナップショット                          |
+| `GET /api/audit/search`                        | SSO/OIDC + audit          | FR-083検索キー一式                                  | `decision_event`のread-only射影                                                  |
+| `POST /api/pr/{repositoryId}/{prNumber}/queue` | SSO/OIDC + Maintainer以上 | `{action: "leave" \| "rejoin", reason}`             | Maintainer操作（23.14節）                                                        |
+| `POST /api/repos/{repositoryId}/incident`      | operator + re-auth        | `{reason, ticket}`                                  | Incident開始（23.14節、FR-063）                                                  |
+| `POST /api/policy/{repositoryId}/proposals`    | operator + re-auth        | `{diff, reason, ticket}`                            | Policy変更案作成（9.4節のself-weakening防止の枠内。適用はGovernor承認後）        |
 
 集計ロジック（誰が次アクターか、どのカテゴリかなど）は既に9章Policy EngineのReason Graphと14章SummaryStateに存在するため、これらのAPIは`yoroi-control`側で**それらを`installation_id`横断でUNIONするだけ**の薄い集約層として実装し、`packages/notifications`のreason graph builderを再利用する（ダッシュボード専用の判定分岐を作らない）。
 
@@ -2348,24 +2526,24 @@ SEC-020「Dashboardと管理APIをorganization SSO/OIDC + RBACで保護する」
 // apps/console/src/lib/auth/port.ts (Port)
 
 export interface ConsoleAuthPort {
-  getSession(headers: Headers): Promise<{ actorStableId: ActorStableId } | null>;
-  signOut(headers: Headers): Promise<void>;
+	getSession(headers: Headers): Promise<{ actorStableId: ActorStableId } | null>;
+	signOut(headers: Headers): Promise<void>;
 }
 ```
 
 ```typescript
 // apps/console/src/lib/auth/better-auth-adapter.ts (Adapter)
 
-import { betterAuth } from "npm:better-auth";
+import { betterAuth } from 'npm:better-auth';
 
-const auth = betterAuth({ /* org SSO/OIDC provider設定 */ });
+const auth = betterAuth({/* org SSO/OIDC provider設定 */});
 
 export const consoleAuth: ConsoleAuthPort = {
-  async getSession(headers) {
-    const session = await auth.api.getSession({ headers });
-    return session ? { actorStableId: session.user.stableId as ActorStableId } : null;
-  },
-  signOut: (headers) => auth.api.signOut({ headers }),
+	async getSession(headers) {
+		const session = await auth.api.getSession({ headers });
+		return session ? { actorStableId: session.user.stableId as ActorStableId } : null;
+	},
+	signOut: (headers) => auth.api.signOut({ headers })
 };
 ```
 
@@ -2373,20 +2551,20 @@ export const consoleAuth: ConsoleAuthPort = {
 // apps/console/src/hooks.server.ts
 
 export const handle: Handle = async ({ event, resolve }) => {
-  const session = await consoleAuth.getSession(event.request.headers);
-  if (!session) {
-    if (isPublicRoute(event.url.pathname)) return resolve(event);
-    return redirectToSso(event.url);
-  }
+	const session = await consoleAuth.getSession(event.request.headers);
+	if (!session) {
+		if (isPublicRoute(event.url.pathname)) return resolve(event);
+		return redirectToSso(event.url);
+	}
 
-  // ロールはyoroi-control側で解決させ、consoleは結果を信頼するだけにする (SEC-020)
-  const role = await ctrlApi.resolveRole(session.actorStableId);
-  event.locals.actor = { stableId: session.actorStableId, role };
+	// ロールはyoroi-control側で解決させ、consoleは結果を信頼するだけにする (SEC-020)
+	const role = await ctrlApi.resolveRole(session.actorStableId);
+	event.locals.actor = { stableId: session.actorStableId, role };
 
-  if (isOperatorOnlyRoute(event.url.pathname) && !isOperator(role)) {
-    return new Response("forbidden", { status: 403 });
-  }
-  return resolve(event);
+	if (isOperatorOnlyRoute(event.url.pathname) && !isOperator(role)) {
+		return new Response('forbidden', { status: 403 });
+	}
+	return resolve(event);
 };
 ```
 
@@ -2397,16 +2575,16 @@ export const handle: Handle = async ({ event, resolve }) => {
 ```svelte
 <!-- apps/console/src/lib/components/EtaBadge.svelte -->
 <script lang="ts">
-  export let etaRange: readonly [string, string] | null; // ISO datetime tuple
-  export let confidence: "low" | "medium" | "high" | null;
+	export let etaRange: readonly [string, string] | null; // ISO datetime tuple
+	export let confidence: 'low' | 'medium' | 'high' | null;
 </script>
 
 {#if etaRange}
-  <span class="eta-badge eta-{confidence}">
-    {formatEtaRangeJa(etaRange, confidence)}
-  </span>
+	<span class="eta-badge eta-{confidence}">
+		{formatEtaRangeJa(etaRange, confidence)}
+	</span>
 {:else}
-  <span class="eta-badge eta-unknown">推定不能</span>
+	<span class="eta-badge eta-unknown">推定不能</span>
 {/if}
 ```
 
@@ -2416,9 +2594,15 @@ export const handle: Handle = async ({ event, resolve }) => {
 // apps/console/src/routes/(home)/+page.server.ts
 
 export const load: PageServerLoad = async ({ fetch, locals }) => {
-  const overview = await ctrlApi.get<FleetOverview>("/api/fleet/overview", { fetch, actor: locals.actor });
-  const blocked = await ctrlApi.get<BlockedEntry[]>("/api/fleet/blocked", { fetch, actor: locals.actor });
-  return { overview, blocked }; // 23.1節の問い1・4・5をHomeへ集約
+	const overview = await ctrlApi.get<FleetOverview>('/api/fleet/overview', {
+		fetch,
+		actor: locals.actor
+	});
+	const blocked = await ctrlApi.get<BlockedEntry[]>('/api/fleet/blocked', {
+		fetch,
+		actor: locals.actor
+	});
+	return { overview, blocked }; // 23.1節の問い1・4・5をHomeへ集約
 };
 ```
 
@@ -2428,12 +2612,12 @@ export const load: PageServerLoad = async ({ fetch, locals }) => {
 
 Deno Deployはinstance間でmemoryを共有せずscale-to-zeroするプラットフォームであるため（17.5節）、単一instanceが保持し続けるWebSocket/SSE購読状態は「存在しない共有primitiveへ依存する」DP-16違反になりやすい。ダッシュボードの更新はこの制約を踏まえ、**画面ごとに粒度の異なるステートレスなポーリング**とする。
 
-| 画面 | 更新間隔 | 理由 |
-|---|---|---|
-| Home | 30秒 | org横断集計。多少の遅延は許容（FR-074はSHOULD） |
-| My Work / PR判定詳細 | 10秒、またはrecheck実行直後に即時再取得 | 「次に誰が何を」は鮮度が重要 |
-| Operations（Health board） | 15秒 | `fleet_health_snapshot`自体が1分粒度Cronで更新されるため、それ未満に縮めても情報は増えない |
-| CI Reliability / Reviews / Policy & Drift | 60秒 | 集計対象の変化が緩やか |
+| 画面                                      | 更新間隔                                | 理由                                                                                       |
+| ----------------------------------------- | --------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Home                                      | 30秒                                    | org横断集計。多少の遅延は許容（FR-074はSHOULD）                                            |
+| My Work / PR判定詳細                      | 10秒、またはrecheck実行直後に即時再取得 | 「次に誰が何を」は鮮度が重要                                                               |
+| Operations（Health board）                | 15秒                                    | `fleet_health_snapshot`自体が1分粒度Cronで更新されるため、それ未満に縮めても情報は増えない |
+| CI Reliability / Reviews / Policy & Drift | 60秒                                    | 集計対象の変化が緩やか                                                                     |
 
 各fetchは`If-None-Match`/ETagで304を返せるようにし、無変化時のペイロード転送を避ける。
 
@@ -2460,24 +2644,24 @@ CREATE TABLE fleet_health_snapshot (
 // packages/postgres/src/dashboard-rollup.ts (17.2節のdashboard-rollup Cronから呼ばれる)
 
 export async function refreshFleetHealthSnapshot(app: ControlApp): Promise<void> {
-  const signals = await Promise.all([
-    checkOutboxLag(app.db),               // work_outbox: pending最古のage、dead件数 (7章)
-    checkCronHeartbeat(app.db),           // 各Deno.cronジョブの最終成功時刻 (17.2節)
-    checkGitHubRateLimit(app.github),     // 13.4節で観測しているremaining%
-    checkBranchCoordinatorHealth(app.db), // stale lease、fencing異常 (10.3節)
-    checkEvidenceCompleteness(app.db),    // FR-085 日次検査の直近結果
-    checkMergerReachability(app.merger),  // OIDC疎通確認のみ。merge実行はしない
-  ]);
-  await app.db.transaction((tx) => upsertFleetHealthSnapshot(tx, signals));
+	const signals = await Promise.all([
+		checkOutboxLag(app.db), // work_outbox: pending最古のage、dead件数 (7章)
+		checkCronHeartbeat(app.db), // 各Deno.cronジョブの最終成功時刻 (17.2節)
+		checkGitHubRateLimit(app.github), // 13.4節で観測しているremaining%
+		checkBranchCoordinatorHealth(app.db), // stale lease、fencing異常 (10.3節)
+		checkEvidenceCompleteness(app.db), // FR-085 日次検査の直近結果
+		checkMergerReachability(app.merger) // OIDC疎通確認のみ。merge実行はしない
+	]);
+	await app.db.transaction((tx) => upsertFleetHealthSnapshot(tx, signals));
 }
 ```
 
-| component | red判定の例 | amber判定の例 |
-|---|---|---|
-| `control` | outbox `dead`件数が閾値超過、または最古pendingが`available_at`から15分超過 | 最古pendingが5分超過 |
-| `merger` | OIDC疎通不可、または直近decision_eventのsequenceギャップ検出 | 直近1時間のmerge試行が0件（queueに滞留がある場合のみ） |
-| `github_api` | rate limit remaining 5%未満 | remaining 20%未満（13.4節の後退閾値と同じ） |
-| `evidence_export` | 直近日次検査（FR-085）でmissing envelopeを検出 | 直近日次検査が24時間以上未実行 |
+| component         | red判定の例                                                                | amber判定の例                                          |
+| ----------------- | -------------------------------------------------------------------------- | ------------------------------------------------------ |
+| `control`         | outbox `dead`件数が閾値超過、または最古pendingが`available_at`から15分超過 | 最古pendingが5分超過                                   |
+| `merger`          | OIDC疎通不可、または直近decision_eventのsequenceギャップ検出               | 直近1時間のmerge試行が0件（queueに滞留がある場合のみ） |
+| `github_api`      | rate limit remaining 5%未満                                                | remaining 20%未満（13.4節の後退閾値と同じ）            |
+| `evidence_export` | 直近日次検査（FR-085）でmissing envelopeを検出                             | 直近日次検査が24時間以上未実行                         |
 
 Operations画面はこの`status`をtraffic-light表示し、`reason`を14.2節と同じ「なぜ」語彙（機械可読code＋人向け文）で表示する。これによりPR単位の「なぜ止まっているか」とシステム単位の「なぜYoroiが不調か」を同じ説明モデル（16.1節`ApiErrorBody`）で扱える。
 
@@ -2496,17 +2680,17 @@ Operations画面はこの`status`をtraffic-light表示し、`reason`を14.2節�
 
 20章のテスト方針は既にFunctional Core／Imperative Shellの区分と一致している（5.2節`reduce`・9.3節`evaluate`は純粋関数としてテストされ、GitHub/PostgreSQLはcontract/integration testで別途検証される）。本節では1.5節の用語でその対応を明示し、`yoroi-console`固有の追加分を示す。
 
-| 層 | 手法 | 対象 |
-|---|---|---|
-| Functional Core | `Deno.test` + property-based（20.2節） | `reduce`・`evaluate`・digest算出・23.2節`classifyResponsibility`のような表示用純粋関数。モックなしで`expect(evaluateGate(input)).toEqual(expectedDecision)`の形で検証できる |
-| Imperative Shell：GitHub adapter | Contract test（20.1節） | `packages/github`のrecorded fixture |
-| Imperative Shell：PostgreSQL | Integration test（20.1節） | inbox/outbox、lease/fencing、`fleet_health_snapshot`のロールアップ |
-| Imperative Shell：Webhook→Outbox→Check | 少数のE2E（20.1節fault injection） | 7章ingestionフロー |
-| Merger | 独立したsecurity test（20.3節） | fencing token検証、envelope検証（19章の信頼境界と一致） |
-| yoroi-console：E2E（Playwright） | 追加 | 未認証アクセスがSSOへredirectされる／ReviewerロールにOperator操作ボタンが表示されない／23.14節の危険操作がconfirmation dialogを要求する |
-| yoroi-console：Contract | 追加 | 24.2節の各read APIレスポンスを`packages/notifications`と共有するzodスキーマで検証し、control側の変更をconsole側のビルドで検知する |
-| yoroi-console：Secret漏えい防止 | 追加 | ビルド後バンドルとAPIレスポンスに`token`/`private_key`/`secret`/`authorization`等の禁止語を含まないことをCIで検査する |
-| yoroi-console：Rollupの再現性 | 追加 | `fleet_health_snapshot`のgreen/amber/red判定がfixtureメトリクスに対し決定論的であることをproperty-basedテストで検証する |
+| 層                                     | 手法                                   | 対象                                                                                                                                                                        |
+| -------------------------------------- | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Functional Core                        | `Deno.test` + property-based（20.2節） | `reduce`・`evaluate`・digest算出・23.2節`classifyResponsibility`のような表示用純粋関数。モックなしで`expect(evaluateGate(input)).toEqual(expectedDecision)`の形で検証できる |
+| Imperative Shell：GitHub adapter       | Contract test（20.1節）                | `packages/github`のrecorded fixture                                                                                                                                         |
+| Imperative Shell：PostgreSQL           | Integration test（20.1節）             | inbox/outbox、lease/fencing、`fleet_health_snapshot`のロールアップ                                                                                                          |
+| Imperative Shell：Webhook→Outbox→Check | 少数のE2E（20.1節fault injection）     | 7章ingestionフロー                                                                                                                                                          |
+| Merger                                 | 独立したsecurity test（20.3節）        | fencing token検証、envelope検証（19章の信頼境界と一致）                                                                                                                     |
+| yoroi-console：E2E（Playwright）       | 追加                                   | 未認証アクセスがSSOへredirectされる／ReviewerロールにOperator操作ボタンが表示されない／23.14節の危険操作がconfirmation dialogを要求する                                     |
+| yoroi-console：Contract                | 追加                                   | 24.2節の各read APIレスポンスを`packages/notifications`と共有するzodスキーマで検証し、control側の変更をconsole側のビルドで検知する                                           |
+| yoroi-console：Secret漏えい防止        | 追加                                   | ビルド後バンドルとAPIレスポンスに`token`/`private_key`/`secret`/`authorization`等の禁止語を含まないことをCIで検査する                                                       |
+| yoroi-console：Rollupの再現性          | 追加                                   | `fleet_health_snapshot`のgreen/amber/red判定がfixtureメトリクスに対し決定論的であることをproperty-basedテストで検証する                                                     |
 
 ---
 
@@ -2514,29 +2698,29 @@ Operations画面はこの`status`をtraffic-light表示し、`reason`を14.2節�
 
 要件IDと本書の対応章。
 
-| 要件領域 | 要件ID | 対応章 |
-|---|---|---|
-| Event ingestion・整合性 | FR-001〜008 | 7章 |
-| Policy・判定 | FR-010〜017 | 9章 |
-| Ownership・レビュー・承認 | FR-020〜029 | 8章、9章 |
-| Dynamic CI・証跡 | FR-040〜049 | 11章、13章 |
-| Queue・Merge Train | FR-050〜059 | 11章 |
-| Merge実行・例外・リカバリ | FR-060〜069 | 10章、12章 |
-| UX・説明可能性 | FR-070〜078 | 14章 |
-| 監査・Evidence | FR-080〜085 | 6.7節、12.2節、18章 |
-| 開発者体験・セルフサービス | FR-090〜105 | 14章、15章 |
-| 管理者ダッシュボード | FR-074、FR-092、FR-101 | 23章、24章 |
-| セキュリティ要件 | SEC-001〜038 | 19章 |
-| Dashboard/管理API保護 | SEC-020 | 24.4節 |
-| Deno Deploy構成 | 13章（要件） | 3章、17章 |
-| データモデル・API | 16章（要件） | 4章、6章、16章 |
-| テスト・受入 | AT-01〜AT-40 | 20章 |
+| 要件領域                   | 要件ID                 | 対応章              |
+| -------------------------- | ---------------------- | ------------------- |
+| Event ingestion・整合性    | FR-001〜008            | 7章                 |
+| Policy・判定               | FR-010〜017            | 9章                 |
+| Ownership・レビュー・承認  | FR-020〜029            | 8章、9章            |
+| Dynamic CI・証跡           | FR-040〜049            | 11章、13章          |
+| Queue・Merge Train         | FR-050〜059            | 11章                |
+| Merge実行・例外・リカバリ  | FR-060〜069            | 10章、12章          |
+| UX・説明可能性             | FR-070〜078            | 14章                |
+| 監査・Evidence             | FR-080〜085            | 6.7節、12.2節、18章 |
+| 開発者体験・セルフサービス | FR-090〜105            | 14章、15章          |
+| 管理者ダッシュボード       | FR-074、FR-092、FR-101 | 23章、24章          |
+| セキュリティ要件           | SEC-001〜038           | 19章                |
+| Dashboard/管理API保護      | SEC-020                | 24.4節              |
+| Deno Deploy構成            | 13章（要件）           | 3章、17章           |
+| データモデル・API          | 16章（要件）           | 4章、6章、16章      |
+| テスト・受入               | AT-01〜AT-40           | 20章                |
 
 ---
 
 ## 変更履歴
 
-| 版 | 日付 | 変更 |
-|---|---|---|
-| 0.1 | 2026-08-25 | 要件定義書v0.2に基づき初版作成。Phase 0〜3を詳細設計、Phase 4〜6を概要設計として記述 |
+| 版  | 日付       | 変更                                                                                                                                                                                                                                                                                  |
+| --- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0.1 | 2026-08-25 | 要件定義書v0.2に基づき初版作成。Phase 0〜3を詳細設計、Phase 4〜6を概要設計として記述                                                                                                                                                                                                  |
 | 0.2 | 2026-08-25 | 1.5節「Modular FC/IS + Ports at the Edges」を新設し、本書のアーキテクチャスタイルを明文化。23章「管理者ダッシュボード設計」（画面・操作、FR-074/FR-092/FR-101反映）と24章「yoroi-console実装設計」（SvelteKit、SEC-020、Better Auth）を追加し、旧23章トレーサビリティを25章へ繰り下げ |

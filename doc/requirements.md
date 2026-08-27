@@ -58,12 +58,12 @@ Yoroiを、**GitHub App + Deno Deploy + PostgreSQLのイベント駆動コント
 
 ### 1.2 Yoroiが判定する4層ゲート
 
-| ゲート | 判定対象 | 合格の意味 |
-|---|---|---|
+| ゲート                 | 判定対象                                              | 合格の意味                                           |
+| ---------------------- | ----------------------------------------------------- | ---------------------------------------------------- |
 | G1 Identity / Approval | 担当範囲、役割、定足数、職務分離、scope change digest | 必要な人が、現在も同一と証明できる変更範囲を承認した |
-| G2 Candidate Integrity | head SHA、base SHA、依存DAG、policy digest | テスト対象と最終マージ対象が一致する |
-| G3 Test Evidence | 動的テスト計画、flaky判定、成果物provenance | 必要な検証が信頼できる環境で完了した |
-| G4 Merge Authorization | 順序、最新main、freeze、例外期限 | 今この瞬間に統合してよい |
+| G2 Candidate Integrity | head SHA、base SHA、依存DAG、policy digest            | テスト対象と最終マージ対象が一致する                 |
+| G3 Test Evidence       | 動的テスト計画、flaky判定、成果物provenance           | 必要な検証が信頼できる環境で完了した                 |
+| G4 Merge Authorization | 順序、最新main、freeze、例外期限                      | 今この瞬間に統合してよい                             |
 
 ### 1.3 最重要の設計判断
 
@@ -107,13 +107,13 @@ Yoroiを、**GitHub App + Deno Deploy + PostgreSQLのイベント駆動コント
 
 ### 2.2 対象範囲
 
-| 領域 | 対象 | 境界 |
-|---|---|---|
-| Pull Request | 承認、owner coverage、依存、queue、merge | コード内容の妥当性そのものは人間とCIが判断する |
-| CI / CD | 実行計画、結果収集、provenance、再試行 | YoroiのDeno Deploy app内でbuildやTerraformを実行しない |
+| 領域           | 対象                                                 | 境界                                                           |
+| -------------- | ---------------------------------------------------- | -------------------------------------------------------------- |
+| Pull Request   | 承認、owner coverage、依存、queue、merge             | コード内容の妥当性そのものは人間とCIが判断する                 |
+| CI / CD        | 実行計画、結果収集、provenance、再試行               | YoroiのDeno Deploy app内でbuildやTerraformを実行しない         |
 | Org / Repo設定 | Ruleset、App権限、Actions policy、team access、drift | GitHubまたはTerraformのどちらをsource of truthにするか明示する |
-| リリース | freeze、hotfix lane、canary、auto-revert | 製品固有のdeployはアダプタ化する |
-| 監査 | 誰が・何を・なぜ許可したか | ソース本文やSecretは原則保存しない |
+| リリース       | freeze、hotfix lane、canary、auto-revert             | 製品固有のdeployはアダプタ化する                               |
+| 監査           | 誰が・何を・なぜ許可したか                           | ソース本文やSecretは原則保存しない                             |
 
 ### 2.3 非目標（初期）
 
@@ -169,20 +169,20 @@ IssueやDiscussionは、統計的な満足度調査としては扱わない。**
 
 2026-08-25の運用レビューを、単なる要望一覧ではなく設計のfailure-mode reviewとして扱った。主な判断は次のとおり。
 
-| 指摘 | 判断 | 反映先 |
-|---|---|---|
+| 指摘                              | 判断                                                                                                                                                          | 反映先                               |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
 | exact-SHA承認とreviewer枯渇が衝突 | **採用。ただしpatch-id単独は不採用。** 人の承認をscope単位のwhitespace-preserving change digest + context safety proofへ、CI/mergeをexact candidate SHAへ分離 | DP-13、FR-024/025、FR-090、AT-04A〜F |
-| PR open時の期待提示 | **MUSTへ昇格** | FR-071、FR-091、NFR-002、AT-25 |
-| questionnaire疲れ | **該当差分だけ表示** | FR-029、FR-097、AT-27 |
-| Draftで無駄なCI/noise | **Candidateと高コストCIを停止** | FR-096、AT-26 |
-| Queue ETA | **範囲 + confidenceとして採用** | FR-092、NFR-020、AT-33 |
-| Speculative再構築の理由通知 | **push型・coalesce付きでMUST** | FR-093、FR-101、AT-28 |
-| Batch干渉の当事者通知 | **相互linkと最小失敗集合を表示** | FR-094、AT-08 |
-| Flakyのself-service | **報告/申請はself-service、gate弱体化は別承認** | FR-098、AT-31 |
-| 誤検知時のrecheck | **break-glassと分離して採用** | FR-095、AT-29/30 |
-| 異議申立て経路 | **gate非迂回のfeedback loopを追加** | FR-099、AT-32 |
-| 開発者向けdocument不足 | **正式deliverableへ追加** | 23.1 Developer向け正式成果物 |
-| Exit criteriaが技術偏重 | **各phaseへDX exitを追加** | NFR-016〜023、20章 |
+| PR open時の期待提示               | **MUSTへ昇格**                                                                                                                                                | FR-071、FR-091、NFR-002、AT-25       |
+| questionnaire疲れ                 | **該当差分だけ表示**                                                                                                                                          | FR-029、FR-097、AT-27                |
+| Draftで無駄なCI/noise             | **Candidateと高コストCIを停止**                                                                                                                               | FR-096、AT-26                        |
+| Queue ETA                         | **範囲 + confidenceとして採用**                                                                                                                               | FR-092、NFR-020、AT-33               |
+| Speculative再構築の理由通知       | **push型・coalesce付きでMUST**                                                                                                                                | FR-093、FR-101、AT-28                |
+| Batch干渉の当事者通知             | **相互linkと最小失敗集合を表示**                                                                                                                              | FR-094、AT-08                        |
+| Flakyのself-service               | **報告/申請はself-service、gate弱体化は別承認**                                                                                                               | FR-098、AT-31                        |
+| 誤検知時のrecheck                 | **break-glassと分離して採用**                                                                                                                                 | FR-095、AT-29/30                     |
+| 異議申立て経路                    | **gate非迂回のfeedback loopを追加**                                                                                                                           | FR-099、AT-32                        |
+| 開発者向けdocument不足            | **正式deliverableへ追加**                                                                                                                                     | 23.1 Developer向け正式成果物         |
+| Exit criteriaが技術偏重           | **各phaseへDX exitを追加**                                                                                                                                    | NFR-016〜023、20章                   |
 
 このレビューで信頼核を弱めた箇所はない。むしろ「人が承認した変更と文脈」と「機械が実行したcandidate」を別々に証明することで、どの証跡が何を保証するかを明確にした。
 
@@ -192,18 +192,18 @@ IssueやDiscussionは、統計的な満足度調査としては扱わない。**
 
 ### 4.1 比較表
 
-| 方式 | 強いところ | 課題・代償 | Yoroiへ採用する要素 |
-|---|---|---|---|
-| Rust bors | 承認後、最新mainとの統合候補をテストしてからmerge。mainをgreenに保つ | 長いCIでは直列待ちが増える。rollup失敗時の犯人特定と公平性が難しい [S1][S2] | exact candidate、明示的状態機械、Serial mode |
-| Kubernetes Prow / Tide | ReviewerとApproverを分離。OWNERSで変更範囲を被覆。pool/batch [S3][S4] | 設定とstatus contextの組合せが複雑。失敗batchを反復し進まない事例 [S19][S21] | scope approval、pool、batch自動分割 |
-| Chromium Gerrit / CQ | ディレクトリOWNERS、巨大変更専用手続き、patch有無の失敗比較 [S5][S6] | 運用・インフラが重くGerrit前提 | 高感度scope、mega lane、failure comparison |
-| Zuul | A、A+B、A+B+Cを並列検証し、実際にmergeされる形をテスト [S12] | 先頭失敗で後続再実行。学習・運用コスト | speculative train、adaptive window、cross-repo DAG |
-| GitHub Merge Queue | GitHub UI・Rulesetとの統合、導入が容易 [S10] | 動的check、診断、API可視性に粗さ。Actions設定ミスが分かりにくい [S15]–[S18] | GitHub-native UX、aggregate check、reason graph |
-| GitLab Merge Trains | 累積候補を並列実行し、失敗要素を除いて後続を再構築 [S11] | flakyでtrain全体のCI成果が無効化されうる [S24] | 選択的再構築、安全な証跡再利用 |
-| Graphite | stack-aware queue、stackの並列処理、GitHub連携 [S31] | 外部SaaSへの権限・metadata委託、lock-in | stacked PR UX、fast-forward可能性の検証 |
-| Aviator | parallel queue、flaky対策、optimistic validation [S32] | optimistic時は真の失敗を排除するまで遅くなる | flaky registry、限定的optimistic mode |
-| Mergify | 宣言的rules、priority queue、GitHub-native automation [S35] | 複雑なruleの可読性、外部SaaS権限 | Policy as Code、rule simulation |
-| Linux / CPython / LLVM | 階層的信頼、maintainer裁量、revert文化、プロジェクトに合う軽さ [S7]–[S9] | 自動ゲートの強さは一様でなく属人性も残る | 人間の裁量、subsystem delegation、revert first |
+| 方式                   | 強いところ                                                               | 課題・代償                                                                   | Yoroiへ採用する要素                                |
+| ---------------------- | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------- | -------------------------------------------------- |
+| Rust bors              | 承認後、最新mainとの統合候補をテストしてからmerge。mainをgreenに保つ     | 長いCIでは直列待ちが増える。rollup失敗時の犯人特定と公平性が難しい [S1][S2]  | exact candidate、明示的状態機械、Serial mode       |
+| Kubernetes Prow / Tide | ReviewerとApproverを分離。OWNERSで変更範囲を被覆。pool/batch [S3][S4]    | 設定とstatus contextの組合せが複雑。失敗batchを反復し進まない事例 [S19][S21] | scope approval、pool、batch自動分割                |
+| Chromium Gerrit / CQ   | ディレクトリOWNERS、巨大変更専用手続き、patch有無の失敗比較 [S5][S6]     | 運用・インフラが重くGerrit前提                                               | 高感度scope、mega lane、failure comparison         |
+| Zuul                   | A、A+B、A+B+Cを並列検証し、実際にmergeされる形をテスト [S12]             | 先頭失敗で後続再実行。学習・運用コスト                                       | speculative train、adaptive window、cross-repo DAG |
+| GitHub Merge Queue     | GitHub UI・Rulesetとの統合、導入が容易 [S10]                             | 動的check、診断、API可視性に粗さ。Actions設定ミスが分かりにくい [S15]–[S18]  | GitHub-native UX、aggregate check、reason graph    |
+| GitLab Merge Trains    | 累積候補を並列実行し、失敗要素を除いて後続を再構築 [S11]                 | flakyでtrain全体のCI成果が無効化されうる [S24]                               | 選択的再構築、安全な証跡再利用                     |
+| Graphite               | stack-aware queue、stackの並列処理、GitHub連携 [S31]                     | 外部SaaSへの権限・metadata委託、lock-in                                      | stacked PR UX、fast-forward可能性の検証            |
+| Aviator                | parallel queue、flaky対策、optimistic validation [S32]                   | optimistic時は真の失敗を排除するまで遅くなる                                 | flaky registry、限定的optimistic mode              |
+| Mergify                | 宣言的rules、priority queue、GitHub-native automation [S35]              | 複雑なruleの可読性、外部SaaS権限                                             | Policy as Code、rule simulation                    |
+| Linux / CPython / LLVM | 階層的信頼、maintainer裁量、revert文化、プロジェクトに合う軽さ [S7]–[S9] | 自動ゲートの強さは一様でなく属人性も残る                                     | 人間の裁量、subsystem delegation、revert first     |
 
 ### 4.2 統合するパターン
 
@@ -355,35 +355,35 @@ Deploy ClassicにはQueuesがあったが、新Deno Deployでは未対応であ�
 
 ## 6. いいとこ取りの設計原則
 
-| ID | 原則 | 具体化 |
-|---|---|---|
-| DP-01 | Exact candidate | CIを通したcommitとmergeするcommitを一致させる |
-| DP-02 | Small trusted kernel | Webhook検証、状態遷移、gate、mergeだけを信頼核にする |
-| DP-03 | Fail closed for merge | 不明、欠落、競合、外部障害時はmergeしない。表示と診断は継続する |
-| DP-04 | Risk proportionality | 変更影響に応じて承認、CI、queue modeを増減する |
-| DP-05 | Human-legible policy | 機械評価でき、人がPR上で理解できるreason graphを返す |
-| DP-06 | Idempotent event sourcing | 重複・順不同を前提にevent journalと単調な状態機械で処理する |
-| DP-07 | Least privilege by component | Observer、Merger、Apply、Auditの資格情報を分離する |
-| DP-08 | Reconcile, do not assume | Webhookだけを真実とせずGitHub APIと再照合する |
-| DP-09 | Progressive enforcement | Observe→Advisory→Serial→Speculative/Batchの順に強化する |
-| DP-10 | Revert is first-class | merge後の監視、culprit判定、revertまで一連の制御に含める |
-| DP-11 | Evidence before optimization | 高速化は安全性が同等と証明できる範囲だけ行う |
-| DP-12 | No silent exception | すべてのbypassにactor、理由、期限、対象、事後処理を要求する |
-| DP-13 | Content-aware approval | 人の承認はscope change + context proofへ、CIとmergeはexact candidate SHAへ結合する |
-| DP-14 | Explain before waiting | PR open直後に必要条件を示し、状態変化は理由と次の行動を伴って通知する |
-| DP-15 | Self-service reconciliation | policy非変更の再照合は開発者が安全に起動できるようにする |
-| DP-16 | No phantom platform primitive | Deno Deployに存在しないQueue、共有memory、永続filesystemを設計へ持ち込まない |
-| DP-17 | Measure human cost | 安全性だけでなくreview load、理解度、待ち時間、信頼感をphase exitで測る |
+| ID    | 原則                          | 具体化                                                                             |
+| ----- | ----------------------------- | ---------------------------------------------------------------------------------- |
+| DP-01 | Exact candidate               | CIを通したcommitとmergeするcommitを一致させる                                      |
+| DP-02 | Small trusted kernel          | Webhook検証、状態遷移、gate、mergeだけを信頼核にする                               |
+| DP-03 | Fail closed for merge         | 不明、欠落、競合、外部障害時はmergeしない。表示と診断は継続する                    |
+| DP-04 | Risk proportionality          | 変更影響に応じて承認、CI、queue modeを増減する                                     |
+| DP-05 | Human-legible policy          | 機械評価でき、人がPR上で理解できるreason graphを返す                               |
+| DP-06 | Idempotent event sourcing     | 重複・順不同を前提にevent journalと単調な状態機械で処理する                        |
+| DP-07 | Least privilege by component  | Observer、Merger、Apply、Auditの資格情報を分離する                                 |
+| DP-08 | Reconcile, do not assume      | Webhookだけを真実とせずGitHub APIと再照合する                                      |
+| DP-09 | Progressive enforcement       | Observe→Advisory→Serial→Speculative/Batchの順に強化する                            |
+| DP-10 | Revert is first-class         | merge後の監視、culprit判定、revertまで一連の制御に含める                           |
+| DP-11 | Evidence before optimization  | 高速化は安全性が同等と証明できる範囲だけ行う                                       |
+| DP-12 | No silent exception           | すべてのbypassにactor、理由、期限、対象、事後処理を要求する                        |
+| DP-13 | Content-aware approval        | 人の承認はscope change + context proofへ、CIとmergeはexact candidate SHAへ結合する |
+| DP-14 | Explain before waiting        | PR open直後に必要条件を示し、状態変化は理由と次の行動を伴って通知する              |
+| DP-15 | Self-service reconciliation   | policy非変更の再照合は開発者が安全に起動できるようにする                           |
+| DP-16 | No phantom platform primitive | Deno Deployに存在しないQueue、共有memory、永続filesystemを設計へ持ち込まない       |
+| DP-17 | Measure human cost            | 安全性だけでなくreview load、理解度、待ち時間、信頼感をphase exitで測る            |
 
 ### 6.1 運用モード
 
-| モード | 用途 | Bot権限 | 統合方式 |
-|---|---|---|---|
-| Observe | 導入前、新repo | read + Check Run | 人間のmergeをshadow採点する |
-| Advisory | 小規模、低リスク | status/comment | GitHub native mergeを補助する |
-| Serial | 高リスク、CI不安定 | merge権限 | 最新main + 1 PRを完全検証する |
-| Speculative | 高頻度、CI安定 | merge権限 | A / A+B / A+B+Cを並列検証する |
-| Batch | 低リスク、長時間CI | merge権限 | 複数PRをまとめ、失敗時に自動分割する |
+| モード      | 用途               | Bot権限          | 統合方式                             |
+| ----------- | ------------------ | ---------------- | ------------------------------------ |
+| Observe     | 導入前、新repo     | read + Check Run | 人間のmergeをshadow採点する          |
+| Advisory    | 小規模、低リスク   | status/comment   | GitHub native mergeを補助する        |
+| Serial      | 高リスク、CI不安定 | merge権限        | 最新main + 1 PRを完全検証する        |
+| Speculative | 高頻度、CI安定     | merge権限        | A / A+B / A+B+Cを並列検証する        |
+| Batch       | 低リスク、長時間CI | merge権限        | 複数PRをまとめ、失敗時に自動分割する |
 
 ---
 
@@ -391,18 +391,18 @@ Deploy ClassicにはQueuesがあったが、新Deno Deployでは未対応であ�
 
 ### 7.1 役割
 
-| 役割 | できること | 制約 |
-|---|---|---|
-| Author | PR作成、依存宣言、risk questionnaire回答 | 自己承認、自分の例外承認は不可 |
-| Reviewer | 実装品質のLGTM、changes request | 所有範囲の最終承認とは別 |
-| Scope Approver | OWNERS範囲の変更責任を引き受ける | 対象SHAとscopeにのみ有効 |
-| Security Approver | 認証、権限、秘密、supply chainを承認 | 通常owner承認の代替にならない |
-| Data Approver | schema、migration、retention、PIIを承認 | service owner承認と独立に要求可能 |
-| Infra Approver | Terraform、workflow、runner、networkを承認 | 高リスクでは二名定足数 |
-| Release Manager | freeze、優先度、release train操作 | gate結果を書き換えない |
-| Bot Operator | pause、replay、deploy、障害対応 | PR承認や単独break-glassは不可 |
-| Org Governor | policy root、App権限、Ruleset変更を複数承認 | 日常queue操作から分離 |
-| Auditor | 証跡、例外、driftの閲覧・export | mergeやpolicy変更は不可 |
+| 役割              | できること                                  | 制約                              |
+| ----------------- | ------------------------------------------- | --------------------------------- |
+| Author            | PR作成、依存宣言、risk questionnaire回答    | 自己承認、自分の例外承認は不可    |
+| Reviewer          | 実装品質のLGTM、changes request             | 所有範囲の最終承認とは別          |
+| Scope Approver    | OWNERS範囲の変更責任を引き受ける            | 対象SHAとscopeにのみ有効          |
+| Security Approver | 認証、権限、秘密、supply chainを承認        | 通常owner承認の代替にならない     |
+| Data Approver     | schema、migration、retention、PIIを承認     | service owner承認と独立に要求可能 |
+| Infra Approver    | Terraform、workflow、runner、networkを承認  | 高リスクでは二名定足数            |
+| Release Manager   | freeze、優先度、release train操作           | gate結果を書き換えない            |
+| Bot Operator      | pause、replay、deploy、障害対応             | PR承認や単独break-glassは不可     |
+| Org Governor      | policy root、App権限、Ruleset変更を複数承認 | 日常queue操作から分離             |
+| Auditor           | 証跡、例外、driftの閲覧・export             | mergeやpolicy変更は不可           |
 
 ### 7.2 承認カバレッジ
 
@@ -496,17 +496,17 @@ continuityはdigest一致だけで完了しない。次の`ContextSafetyProof`�
 
 内部のgateや状態名を覚えなくても、AuthorとReviewerが次の行動を判断できることを受入条件にする。
 
-| 段階 | Yoroiの即時動作 | 開発者に見せるもの | 抑止する負担 |
-|---|---|---|---|
-| Draft作成 | webhook永続化、軽量scope/risk推定、初期summary。Candidateと高コストCIは原則作らない | 想定role、想定check、高感度scope、Draft中に省略する処理 | 無駄なCI、早すぎるreview依頼、Bot noise |
-| Ready for review | scopeとriskを確定し、必要reviewer候補とcheck planを更新 | 必要票、推奨reviewer、questionnaire該当理由、開始されたCI | 後出し要件、reviewer探索 |
-| Review中 | approval coverageをscope別に集約。push時はchange continuityとcontext proofを判定 | 維持した承認、失効した承認、変更scope、必要な再依頼だけ | rebase起因の再承認storm |
-| Queue待ち | laneへenqueueし、位置・ETA範囲・信頼度を更新 | 待ち理由、先行PR、推定時間、優先順位根拠 | ブラックボックス感、手動問い合わせ |
-| Candidate / CI | exact candidateを作り、必要jobだけ実行。再構築理由を記録 | candidate SHA、job選択理由、再実行の原因PR | 「なぜまたCI？」という混乱 |
-| Batch干渉 | 最小失敗集合を探索し、相互作用を学習 | 関係PRの相互link、共同で直すべき症状、次のmode | 原因不明の再試行ループ |
-| Merge直前 | GitHubから全権威状態を再取得し、lease/fencingを検証 | 最終gate、merge予定、変更があれば差分理由 | stale state merge |
-| Merge後 | evidenceを確定しpost-merge signalを監視 | merged SHA、evidence link、監視状態、revert手順 | 「入った後」が見えない状態 |
-| Block / 異議 | `/yoroi recheck`で再照合、`feedback`で異議を受付 | 失敗箇所、自己解決手段、応答SLO、case ID | Fail-closedによる詰み感 |
+| 段階             | Yoroiの即時動作                                                                     | 開発者に見せるもの                                        | 抑止する負担                            |
+| ---------------- | ----------------------------------------------------------------------------------- | --------------------------------------------------------- | --------------------------------------- |
+| Draft作成        | webhook永続化、軽量scope/risk推定、初期summary。Candidateと高コストCIは原則作らない | 想定role、想定check、高感度scope、Draft中に省略する処理   | 無駄なCI、早すぎるreview依頼、Bot noise |
+| Ready for review | scopeとriskを確定し、必要reviewer候補とcheck planを更新                             | 必要票、推奨reviewer、questionnaire該当理由、開始されたCI | 後出し要件、reviewer探索                |
+| Review中         | approval coverageをscope別に集約。push時はchange continuityとcontext proofを判定    | 維持した承認、失効した承認、変更scope、必要な再依頼だけ   | rebase起因の再承認storm                 |
+| Queue待ち        | laneへenqueueし、位置・ETA範囲・信頼度を更新                                        | 待ち理由、先行PR、推定時間、優先順位根拠                  | ブラックボックス感、手動問い合わせ      |
+| Candidate / CI   | exact candidateを作り、必要jobだけ実行。再構築理由を記録                            | candidate SHA、job選択理由、再実行の原因PR                | 「なぜまたCI？」という混乱              |
+| Batch干渉        | 最小失敗集合を探索し、相互作用を学習                                                | 関係PRの相互link、共同で直すべき症状、次のmode            | 原因不明の再試行ループ                  |
+| Merge直前        | GitHubから全権威状態を再取得し、lease/fencingを検証                                 | 最終gate、merge予定、変更があれば差分理由                 | stale state merge                       |
+| Merge後          | evidenceを確定しpost-merge signalを監視                                             | merged SHA、evidence link、監視状態、revert手順           | 「入った後」が見えない状態              |
+| Block / 異議     | `/yoroi recheck`で再照合、`feedback`で異議を受付                                    | 失敗箇所、自己解決手段、応答SLO、case ID                  | Fail-closedによる詰み感                 |
 
 summaryは内部用語を次の4問へ翻訳する。
 
@@ -590,152 +590,152 @@ stateDiagram-v2
 
 ### 9.1 Event ingestion・整合性
 
-| ID | 優先 | 要求 |
-|---|---|---|
-| FR-001 | MUST | Webhook raw bodyへHMAC-SHA256を検証し、event type allowlist、content-type、payload上限を適用する |
-| FR-002 | MUST | 受信時刻、GitHub delivery ID、installation ID、repository ID、event type、payload digestと再処理に必要な最小event factsをjournalへ記録する。raw payloadを保持する場合は暗号化と短いTTLを適用する |
-| FR-003 | MUST | GitHubへ10秒以内に2xxを返す。応答前にeventをPostgreSQL transactional inboxへcommitし、重い処理をoutbox workerへ分離する。response後のdetached Promiseを唯一のdelivery手段にしない [S13][S37] |
-| FR-004 | MUST | `delivery ID + installation ID` をidempotency keyとし、同一eventでCheck、queue、mergeを二重実行しない |
-| FR-005 | MUST | 順不同eventを許容し、古いeventで状態を後退させない |
-| FR-006 | MUST | Deno Cronでopen PR、review、check、queue、Ruleset、stalled leaseをGitHub APIと再照合する。Cronは1分粒度のsafety netであり、低遅延queueの代替にしない [S42] |
-| FR-007 | MUST | 再処理、DLQ復帰、手動replayでも同一operationを一度だけ有効化する |
-| FR-008 | SHOULD | GitHub API rate limitとsecondary rate limitを監視し、backoff、window縮小、優先event処理を行う |
+| ID     | 優先   | 要求                                                                                                                                                                                             |
+| ------ | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| FR-001 | MUST   | Webhook raw bodyへHMAC-SHA256を検証し、event type allowlist、content-type、payload上限を適用する                                                                                                 |
+| FR-002 | MUST   | 受信時刻、GitHub delivery ID、installation ID、repository ID、event type、payload digestと再処理に必要な最小event factsをjournalへ記録する。raw payloadを保持する場合は暗号化と短いTTLを適用する |
+| FR-003 | MUST   | GitHubへ10秒以内に2xxを返す。応答前にeventをPostgreSQL transactional inboxへcommitし、重い処理をoutbox workerへ分離する。response後のdetached Promiseを唯一のdelivery手段にしない [S13][S37]     |
+| FR-004 | MUST   | `delivery ID + installation ID` をidempotency keyとし、同一eventでCheck、queue、mergeを二重実行しない                                                                                            |
+| FR-005 | MUST   | 順不同eventを許容し、古いeventで状態を後退させない                                                                                                                                               |
+| FR-006 | MUST   | Deno Cronでopen PR、review、check、queue、Ruleset、stalled leaseをGitHub APIと再照合する。Cronは1分粒度のsafety netであり、低遅延queueの代替にしない [S42]                                       |
+| FR-007 | MUST   | 再処理、DLQ復帰、手動replayでも同一operationを一度だけ有効化する                                                                                                                                 |
+| FR-008 | SHOULD | GitHub API rate limitとsecondary rate limitを監視し、backoff、window縮小、優先event処理を行う                                                                                                    |
 
 ### 9.2 Policy・判定
 
-| ID | 優先 | 要求 |
-|---|---|---|
-| FR-010 | MUST | versioned YAMLまたはJSON policyをschema検証し、org/repo/branch継承、例外、effective policyを決定する |
-| FR-011 | MUST | 同じ入力bundleから同じ判定とreason graphを返す決定論的evaluatorを提供する |
-| FR-012 | MUST | invalid syntax、未知field、owner不在、循環継承、空の必須check集合を安全側のerrorにする |
-| FR-013 | MUST | 過去eventまたは対象PRへpolicyをdry-runし、merge可否、追加CI、待ち時間への影響を比較する |
-| FR-014 | MUST | GitHub Rulesetへ `yoroi/gate` をrequired checkとして公開する |
-| FR-015 | MUST | 内部の期待check集合、承認coverage、候補SHA、policy versionをCheck Run detailへ表示する |
-| FR-016 | SHOULD | policy schemaのversioning、deprecation、converter、rollbackを提供する |
-| FR-017 | SHOULD | Shadow判定と実際の人間判断の差を記録し、誤判定を分類する |
+| ID     | 優先   | 要求                                                                                                 |
+| ------ | ------ | ---------------------------------------------------------------------------------------------------- |
+| FR-010 | MUST   | versioned YAMLまたはJSON policyをschema検証し、org/repo/branch継承、例外、effective policyを決定する |
+| FR-011 | MUST   | 同じ入力bundleから同じ判定とreason graphを返す決定論的evaluatorを提供する                            |
+| FR-012 | MUST   | invalid syntax、未知field、owner不在、循環継承、空の必須check集合を安全側のerrorにする               |
+| FR-013 | MUST   | 過去eventまたは対象PRへpolicyをdry-runし、merge可否、追加CI、待ち時間への影響を比較する              |
+| FR-014 | MUST   | GitHub Rulesetへ `yoroi/gate` をrequired checkとして公開する                                         |
+| FR-015 | MUST   | 内部の期待check集合、承認coverage、候補SHA、policy versionをCheck Run detailへ表示する               |
+| FR-016 | SHOULD | policy schemaのversioning、deprecation、converter、rollbackを提供する                                |
+| FR-017 | SHOULD | Shadow判定と実際の人間判断の差を記録し、誤判定を分類する                                             |
 
 ### 9.3 Ownership・レビュー・承認
 
-| ID | 優先 | 要求 |
-|---|---|---|
-| FR-020 | MUST | path、component、service、data class、infra resourceをscopeへ写像するownership graphを持つ |
-| FR-021 | MUST | scopeごとにAND、OR、quorum、role、fallback、separation-of-dutiesを表現する |
-| FR-022 | MUST | Reviewer、Scope Approver、Security/Data/Infra Approver、Governorを区別する |
-| FR-023 | MUST | Authorの自己承認、Botの自己承認、同一人物による二役充足をpolicyに従い拒否する |
-| FR-024 | MUST | approvalをscope change digest、context proof policy、scope mapping version、policy digest、actor roleへ結合し、承認時head/base SHAとresult digestを監査文脈として保存する |
-| FR-025 | MUST | head変更後にscope別change continuityとcontext safety proofを判定し、変更が異なるscopeのapprovalだけを無効化する。同一かつ適用結果を証明できれば維持し、判定不能なら影響scopeを安全側に失効する |
-| FR-026 | MUST | changes requested、dismissed review、team membership変更、SSO失効を再評価する |
-| FR-027 | SHOULD | availability、直近負荷、domain、timezone、bus factorからreviewer候補を提示する |
-| FR-028 | SHOULD | review SLA超過時にfallback team、manager、release managerへ段階的にescalateする |
-| FR-029 | SHOULD | schema、auth、permission、infra、public API等の差分ヒューリスティックが発火した場合だけ、該当項目のrisk questionnaireを提示する。全PR一律の長いformを禁止し、発火理由と回答用途を表示する |
+| ID     | 優先   | 要求                                                                                                                                                                                           |
+| ------ | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| FR-020 | MUST   | path、component、service、data class、infra resourceをscopeへ写像するownership graphを持つ                                                                                                     |
+| FR-021 | MUST   | scopeごとにAND、OR、quorum、role、fallback、separation-of-dutiesを表現する                                                                                                                     |
+| FR-022 | MUST   | Reviewer、Scope Approver、Security/Data/Infra Approver、Governorを区別する                                                                                                                     |
+| FR-023 | MUST   | Authorの自己承認、Botの自己承認、同一人物による二役充足をpolicyに従い拒否する                                                                                                                  |
+| FR-024 | MUST   | approvalをscope change digest、context proof policy、scope mapping version、policy digest、actor roleへ結合し、承認時head/base SHAとresult digestを監査文脈として保存する                      |
+| FR-025 | MUST   | head変更後にscope別change continuityとcontext safety proofを判定し、変更が異なるscopeのapprovalだけを無効化する。同一かつ適用結果を証明できれば維持し、判定不能なら影響scopeを安全側に失効する |
+| FR-026 | MUST   | changes requested、dismissed review、team membership変更、SSO失効を再評価する                                                                                                                  |
+| FR-027 | SHOULD | availability、直近負荷、domain、timezone、bus factorからreviewer候補を提示する                                                                                                                 |
+| FR-028 | SHOULD | review SLA超過時にfallback team、manager、release managerへ段階的にescalateする                                                                                                                |
+| FR-029 | SHOULD | schema、auth、permission、infra、public API等の差分ヒューリスティックが発火した場合だけ、該当項目のrisk questionnaireを提示する。全PR一律の長いformを禁止し、発火理由と回答用途を表示する      |
 
 ### 9.4 Dynamic CI・証跡
 
-| ID | 優先 | 要求 |
-|---|---|---|
-| FR-040 | MUST | 差分、dependency graph、risk tag、履歴から期待job集合を決める |
-| FR-041 | MUST | 実行するjobだけでなく、選択理由と省略理由を表示する |
-| FR-042 | MUST | job結果をcandidate SHA、workflow SHA、runner class、input/artifact digestへ結合する |
-| FR-043 | MUST | 期待jobが存在し、完了し、対象SHA一致の場合のみ合格する。未起動、遅延、cancelledを成功扱いしない |
-| FR-044 | MUST | fork/unreviewed CIをread-only token、Secretなし、ephemeral runnerで実行する |
-| FR-045 | MUST | Secretを使うjobをreview後のtrusted pipelineへ限定する |
-| FR-046 | SHOULD | test単位の失敗履歴、再現率、owner、quarantine期限をflaky registryへ保持する |
-| FR-047 | SHOULD | retry回数、backoff、confidence、voting/non-voting扱いをtest classごとにpolicy化する |
-| FR-048 | SHOULD | patch有無、直前main、同一runner imageの結果を比較し、既知infra failureと変更起因を区別する |
+| ID     | 優先   | 要求                                                                                                     |
+| ------ | ------ | -------------------------------------------------------------------------------------------------------- |
+| FR-040 | MUST   | 差分、dependency graph、risk tag、履歴から期待job集合を決める                                            |
+| FR-041 | MUST   | 実行するjobだけでなく、選択理由と省略理由を表示する                                                      |
+| FR-042 | MUST   | job結果をcandidate SHA、workflow SHA、runner class、input/artifact digestへ結合する                      |
+| FR-043 | MUST   | 期待jobが存在し、完了し、対象SHA一致の場合のみ合格する。未起動、遅延、cancelledを成功扱いしない          |
+| FR-044 | MUST   | fork/unreviewed CIをread-only token、Secretなし、ephemeral runnerで実行する                              |
+| FR-045 | MUST   | Secretを使うjobをreview後のtrusted pipelineへ限定する                                                    |
+| FR-046 | SHOULD | test単位の失敗履歴、再現率、owner、quarantine期限をflaky registryへ保持する                              |
+| FR-047 | SHOULD | retry回数、backoff、confidence、voting/non-voting扱いをtest classごとにpolicy化する                      |
+| FR-048 | SHOULD | patch有無、直前main、同一runner imageの結果を比較し、既知infra failureと変更起因を区別する               |
 | FR-049 | SHOULD | source、lockfile、toolchain、workflow、environment、candidate ancestryが同一の場合だけCI結果を再利用する |
 
 ### 9.5 Queue・Merge Train
 
-| ID | 優先 | 要求 |
-|---|---|---|
-| FR-050 | MUST | 最新mainへ1 PRを合成し、候補SHAの全gate通過後のみmergeするSerial modeを提供する |
-| FR-051 | MUST | base更新時に候補を再生成し、旧候補の証跡を最終mergeへ使わない |
-| FR-052 | SHOULD | A、A+B、A+B+Cを並列検証するSpeculative modeを提供する |
-| FR-053 | SHOULD | 先行失敗時、影響を受ける後続だけを新しい累積候補で再実行する |
-| FR-054 | SHOULD | 成功率、flaky率、CI capacity、riskに応じtrain windowを自動拡縮する |
-| FR-055 | SHOULD | 低リスクPRをbatch化し、失敗時に二分探索またはdelta debuggingで原因集合を特定する |
-| FR-056 | MUST | stacked PR、cross-repo/API/schema依存をDAGとして表し、cycle、欠落、逆順mergeを拒否する |
-| FR-057 | MUST | textual conflictをenqueue前とcandidate作成時に検出する |
-| FR-058 | MUST | priority、aging、risk lane、reserved slotで順序を決め、starvationを可視化する |
-| FR-059 | MUST | 同一batch、同一failure fingerprintの無限再試行をcircuit breakerで止める |
+| ID     | 優先   | 要求                                                                                   |
+| ------ | ------ | -------------------------------------------------------------------------------------- |
+| FR-050 | MUST   | 最新mainへ1 PRを合成し、候補SHAの全gate通過後のみmergeするSerial modeを提供する        |
+| FR-051 | MUST   | base更新時に候補を再生成し、旧候補の証跡を最終mergeへ使わない                          |
+| FR-052 | SHOULD | A、A+B、A+B+Cを並列検証するSpeculative modeを提供する                                  |
+| FR-053 | SHOULD | 先行失敗時、影響を受ける後続だけを新しい累積候補で再実行する                           |
+| FR-054 | SHOULD | 成功率、flaky率、CI capacity、riskに応じtrain windowを自動拡縮する                     |
+| FR-055 | SHOULD | 低リスクPRをbatch化し、失敗時に二分探索またはdelta debuggingで原因集合を特定する       |
+| FR-056 | MUST   | stacked PR、cross-repo/API/schema依存をDAGとして表し、cycle、欠落、逆順mergeを拒否する |
+| FR-057 | MUST   | textual conflictをenqueue前とcandidate作成時に検出する                                 |
+| FR-058 | MUST   | priority、aging、risk lane、reserved slotで順序を決め、starvationを可視化する          |
+| FR-059 | MUST   | 同一batch、同一failure fingerprintの無限再試行をcircuit breakerで止める                |
 
 ### 9.6 Merge実行・例外・リカバリ
 
-| ID | 優先 | 要求 |
-|---|---|---|
-| FR-060 | MUST | merge直前にhead、base、policy、approval、expected checks、tree-openをGitHubから再取得する |
-| FR-061 | MUST | merge API呼出しへ一意なoperation IDを割り当て、retry時も二重mergeしない |
-| FR-062 | MUST | pause、drain、tree close、repo quarantine、lane freezeを権限付きで操作する |
-| FR-063 | MUST | 操作へ理由、対象、actor、期限を要求する |
-| FR-064 | MUST | break-glassへ二名承認、ticket、TTL、事後reviewを要求する |
-| FR-065 | MUST | Bot、GitHub、Deno Deploy、PostgreSQL、外部証跡先の不整合時はmergeをfail closedにする |
-| FR-066 | MUST | Bot停止中のeventを保持し、復旧後reconcileして一度だけ処理する |
-| FR-067 | SHOULD | post-merge signalを監視し、回帰候補をqueue履歴と突合する |
-| FR-068 | SHOULD | 単一culpritが明確でrevert安全性を満たす場合、revert PRを自動作成する |
-| FR-069 | SHOULD | auto-revertがpolicyを満たすrepoだけ自動mergeし、曖昧な場合は人へ委譲する |
+| ID     | 優先   | 要求                                                                                      |
+| ------ | ------ | ----------------------------------------------------------------------------------------- |
+| FR-060 | MUST   | merge直前にhead、base、policy、approval、expected checks、tree-openをGitHubから再取得する |
+| FR-061 | MUST   | merge API呼出しへ一意なoperation IDを割り当て、retry時も二重mergeしない                   |
+| FR-062 | MUST   | pause、drain、tree close、repo quarantine、lane freezeを権限付きで操作する                |
+| FR-063 | MUST   | 操作へ理由、対象、actor、期限を要求する                                                   |
+| FR-064 | MUST   | break-glassへ二名承認、ticket、TTL、事後reviewを要求する                                  |
+| FR-065 | MUST   | Bot、GitHub、Deno Deploy、PostgreSQL、外部証跡先の不整合時はmergeをfail closedにする      |
+| FR-066 | MUST   | Bot停止中のeventを保持し、復旧後reconcileして一度だけ処理する                             |
+| FR-067 | SHOULD | post-merge signalを監視し、回帰候補をqueue履歴と突合する                                  |
+| FR-068 | SHOULD | 単一culpritが明確でrevert安全性を満たす場合、revert PRを自動作成する                      |
+| FR-069 | SHOULD | auto-revertがpolicyを満たすrepoだけ自動mergeし、曖昧な場合は人へ委譲する                  |
 
 ### 9.7 UX・説明可能性
 
-| ID | 優先 | 要求 |
-|---|---|---|
-| FR-070 | MUST | PR上に一つの更新型summaryと一つのaggregate Checkを表示し、同一原因のBotコメントを乱立させない。重要な状態変化だけをtargeted notificationにする |
-| FR-071 | MUST | PR openイベント受信直後に初期summaryを投稿し、現在状態、必要role、該当scope、高感度判定、想定check、不足gate、次の担当、queue位置、ETA、候補SHA、policy versionを段階的に表示する |
-| FR-072 | MUST | event→policy→期待check→実check→結論のreason graphを表示する |
-| FR-073 | MUST | raw webhook delivery、Actions run、policy source、decision evidenceへのlinkを表示する |
-| FR-074 | SHOULD | org/repo横断dashboardへqueue、aging、review bottleneck、CI reliability、drift、incidentを表示する |
-| FR-075 | SHOULD | 同一原因の通知を集約し、owner/SLA/escalationに応じGitHub通知する |
-| FR-076 | SHOULD | Slack等はadapterとし、通知先を判定のsource of truthにしない |
-| FR-077 | COULD | 依存宣言、PR分割、reviewer候補、risk説明、失敗要約をAIが提案する |
-| FR-078 | MUST | AI提案をgateの権威ある根拠にせず、決定論的判定から分離する |
+| ID     | 優先   | 要求                                                                                                                                                                              |
+| ------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| FR-070 | MUST   | PR上に一つの更新型summaryと一つのaggregate Checkを表示し、同一原因のBotコメントを乱立させない。重要な状態変化だけをtargeted notificationにする                                    |
+| FR-071 | MUST   | PR openイベント受信直後に初期summaryを投稿し、現在状態、必要role、該当scope、高感度判定、想定check、不足gate、次の担当、queue位置、ETA、候補SHA、policy versionを段階的に表示する |
+| FR-072 | MUST   | event→policy→期待check→実check→結論のreason graphを表示する                                                                                                                       |
+| FR-073 | MUST   | raw webhook delivery、Actions run、policy source、decision evidenceへのlinkを表示する                                                                                             |
+| FR-074 | SHOULD | org/repo横断dashboardへqueue、aging、review bottleneck、CI reliability、drift、incidentを表示する                                                                                 |
+| FR-075 | SHOULD | 同一原因の通知を集約し、owner/SLA/escalationに応じGitHub通知する                                                                                                                  |
+| FR-076 | SHOULD | Slack等はadapterとし、通知先を判定のsource of truthにしない                                                                                                                       |
+| FR-077 | COULD  | 依存宣言、PR分割、reviewer候補、risk説明、失敗要約をAIが提案する                                                                                                                  |
+| FR-078 | MUST   | AI提案をgateの権威ある根拠にせず、決定論的判定から分離する                                                                                                                        |
 
 ### 9.8 監査・Evidence
 
-| ID | 優先 | 要求 |
-|---|---|---|
+| ID     | 優先 | 要求                                                                                  |
+| ------ | ---- | ------------------------------------------------------------------------------------- |
 | FR-080 | MUST | review、policy、candidate、CI、merge API responseをdecision evidence bundleへまとめる |
-| FR-081 | MUST | evidenceにactorのstable GitHub IDを使い、変更可能なhandleだけに依存しない |
-| FR-082 | MUST | evidence bundleへhash chainを持たせ、独立した保存先またはSIEMへexportする |
-| FR-083 | MUST | actor、PR、SHA、policy、exception、merge、config changeで検索できる |
-| FR-084 | MUST | 保持期間、legal hold、削除、exportをorg policyで設定できる |
-| FR-085 | MUST | 全mergeにdecision envelopeとevidence linkが存在することを日次検査する |
+| FR-081 | MUST | evidenceにactorのstable GitHub IDを使い、変更可能なhandleだけに依存しない             |
+| FR-082 | MUST | evidence bundleへhash chainを持たせ、独立した保存先またはSIEMへexportする             |
+| FR-083 | MUST | actor、PR、SHA、policy、exception、merge、config changeで検索できる                   |
+| FR-084 | MUST | 保持期間、legal hold、削除、exportをorg policyで設定できる                            |
+| FR-085 | MUST | 全mergeにdecision envelopeとevidence linkが存在することを日次検査する                 |
 
 ### 9.9 開発者体験・セルフサービス
 
 レビュー指摘を信頼核と同格の製品要件へ引き上げる。以下は「便利機能」ではなく、回避行動とreviewer枯渇を防ぐ統制である。
 
-| ID | 優先 | 要求 |
-|---|---|---|
-| FR-090 | MUST | 承認継続は生head SHA一致ではなく、対象scopeのwhitespace-preserving canonical change digest一致と、新base上のcontext safety proofで判定する。CI・mergeのexact candidate SHA原則は維持する |
-| FR-091 | MUST | PR open受信後、初期summaryをp95 30秒以内に投稿し、想定必要role、高感度scope、想定check集合、Draft扱い、次のactionを表示する |
-| FR-092 | SHOULD | queue位置に加え、lane別の実測throughput、CI所要分布、先行依存からETA範囲・信頼度・主要変動要因を表示する |
-| FR-093 | MUST | 候補が先行PRの失敗・離脱・順序変更で再構築された場合、影響PR authorへ原因PR、旧/新candidate、再実行範囲、次の見込みを通知する |
-| FR-094 | SHOULD | batch相互作用で失敗した最小集合の各PRを相互linkし、単体pass・組合せfailの事実、failure fingerprint、調整ownerを当事者へ通知する |
-| FR-095 | SHOULD | policy変更を伴わないGitHub状態再照合を `/yoroi recheck` とUI actionで提供し、Operator承認を要求しない。coalescing、cooldown、audit、権限確認を行う |
-| FR-096 | MUST | Draft/WIP PRではCandidate生成、queue投入、review escalation、高コストdynamic CIをskipする。cheap safety checkの実行可否はpolicy化する |
-| FR-097 | SHOULD | risk questionnaireは差分ヒューリスティック該当時だけ段階表示し、質問ごとに発火path/ruleと回答が変えるgateを説明する |
+| ID     | 優先   | 要求                                                                                                                                                                                                     |
+| ------ | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| FR-090 | MUST   | 承認継続は生head SHA一致ではなく、対象scopeのwhitespace-preserving canonical change digest一致と、新base上のcontext safety proofで判定する。CI・mergeのexact candidate SHA原則は維持する                 |
+| FR-091 | MUST   | PR open受信後、初期summaryをp95 30秒以内に投稿し、想定必要role、高感度scope、想定check集合、Draft扱い、次のactionを表示する                                                                              |
+| FR-092 | SHOULD | queue位置に加え、lane別の実測throughput、CI所要分布、先行依存からETA範囲・信頼度・主要変動要因を表示する                                                                                                 |
+| FR-093 | MUST   | 候補が先行PRの失敗・離脱・順序変更で再構築された場合、影響PR authorへ原因PR、旧/新candidate、再実行範囲、次の見込みを通知する                                                                            |
+| FR-094 | SHOULD | batch相互作用で失敗した最小集合の各PRを相互linkし、単体pass・組合せfailの事実、failure fingerprint、調整ownerを当事者へ通知する                                                                          |
+| FR-095 | SHOULD | policy変更を伴わないGitHub状態再照合を `/yoroi recheck` とUI actionで提供し、Operator承認を要求しない。coalescing、cooldown、audit、権限確認を行う                                                       |
+| FR-096 | MUST   | Draft/WIP PRではCandidate生成、queue投入、review escalation、高コストdynamic CIをskipする。cheap safety checkの実行可否はpolicy化する                                                                    |
+| FR-097 | SHOULD | risk questionnaireは差分ヒューリスティック該当時だけ段階表示し、質問ごとに発火path/ruleと回答が変えるgateを説明する                                                                                      |
 | FR-098 | SHOULD | developerがflaky failureをself-service reportでき、test ID、run、failure fingerprint、再現率、ownerを自動添付する。quarantineは期限付きproposalとして別権限者が承認し、commandだけでvotingを無効化しない |
-| FR-099 | MUST | 本番稼働後の誤判定・wrong owner・wrong check・unexplained rerun・ETA不満を送れるfeedback/appeal導線を提供し、decision IDと最小metadataを添付する。申立てはgateを迂回しない |
-| FR-100 | MUST | slash commandのsyntax、対象状態、実行権限、副作用、idempotency、audit、rate limitをversioned registryとして定義し、`/yoroi help`から参照できるようにする |
-| FR-101 | SHOULD | 通知をblocker、action required、informationalへ分類し、同一原因を一つのsummary/checkへ集約する。authorは非必須通知を選択できる |
-| FR-102 | MUST | 内容不変pushではreview requestを再送しない。失効scopeと同じreviewerへの依頼は一定時間coalesceし、reviewerごとの重複依頼率を計測する |
-| FR-103 | SHOULD | merge後summaryへmerged SHA、merge時刻、decision evidence、post-merge監視、release/freezeとの関係、revert窓口を表示する |
-| FR-104 | SHOULD | block理由は人向け文、機械code、根拠link、self-service action、escalation先を必ず持つ |
-| FR-105 | SHOULD | 初期summary、ETA、再構築通知、approval carry-forwardを本番UI同等のpreviewでShadow mode中にusability testする |
+| FR-099 | MUST   | 本番稼働後の誤判定・wrong owner・wrong check・unexplained rerun・ETA不満を送れるfeedback/appeal導線を提供し、decision IDと最小metadataを添付する。申立てはgateを迂回しない                               |
+| FR-100 | MUST   | slash commandのsyntax、対象状態、実行権限、副作用、idempotency、audit、rate limitをversioned registryとして定義し、`/yoroi help`から参照できるようにする                                                 |
+| FR-101 | SHOULD | 通知をblocker、action required、informationalへ分類し、同一原因を一つのsummary/checkへ集約する。authorは非必須通知を選択できる                                                                           |
+| FR-102 | MUST   | 内容不変pushではreview requestを再送しない。失効scopeと同じreviewerへの依頼は一定時間coalesceし、reviewerごとの重複依頼率を計測する                                                                      |
+| FR-103 | SHOULD | merge後summaryへmerged SHA、merge時刻、decision evidence、post-merge監視、release/freezeとの関係、revert窓口を表示する                                                                                   |
+| FR-104 | SHOULD | block理由は人向け文、機械code、根拠link、self-service action、escalation先を必ず持つ                                                                                                                     |
+| FR-105 | SHOULD | 初期summary、ETA、再構築通知、approval carry-forwardを本番UI同等のpreviewでShadow mode中にusability testする                                                                                             |
 
 #### 9.9.1 Slash command registry
 
 通常の承認はGitHub Review UI、ready状態は標準Draft UIを正とする。commandは補助であり、PR本文や未信頼文字列をshell、SQL、template式として実行しない。
 
-| Command | 実行者 | 効果 | 非効果・安全境界 |
-|---|---|---|---|
-| `/yoroi status` | repo read以上 | 現在のsummaryを再表示し、decision IDを返す | 再評価・状態変更なし |
-| `/yoroi why [gate]` | repo read以上 | reason graphの該当箇所を展開する | gate変更なし |
-| `/yoroi recheck` | repo write以上またはPR author | 現在のGitHub権威状態を再取得しevaluatorを再実行する | policy、承認、CI結果を改変せず、mergeを強制しない |
-| `/yoroi queue` | repo write以上 | queue位置、lane、ETA、先行依存を再表示する | priority変更なし |
-| `/yoroi flaky report <test-id>` | CI閲覧可能なcontributor | 現在runをflaky候補として登録し、evidenceを収集する | quarantineやnon-voting化はしない |
-| `/yoroi flaky quarantine-request <test-id>` | repo write以上 | 期限・owner付きproposalを作る | 承認者なしにgateを弱めない |
-| `/yoroi feedback <category>` | contributor | decision ID付きfeedback caseを作る | gate bypass、merge実行なし |
-| `/yoroi help` | 全員 | 利用可能commandと権限、例を表示する | 状態変更なし |
+| Command                                     | 実行者                        | 効果                                                | 非効果・安全境界                                  |
+| ------------------------------------------- | ----------------------------- | --------------------------------------------------- | ------------------------------------------------- |
+| `/yoroi status`                             | repo read以上                 | 現在のsummaryを再表示し、decision IDを返す          | 再評価・状態変更なし                              |
+| `/yoroi why [gate]`                         | repo read以上                 | reason graphの該当箇所を展開する                    | gate変更なし                                      |
+| `/yoroi recheck`                            | repo write以上またはPR author | 現在のGitHub権威状態を再取得しevaluatorを再実行する | policy、承認、CI結果を改変せず、mergeを強制しない |
+| `/yoroi queue`                              | repo write以上                | queue位置、lane、ETA、先行依存を再表示する          | priority変更なし                                  |
+| `/yoroi flaky report <test-id>`             | CI閲覧可能なcontributor       | 現在runをflaky候補として登録し、evidenceを収集する  | quarantineやnon-voting化はしない                  |
+| `/yoroi flaky quarantine-request <test-id>` | repo write以上                | 期限・owner付きproposalを作る                       | 承認者なしにgateを弱めない                        |
+| `/yoroi feedback <category>`                | contributor                   | decision ID付きfeedback caseを作る                  | gate bypass、merge実行なし                        |
+| `/yoroi help`                               | 全員                          | 利用可能commandと権限、例を表示する                 | 状態変更なし                                      |
 
 `ready`はGitHubのReady for review UIを優先し、command aliasを設ける場合も同じ権限・eventへ正規化する。priority、pause、freeze、break-glass、policy変更は一般slash commandへ公開しない。
 
@@ -861,68 +861,68 @@ Bot自身のDBだけに監査証跡を置かず、hash chain付きbundleを独�
 
 ## 11. セキュリティ要件
 
-| ID | 優先 | 要求 |
-|---|---|---|
-| SEC-001 | MUST | GitHub App permission、Webhook購読、対象repositoryを最小化する [S14] |
-| SEC-002 | MUST | installation token生成時にrepositoryとpermissionをさらに限定する |
-| SEC-003 | MUST | PATを使用せず、短命installation tokenを必要時生成・cacheする [S14] |
-| SEC-004 | MUST | GitHub App private key、Webhook Secretをコード・repo・logへ保存しない |
-| SEC-005 | MUST | private keyとWebhook Secretのrotation、失効、侵害対応runbookを持つ |
-| SEC-006 | SHOULD | 高保証構成ではprivate keyを外部KMS/HSMのsign-only運用にする |
-| SEC-007 | MUST | raw bodyでWebhook HMACを検証し、比較はtiming-safeに行う |
-| SEC-008 | MUST | delivery ID、installation ID、repository ID、許容時間窓でreplayと重複を制御する |
-| SEC-009 | MUST | fork/untrusted codeをSecret、write token、Merger keyと同じ実行環境へ置かない |
-| SEC-010 | MUST | `pull_request_target`、`workflow_run`、`issue_comment`等で未信頼コードやartifactを実行しない [S27] |
-| SEC-011 | MUST | untrusted runnerをephemeralにし、内部networkへの到達とegressを必要最小限にする |
-| SEC-012 | MUST | 第三者GitHub Actionをfull commit SHAへpinし、allowlistと更新手順を持つ |
-| SEC-013 | MUST | workflow、lockfile、runner image、build toolchainの変更を高感度scopeにする |
-| SEC-014 | SHOULD | SBOM、artifact attestation、provenanceをevidence bundleへ結合する |
-| SEC-015 | MUST | Author、Approver、Operator、Governorの職務を分離する |
-| SEC-016 | MUST | 高リスクmerge、policy弱体化、break-glassへ二者統制を要求する |
-| SEC-017 | MUST | break-glassに理由、ticket、対象、TTL、自動失効、事後reviewを要求する |
-| SEC-018 | MUST | 不整合、欠落、parse error、証跡不明、時刻不明時はmergeをfail closedにする |
-| SEC-019 | MUST | installation/repository IDを全storage keyへ含め、repo間データ混同を防ぐ |
-| SEC-020 | MUST | Dashboardと管理APIをorganization SSO/OIDC + RBACで保護し、Merger APIはDeno OIDCのaudience、issuer、expiry、org/app/context claimとdecision署名を検証する [S45] |
-| SEC-021 | MUST | 高権限操作へ再認証、CSRF防御、監査、必要に応じdevice/IP条件を課す |
-| SEC-022 | MUST | ソース本文、diff全文、Secretを原則保存せず、ID、digest、decision metadata中心にする |
-| SEC-023 | MUST | payload、CI metadata、audit evidenceごとに保持期間と削除手順を定義する |
-| SEC-024 | MUST | installation/repository/actor別rate limit、PostgreSQL outbox backpressure、dead-letter状態と再投入手順を実装する |
-| SEC-025 | MUST | event replay、DB復旧、policy rollback、key revocation、Merger停止を定期演習する |
-| SEC-026 | MUST | Yoroi自身が自分のrequired check、App権限、policy定足数を単独で弱められない |
-| SEC-027 | MUST | 本番deployを保護branch、review、署名、Deno revision preview、段階rollout、timeline lockで制御する [S43] |
-| SEC-028 | SHOULD | Deno Deploy revision、build、依存、SBOM、source revision、contextを追跡可能にする |
-| SEC-029 | MUST | 新Deno Deploy runtimeが`--allow-all`相当で動作することを前提とし、ローカルDeno permission flagを本番security boundaryとして主張しない [S37] |
-| SEC-030 | MUST | Ingress/Controlは一app内の分離moduleとし、MergerとDashboardを別appへ分ける。各appへ必要なproduction secretだけを割り当て、Development / Build contextへMerger secretを置かない [S47] |
-| SEC-031 | MUST | branch/revision previewには環境分離DBを使い、本番DBへfallbackしない。現行のshared preview DB制約をtest data設計へ反映する [S48] |
-| SEC-032 | MUST | instance間でmemory、CPU、filesystemが共有されないため、local mutex、local file、in-memory queueを直列化・永続化の根拠にしない [S37] |
-| SEC-033 | MUST | PostgreSQL coordinatorへlease expiryと単調増加fencing tokenを持たせ、古いinstanceからのmerge requestをMerger側でも拒否する |
-| SEC-034 | MUST | Deno Deploy OIDC tokenの`aud`、`iss`、`exp`、organization、app、contextを検証し、development revisionや別appのtokenを本番操作へ流用できないようにする [S45] |
-| SEC-035 | MUST | OIDC/Cloud ConnectionでAWS/GCP/Vault/KMSへ接続する場合、長期static cloud keyを避け、subject/attribute条件をappとproduction contextへ限定する [S45][S46] |
-| SEC-036 | MUST | Deno KVを採用する場合、primary data locationと組織のresidency要件を照合し、不適合なら承認・監査の正本に使わない [S40] |
-| SEC-037 | MUST | Deno Deploy built-in logの保持期間だけに監査を依存せず、merge evidenceを改ざん耐性のある外部保存先へ継続exportする [S39][S44] |
-| SEC-038 | MUST | dependencyは`deno.lock`をcommitし、JSR/npm importをlockし、build時network取得の再現性とprovenanceを検証する |
+| ID      | 優先   | 要求                                                                                                                                                                                 |
+| ------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| SEC-001 | MUST   | GitHub App permission、Webhook購読、対象repositoryを最小化する [S14]                                                                                                                 |
+| SEC-002 | MUST   | installation token生成時にrepositoryとpermissionをさらに限定する                                                                                                                     |
+| SEC-003 | MUST   | PATを使用せず、短命installation tokenを必要時生成・cacheする [S14]                                                                                                                   |
+| SEC-004 | MUST   | GitHub App private key、Webhook Secretをコード・repo・logへ保存しない                                                                                                                |
+| SEC-005 | MUST   | private keyとWebhook Secretのrotation、失効、侵害対応runbookを持つ                                                                                                                   |
+| SEC-006 | SHOULD | 高保証構成ではprivate keyを外部KMS/HSMのsign-only運用にする                                                                                                                          |
+| SEC-007 | MUST   | raw bodyでWebhook HMACを検証し、比較はtiming-safeに行う                                                                                                                              |
+| SEC-008 | MUST   | delivery ID、installation ID、repository ID、許容時間窓でreplayと重複を制御する                                                                                                      |
+| SEC-009 | MUST   | fork/untrusted codeをSecret、write token、Merger keyと同じ実行環境へ置かない                                                                                                         |
+| SEC-010 | MUST   | `pull_request_target`、`workflow_run`、`issue_comment`等で未信頼コードやartifactを実行しない [S27]                                                                                   |
+| SEC-011 | MUST   | untrusted runnerをephemeralにし、内部networkへの到達とegressを必要最小限にする                                                                                                       |
+| SEC-012 | MUST   | 第三者GitHub Actionをfull commit SHAへpinし、allowlistと更新手順を持つ                                                                                                               |
+| SEC-013 | MUST   | workflow、lockfile、runner image、build toolchainの変更を高感度scopeにする                                                                                                           |
+| SEC-014 | SHOULD | SBOM、artifact attestation、provenanceをevidence bundleへ結合する                                                                                                                    |
+| SEC-015 | MUST   | Author、Approver、Operator、Governorの職務を分離する                                                                                                                                 |
+| SEC-016 | MUST   | 高リスクmerge、policy弱体化、break-glassへ二者統制を要求する                                                                                                                         |
+| SEC-017 | MUST   | break-glassに理由、ticket、対象、TTL、自動失効、事後reviewを要求する                                                                                                                 |
+| SEC-018 | MUST   | 不整合、欠落、parse error、証跡不明、時刻不明時はmergeをfail closedにする                                                                                                            |
+| SEC-019 | MUST   | installation/repository IDを全storage keyへ含め、repo間データ混同を防ぐ                                                                                                              |
+| SEC-020 | MUST   | Dashboardと管理APIをorganization SSO/OIDC + RBACで保護し、Merger APIはDeno OIDCのaudience、issuer、expiry、org/app/context claimとdecision署名を検証する [S45]                       |
+| SEC-021 | MUST   | 高権限操作へ再認証、CSRF防御、監査、必要に応じdevice/IP条件を課す                                                                                                                    |
+| SEC-022 | MUST   | ソース本文、diff全文、Secretを原則保存せず、ID、digest、decision metadata中心にする                                                                                                  |
+| SEC-023 | MUST   | payload、CI metadata、audit evidenceごとに保持期間と削除手順を定義する                                                                                                               |
+| SEC-024 | MUST   | installation/repository/actor別rate limit、PostgreSQL outbox backpressure、dead-letter状態と再投入手順を実装する                                                                     |
+| SEC-025 | MUST   | event replay、DB復旧、policy rollback、key revocation、Merger停止を定期演習する                                                                                                      |
+| SEC-026 | MUST   | Yoroi自身が自分のrequired check、App権限、policy定足数を単独で弱められない                                                                                                           |
+| SEC-027 | MUST   | 本番deployを保護branch、review、署名、Deno revision preview、段階rollout、timeline lockで制御する [S43]                                                                              |
+| SEC-028 | SHOULD | Deno Deploy revision、build、依存、SBOM、source revision、contextを追跡可能にする                                                                                                    |
+| SEC-029 | MUST   | 新Deno Deploy runtimeが`--allow-all`相当で動作することを前提とし、ローカルDeno permission flagを本番security boundaryとして主張しない [S37]                                          |
+| SEC-030 | MUST   | Ingress/Controlは一app内の分離moduleとし、MergerとDashboardを別appへ分ける。各appへ必要なproduction secretだけを割り当て、Development / Build contextへMerger secretを置かない [S47] |
+| SEC-031 | MUST   | branch/revision previewには環境分離DBを使い、本番DBへfallbackしない。現行のshared preview DB制約をtest data設計へ反映する [S48]                                                      |
+| SEC-032 | MUST   | instance間でmemory、CPU、filesystemが共有されないため、local mutex、local file、in-memory queueを直列化・永続化の根拠にしない [S37]                                                  |
+| SEC-033 | MUST   | PostgreSQL coordinatorへlease expiryと単調増加fencing tokenを持たせ、古いinstanceからのmerge requestをMerger側でも拒否する                                                           |
+| SEC-034 | MUST   | Deno Deploy OIDC tokenの`aud`、`iss`、`exp`、organization、app、contextを検証し、development revisionや別appのtokenを本番操作へ流用できないようにする [S45]                          |
+| SEC-035 | MUST   | OIDC/Cloud ConnectionでAWS/GCP/Vault/KMSへ接続する場合、長期static cloud keyを避け、subject/attribute条件をappとproduction contextへ限定する [S45][S46]                              |
+| SEC-036 | MUST   | Deno KVを採用する場合、primary data locationと組織のresidency要件を照合し、不適合なら承認・監査の正本に使わない [S40]                                                                |
+| SEC-037 | MUST   | Deno Deploy built-in logの保持期間だけに監査を依存せず、merge evidenceを改ざん耐性のある外部保存先へ継続exportする [S39][S44]                                                        |
+| SEC-038 | MUST   | dependencyは`deno.lock`をcommitし、JSR/npm importをlockし、build時network取得の再現性とprovenanceを検証する                                                                          |
 
 ---
 
 ## 12. 脅威モデル
 
-| 脅威 | 典型シナリオ | 主要対策 | 残余リスク |
-|---|---|---|---|
-| 悪意あるfork | PR buildでSecret窃取、cache poisoning | SEC-009〜011、Secretなし、ephemeral、egress制限 | テスト基盤DoS |
-| 侵害されたmaintainer | approval後の内容差替え、bypass、policy弱体化 | scope change digest、context proof、exact candidate、二者統制、self-protection | 複数account侵害、同一性classifierの欠陥 |
-| 悪意あるAction | tag差替え、token exfiltration | full SHA pin、allowlist、最小token | pin先自体の脆弱性 |
-| Bot supply chain | Deno revision改ざん、依存package侵害 | protected deploy、lockfile、SBOM、revision trace、timeline lock/rollback | Deno accountまたは依存元侵害 |
-| Webhook spoof/replay | 偽review/check、duplicate operation | HMAC、dedupe、state machine | GitHub側secret侵害 |
-| Race / stale state | 新commit前のgreen statusでmerge | expected checks、SHA binding、直前再取得 | 外部API整合遅延 |
-| CI flaky / outage | 無限retry、starvation、誤green | registry、circuit breaker、Serial fallback | 判別不能なintermittent failure |
-| 内部operator | 監査削除、例外常設、Secret閲覧 | RBAC、dual control、外部export、KMS | 特権者共謀 |
-| 設定drift | RulesetやApp権限を画面変更 | Terraform reconcile、alert、承認付きremediation | 検知までの時間窓 |
-| Cross-repo confusion | repo Aの証跡をrepo Bへ適用 | repo ID付きkey、explicit DAG、tenant isolation | GitHub API側の誤設定 |
-| AI prompt injection | PR本文でBot要約や提案を誘導 | AI出力を非権威化、tool allowlist、構造化入力 | 誤った人間判断への影響 |
-| Preview credential leak | branch/preview revisionから本番Merger keyやDBへ到達 | context分離、環境別DB、OIDC claim pinning、別app | Deno org admin侵害 |
-| Split-brain coordinator | 複数instanceが同じbranchのlockを保持したと誤認 | PostgreSQL lease、fencing token、Merger側token検証 | DB重大障害、clock設定不良 |
-| Approval continuity collision | 粗いpatch同一判定で実質変更を見逃す | exact whitespace change digest、deterministic replay、result digest、algorithm version、曖昧時失効 | Git/GitHub object modelの未知ケース |
-| Recheck abuse | comment floodでGitHub API枯渇 | actor権限、coalescing、cooldown、rate limit、audit | 分散した正規actorによるDoS |
+| 脅威                          | 典型シナリオ                                        | 主要対策                                                                                           | 残余リスク                              |
+| ----------------------------- | --------------------------------------------------- | -------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| 悪意あるfork                  | PR buildでSecret窃取、cache poisoning               | SEC-009〜011、Secretなし、ephemeral、egress制限                                                    | テスト基盤DoS                           |
+| 侵害されたmaintainer          | approval後の内容差替え、bypass、policy弱体化        | scope change digest、context proof、exact candidate、二者統制、self-protection                     | 複数account侵害、同一性classifierの欠陥 |
+| 悪意あるAction                | tag差替え、token exfiltration                       | full SHA pin、allowlist、最小token                                                                 | pin先自体の脆弱性                       |
+| Bot supply chain              | Deno revision改ざん、依存package侵害                | protected deploy、lockfile、SBOM、revision trace、timeline lock/rollback                           | Deno accountまたは依存元侵害            |
+| Webhook spoof/replay          | 偽review/check、duplicate operation                 | HMAC、dedupe、state machine                                                                        | GitHub側secret侵害                      |
+| Race / stale state            | 新commit前のgreen statusでmerge                     | expected checks、SHA binding、直前再取得                                                           | 外部API整合遅延                         |
+| CI flaky / outage             | 無限retry、starvation、誤green                      | registry、circuit breaker、Serial fallback                                                         | 判別不能なintermittent failure          |
+| 内部operator                  | 監査削除、例外常設、Secret閲覧                      | RBAC、dual control、外部export、KMS                                                                | 特権者共謀                              |
+| 設定drift                     | RulesetやApp権限を画面変更                          | Terraform reconcile、alert、承認付きremediation                                                    | 検知までの時間窓                        |
+| Cross-repo confusion          | repo Aの証跡をrepo Bへ適用                          | repo ID付きkey、explicit DAG、tenant isolation                                                     | GitHub API側の誤設定                    |
+| AI prompt injection           | PR本文でBot要約や提案を誘導                         | AI出力を非権威化、tool allowlist、構造化入力                                                       | 誤った人間判断への影響                  |
+| Preview credential leak       | branch/preview revisionから本番Merger keyやDBへ到達 | context分離、環境別DB、OIDC claim pinning、別app                                                   | Deno org admin侵害                      |
+| Split-brain coordinator       | 複数instanceが同じbranchのlockを保持したと誤認      | PostgreSQL lease、fencing token、Merger側token検証                                                 | DB重大障害、clock設定不良               |
+| Approval continuity collision | 粗いpatch同一判定で実質変更を見逃す                 | exact whitespace change digest、deterministic replay、result digest、algorithm version、曖昧時失効 | Git/GitHub object modelの未知ケース     |
+| Recheck abuse                 | comment floodでGitHub API枯渇                       | actor権限、coalescing、cooldown、rate limit、audit                                                 | 分散した正規actorによるDoS              |
 
 ### 12.1 最重要の信頼境界
 
@@ -943,17 +943,17 @@ Bot自身のDBだけに監査証跡を置かず、hash chain付きbundleを独�
 
 新Deno Deployを**実行・配布・環境分離・可観測性の基盤**として採用する。状態の正本と直列化はPostgreSQLへ置く。これはDeno Deployを軽視する判断ではなく、同サービスの地の利と限界を正しく分担する判断である。
 
-| Deno Deployの特性 | Yoroiでの活用 | 設計上の注意 |
-|---|---|---|
-| Deno 2 / Node互換、npm/JSR | TypeScript、Octokit、`pg`、OpenTelemetry周辺の資産を再利用する [S38] | lockfileと依存allowlistを必須にする |
-| isolated Linux上のfull runtime | native Node addonやsubprocessも利用可能なため、管理toolingとlocal再現性を高める [S37] | 本番は`--allow-all`相当。未信頼PRを同じappで実行しない |
-| GitHub repository連携と自動build | protected branchからrevisionを作り、build eventを監査へ結合する [S43][S52] | GitHub連携自体をmerge権限の根拠にしない |
-| production / branch / revision timeline | policy simulatorとUIをpreview URLで確認し、直前revisionへrollbackする [S43] | preview DBの共有範囲と本番secret分離を検証する |
-| environment別database | production、branch、previewの状態を分離する [S48] | 現行では一appに一DB instance。複数appの自動DBは別logical DBになる |
-| Deno Cron | reconcile、SLA scan、lease回収、evidence欠落監査を実行する [S42] | 最小1分。重複実行は抑止されるが、通常queueの代替ではない |
-| built-in OpenTelemetry | revision/context/trace単位でwebhookからdecisionまで追跡する [S44] | built-in log保持だけを監査保存にしない |
-| Deno OIDC / Cloud Connections | AWS/GCP/Vault/KMSへ短命資格情報で接続する [S45][S46] | audienceとorg/app/context claimを厳密にpinする |
-| cold startとscale-to-zero | 低トラフィックrepoの費用を抑える [S37] | global constructorを軽くし、local memoryへ状態を置かない |
+| Deno Deployの特性                       | Yoroiでの活用                                                                         | 設計上の注意                                                      |
+| --------------------------------------- | ------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| Deno 2 / Node互換、npm/JSR              | TypeScript、Octokit、`pg`、OpenTelemetry周辺の資産を再利用する [S38]                  | lockfileと依存allowlistを必須にする                               |
+| isolated Linux上のfull runtime          | native Node addonやsubprocessも利用可能なため、管理toolingとlocal再現性を高める [S37] | 本番は`--allow-all`相当。未信頼PRを同じappで実行しない            |
+| GitHub repository連携と自動build        | protected branchからrevisionを作り、build eventを監査へ結合する [S43][S52]            | GitHub連携自体をmerge権限の根拠にしない                           |
+| production / branch / revision timeline | policy simulatorとUIをpreview URLで確認し、直前revisionへrollbackする [S43]           | preview DBの共有範囲と本番secret分離を検証する                    |
+| environment別database                   | production、branch、previewの状態を分離する [S48]                                     | 現行では一appに一DB instance。複数appの自動DBは別logical DBになる |
+| Deno Cron                               | reconcile、SLA scan、lease回収、evidence欠落監査を実行する [S42]                      | 最小1分。重複実行は抑止されるが、通常queueの代替ではない          |
+| built-in OpenTelemetry                  | revision/context/trace単位でwebhookからdecisionまで追跡する [S44]                     | built-in log保持だけを監査保存にしない                            |
+| Deno OIDC / Cloud Connections           | AWS/GCP/Vault/KMSへ短命資格情報で接続する [S45][S46]                                  | audienceとorg/app/context claimを厳密にpinする                    |
+| cold startとscale-to-zero               | 低トラフィックrepoの費用を抑える [S37]                                                | global constructorを軽くし、local memoryへ状態を置かない          |
 
 ### 13.2 推奨論理構成
 
@@ -972,11 +972,11 @@ flowchart TD
 
 #### Deno Deploy apps
 
-| App | 公開入口 | 保持する資格情報 | 責務 |
-|---|---|---|---|
+| App             | 公開入口                       | 保持する資格情報                                                | 責務                                                                     |
+| --------------- | ------------------------------ | --------------------------------------------------------------- | ------------------------------------------------------------------------ |
 | `yoroi-control` | GitHub webhook、read/admin API | Webhook secret、Observer App key、PostgreSQL role、OIDC発行権限 | ingress、policy、state machine、outbox drain、scheduler、Check Run、Cron |
-| `yoroi-merger` | OIDC保護されたmerge endpoint | Merger App key、decision署名検証key | envelope検証、GitHub再取得、fencing検証、merge一回実行 |
-| `yoroi-console` | SSO保護UI | 本番merge secretなし | SvelteKit UI、read API利用、recheck/feedback操作 [S51] |
+| `yoroi-merger`  | OIDC保護されたmerge endpoint   | Merger App key、decision署名検証key                             | envelope検証、GitHub再取得、fencing検証、merge一回実行                   |
+| `yoroi-console` | SSO保護UI                      | 本番merge secretなし                                            | SvelteKit UI、read API利用、recheck/feedback操作 [S51]                   |
 
 IngressとControlは同じapp・同じPostgreSQLへ置く。Deno Deployの自動database isolationはapp単位で別logical DBを作るため、無理に別appへ分けて共有DBを暗黙期待しない [S48]。最強権限のMergerだけは別app・別GitHub App・別deploy権限へ分離する。
 
@@ -1048,15 +1048,15 @@ BranchLease = {
 
 ### 13.5 PostgreSQLとDeno KVの使い分け
 
-| 項目 | PostgreSQL（本番推奨） | Deno KV（PoC / 小規模option） |
-|---|---|---|
-| transaction | inbox/outbox、projection、coordinatorを一transactionへ束ねやすい | versionstamp checkを使うoptimistic atomic operation [S41] |
-| queue claim | `SKIP LOCKED`、lease、DLQ、検索を明示実装 | key設計、lease、retry、DLQをすべて自前実装 |
-| audit/search | SQL、index、BI/SIEM exportに向く | secondary indexを別keyとして維持する必要 |
-| environment | Deno Deployがtimeline別logical DBを自動作成 [S48] | timelineに対応したKVへ自動接続 [S40] |
-| residency | provider/regionを要件に合わせて選択 | primary data locationなど現行仕様を事前確認 [S40] |
-| watch | LISTEN/NOTIFYは補助signalとして利用可能 | `watch`は全中間変更を保証しないためjournal/queueに不可 [S53] |
-| app接続 | 一appにつき一DB instance | PostgreSQLと同じappへ同時attach不可 [S48] |
+| 項目         | PostgreSQL（本番推奨）                                           | Deno KV（PoC / 小規模option）                                |
+| ------------ | ---------------------------------------------------------------- | ------------------------------------------------------------ |
+| transaction  | inbox/outbox、projection、coordinatorを一transactionへ束ねやすい | versionstamp checkを使うoptimistic atomic operation [S41]    |
+| queue claim  | `SKIP LOCKED`、lease、DLQ、検索を明示実装                        | key設計、lease、retry、DLQをすべて自前実装                   |
+| audit/search | SQL、index、BI/SIEM exportに向く                                 | secondary indexを別keyとして維持する必要                     |
+| environment  | Deno Deployがtimeline別logical DBを自動作成 [S48]                | timelineに対応したKVへ自動接続 [S40]                         |
+| residency    | provider/regionを要件に合わせて選択                              | primary data locationなど現行仕様を事前確認 [S40]            |
+| watch        | LISTEN/NOTIFYは補助signalとして利用可能                          | `watch`は全中間変更を保証しないためjournal/queueに不可 [S53] |
+| app接続      | 一appにつき一DB instance                                         | PostgreSQLと同じappへ同時attach不可 [S48]                    |
 
 PoCでDeno KVを使う場合のkey例：
 
@@ -1073,13 +1073,13 @@ KV atomic operationのcheck/mutation/size上限を負荷試験へ含める。`wa
 
 最低限、次のCronを定義する。
 
-| Job | 目安 | 用途 | 失敗時 |
-|---|---:|---|---|
-| `outbox-sweep` | 1分 | pending/stalled workを回収 | exponential retryを設定し、5回以内。未回復はalert [S42] |
-| `github-reconcile` | 5分 | active PR/check/review/queueを再照合 | repo shardごとにcursor継続 |
-| `approval-membership-scan` | 15分 | team membership/SSO変更でcoverage再評価 | 影響PRだけ再判定 |
-| `evidence-completeness` | 1日 | merge済みdecision envelope欠落を検査 | Critical alert、監査case作成 |
-| `ttl-expiry` | 1分 | break-glass、quarantine、freeze、lease期限を処理 | 期限超過を安全側に停止 |
+| Job                        | 目安 | 用途                                             | 失敗時                                                  |
+| -------------------------- | ---: | ------------------------------------------------ | ------------------------------------------------------- |
+| `outbox-sweep`             |  1分 | pending/stalled workを回収                       | exponential retryを設定し、5回以内。未回復はalert [S42] |
+| `github-reconcile`         |  5分 | active PR/check/review/queueを再照合             | repo shardごとにcursor継続                              |
+| `approval-membership-scan` | 15分 | team membership/SSO変更でcoverage再評価          | 影響PRだけ再判定                                        |
+| `evidence-completeness`    |  1日 | merge済みdecision envelope欠落を検査             | Critical alert、監査case作成                            |
+| `ttl-expiry`               |  1分 | break-glass、quarantine、freeze、lease期限を処理 | 期限超過を安全側に停止                                  |
 
 Deno Cronは同じjobのoverlapを防ぎ、実行中なら次回をskipする。failure retryは既定で自動ではないため、retry policyを明示する [S42]。長い全件scanを一回に詰めずcursorで分割する。
 
@@ -1171,16 +1171,16 @@ Yoroiは次のDeno Deploy機能がなくてもcore domainを移植できるよ�
 
 2026-08-25時点のplatform前提をADRとcapacity testへ固定し、変化したら再評価する。
 
-| 制約 | 本PJの判断 |
-|---|---|
-| 新Deployは2 deployment regions、managed Queueなし [S36] | GitHub APIとprimary DBに近いUS配置を第一候補にし、multi-region active-activeを前提にしない。latency/DRをPoC計測する |
-| instanceはscale-to-zeroし、単純appでもcold start、停止時は短いgrace periodがある [S37] | global initializationを軽くし、各workを短くcheckpoint可能にする。shutdown handlerはbest effortであり、lease回収を正とする |
-| Free planは1日log retention、request/CPU/memory/app/member等に上限がありSLAがない [S39] | local/preview/Shadowに有用。本番merge authorityはquota実測、support、SLA、DPA、監査保持を満たすplan/構成が決まるまでGoにしない |
-| Free planのCronはrevisionあたり上限がある [S39][S42] | MVPは5 jobへ集約し、repoごとのCronを作らずsharded scanにする |
-| appへattachできるdatabase instanceは一つ。preview deploymentは現行一つのpreview DBを共有 [S48] | control appはPostgreSQL一つへ集約。preview dataをtenant prefixで隔離し、production fallbackを禁止する |
-| 外部PostgreSQL接続でDeno Deployの固定egress IP一覧は現時点で提供されない [S48] | network IP allowlist必須環境では未解決blockerとする。Deno provisioned DB、TLS/CA、最小DB role、credential rotation、DB proxy等を比較し、public unauthenticated DBを許可しない |
-| Deno KVはglobally distributedだがprimary location/residencyに制約 [S40] | merge metadataのresidency要件と合わなければPoC cacheにも使用しない |
-| Production runtimeはDeno permission sandboxを適用した制限実行ではない [S37] | `--allow-net`等のlocal testは開発事故防止に使えるが、本番境界はapp/context/credential/DB role/OIDCで作る |
+| 制約                                                                                           | 本PJの判断                                                                                                                                                                    |
+| ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 新Deployは2 deployment regions、managed Queueなし [S36]                                        | GitHub APIとprimary DBに近いUS配置を第一候補にし、multi-region active-activeを前提にしない。latency/DRをPoC計測する                                                           |
+| instanceはscale-to-zeroし、単純appでもcold start、停止時は短いgrace periodがある [S37]         | global initializationを軽くし、各workを短くcheckpoint可能にする。shutdown handlerはbest effortであり、lease回収を正とする                                                     |
+| Free planは1日log retention、request/CPU/memory/app/member等に上限がありSLAがない [S39]        | local/preview/Shadowに有用。本番merge authorityはquota実測、support、SLA、DPA、監査保持を満たすplan/構成が決まるまでGoにしない                                                |
+| Free planのCronはrevisionあたり上限がある [S39][S42]                                           | MVPは5 jobへ集約し、repoごとのCronを作らずsharded scanにする                                                                                                                  |
+| appへattachできるdatabase instanceは一つ。preview deploymentは現行一つのpreview DBを共有 [S48] | control appはPostgreSQL一つへ集約。preview dataをtenant prefixで隔離し、production fallbackを禁止する                                                                         |
+| 外部PostgreSQL接続でDeno Deployの固定egress IP一覧は現時点で提供されない [S48]                 | network IP allowlist必須環境では未解決blockerとする。Deno provisioned DB、TLS/CA、最小DB role、credential rotation、DB proxy等を比較し、public unauthenticated DBを許可しない |
+| Deno KVはglobally distributedだがprimary location/residencyに制約 [S40]                        | merge metadataのresidency要件と合わなければPoC cacheにも使用しない                                                                                                            |
+| Production runtimeはDeno permission sandboxを適用した制限実行ではない [S37]                    | `--allow-net`等のlocal testは開発事故防止に使えるが、本番境界はapp/context/credential/DB role/OIDCで作る                                                                      |
 
 Free planの数値上限は変更されうるため本文へcapacity commitmentとして埋め込まず、deploy前checklistで公式pricingを再確認する。Yoroi自身はquota残量を監視し、approach-to-limitをqueue ETAとoperator alertへ反映する。
 
@@ -1386,8 +1386,8 @@ defaults:
 scopes:
   - id: infrastructure
     match:
-      - "infra/**"
-      - "**/*.tf"
+      - 'infra/**'
+      - '**/*.tf'
     require:
       approvals:
         - role: infra-approver
@@ -1400,7 +1400,7 @@ scopes:
 
   - id: database-migration
     match:
-      - "db/migrations/**"
+      - 'db/migrations/**'
     require:
       approvals:
         - role: data-approver
@@ -1413,8 +1413,8 @@ scopes:
 
   - id: yoroi-policy
     match:
-      - ".yoroi/**"
-      - ".github/workflows/**"
+      - '.yoroi/**'
+      - '.github/workflows/**'
     require:
       approvals:
         - role: org-governor
@@ -1494,53 +1494,53 @@ yoroi/gate = BLOCKED
 
 ### 16.1 主要エンティティ
 
-| エンティティ | 主キー・重要属性 | 保持方針 |
-|---|---|---|
-| PullRequestRevision | repo ID + PR number + head SHA | PR終了後は短期保持、証跡参照はdigest化 |
-| MergeCandidate | base SHA + ordered heads + policy digest | CI evidence retentionに合わせる |
-| ScopeSnapshot | repo + PR + base/head SHA + scope + change/result digest + algorithm | review continuityと監査期間 |
-| Approval | actor ID + role + scope change digest + context policy + policy digest + original head/base | 監査期間。handleではなくstable GitHub ID |
-| ApprovalCarryForward | review ID + old/new base/head + unchanged scopes + context proof digest | 元Approvalと同期間 |
-| ExpectedCheckPlan | candidate + ordered expected jobs + reasons | decision retentionに合わせる |
-| CheckEvidence | candidate SHA + job + workflow SHA + result | raw logはGitHub、Botはmetadata/digest中心 |
-| QueueEntry | repo + lane + priority + aging + dependency | 完了後metricへ集約 |
-| PolicyBundle | org/repo + version + digest + signer | 全merge evidenceから参照できる期間 |
-| DecisionEvent | operation ID + actor + from/to + reason | append-only論理log + hash chain + export |
-| ConfigSnapshot | resource ID + desired/actual digest | drift調査期間 |
-| FlakyTest | test fingerprint + failure history + owner + expiry | quarantineと傾向分析期間 |
-| WebhookInbox | installation + delivery ID + event type + payload digest | raw payloadは最短、metadataはreconcile期間 |
-| WorkOutbox | operation ID + kind + state + lease + attempts | terminal後にdecisionへ集約 |
-| BranchCoordinator | repo + branch + lease until + fencing token + base | 現在値 + lease履歴を監査保持 |
-| Notification | decision + audience + reason code + coalesce key | 配信/抑止理由を短期保持 |
-| FeedbackCase | case ID + decision ID + category + disposition | privacy policyと改善分析期間 |
-| DeploymentRevision | Deno app + context + revision + source + SBOM digest | 対応するdecision evidence期間 |
+| エンティティ         | 主キー・重要属性                                                                            | 保持方針                                   |
+| -------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| PullRequestRevision  | repo ID + PR number + head SHA                                                              | PR終了後は短期保持、証跡参照はdigest化     |
+| MergeCandidate       | base SHA + ordered heads + policy digest                                                    | CI evidence retentionに合わせる            |
+| ScopeSnapshot        | repo + PR + base/head SHA + scope + change/result digest + algorithm                        | review continuityと監査期間                |
+| Approval             | actor ID + role + scope change digest + context policy + policy digest + original head/base | 監査期間。handleではなくstable GitHub ID   |
+| ApprovalCarryForward | review ID + old/new base/head + unchanged scopes + context proof digest                     | 元Approvalと同期間                         |
+| ExpectedCheckPlan    | candidate + ordered expected jobs + reasons                                                 | decision retentionに合わせる               |
+| CheckEvidence        | candidate SHA + job + workflow SHA + result                                                 | raw logはGitHub、Botはmetadata/digest中心  |
+| QueueEntry           | repo + lane + priority + aging + dependency                                                 | 完了後metricへ集約                         |
+| PolicyBundle         | org/repo + version + digest + signer                                                        | 全merge evidenceから参照できる期間         |
+| DecisionEvent        | operation ID + actor + from/to + reason                                                     | append-only論理log + hash chain + export   |
+| ConfigSnapshot       | resource ID + desired/actual digest                                                         | drift調査期間                              |
+| FlakyTest            | test fingerprint + failure history + owner + expiry                                         | quarantineと傾向分析期間                   |
+| WebhookInbox         | installation + delivery ID + event type + payload digest                                    | raw payloadは最短、metadataはreconcile期間 |
+| WorkOutbox           | operation ID + kind + state + lease + attempts                                              | terminal後にdecisionへ集約                 |
+| BranchCoordinator    | repo + branch + lease until + fencing token + base                                          | 現在値 + lease履歴を監査保持               |
+| Notification         | decision + audience + reason code + coalesce key                                            | 配信/抑止理由を短期保持                    |
+| FeedbackCase         | case ID + decision ID + category + disposition                                              | privacy policyと改善分析期間               |
+| DeploymentRevision   | Deno app + context + revision + source + SBOM digest                                        | 対応するdecision evidence期間              |
 
 ### 16.2 Decision Envelope
 
 ```json
 {
-  "operation_id": "01J...",
-  "installation_id": 123,
-  "repository_id": 456,
-  "pull_request": 789,
-  "head_sha": "...",
-  "base_sha": "...",
-  "dependency_shas": ["..."],
-  "candidate_sha": "...",
-  "scope_review_proofs": {
-    "payments": {
-      "change_digest": "sha256:...",
-      "result_digest": "sha256:...",
-      "context_proof_digest": "sha256:..."
-    }
-  },
-  "policy_digest": "sha256:...",
-  "approval_digest": "sha256:...",
-  "check_plan_digest": "sha256:...",
-  "evidence_digest": "sha256:...",
-  "fencing_token": 1842,
-  "deno_revision_id": "rev_...",
-  "expires_at": "2026-08-25T12:00:00Z"
+	"operation_id": "01J...",
+	"installation_id": 123,
+	"repository_id": 456,
+	"pull_request": 789,
+	"head_sha": "...",
+	"base_sha": "...",
+	"dependency_shas": ["..."],
+	"candidate_sha": "...",
+	"scope_review_proofs": {
+		"payments": {
+			"change_digest": "sha256:...",
+			"result_digest": "sha256:...",
+			"context_proof_digest": "sha256:..."
+		}
+	},
+	"policy_digest": "sha256:...",
+	"approval_digest": "sha256:...",
+	"check_plan_digest": "sha256:...",
+	"evidence_digest": "sha256:...",
+	"fencing_token": 1842,
+	"deno_revision_id": "rev_...",
+	"expires_at": "2026-08-25T12:00:00Z"
 }
 ```
 
@@ -1548,20 +1548,20 @@ yoroi/gate = BLOCKED
 
 ### 16.3 内部APIの最小面
 
-| Method / Path | 認証 | 用途 |
-|---|---|---|
-| `POST /github/webhook` | GitHub HMAC | Webhook受信 |
-| `GET /api/repos/{id}/queue` | SSO/OIDC + read scope | queue、ETA、lane表示 |
-| `GET /api/decisions/{operation_id}` | SSO/OIDC + audit scope | reason graph / evidence |
-| `POST /api/pr/{id}/recheck` | SSO/OIDC + author/write | policy非変更のGitHub再照合 |
-| `POST /api/pr/{id}/feedback` | SSO/OIDC + contributor | decision-linked feedback作成 |
-| `POST /api/flaky/reports` | SSO/OIDC + CI read | flaky evidence収集 |
-| `POST /api/repos/{id}/pause` | operator + re-auth | pause |
-| `POST /api/repos/{id}/drain` | operator + re-auth | 新規投入停止、既存処理継続 |
-| `POST /api/pr/{id}/break-glass` | proposal作成のみ | 二段階例外workflow開始 |
-| `POST /internal/merge` | Deno OIDC + signed envelope | Merger App API |
-| `POST /internal/reconcile` | Deno Cron / operator / self-service | GitHub再照合 |
-| `POST /internal/outbox/drain` | same-app scheduler / Deno OIDC | bounded outbox drain |
+| Method / Path                       | 認証                                | 用途                         |
+| ----------------------------------- | ----------------------------------- | ---------------------------- |
+| `POST /github/webhook`              | GitHub HMAC                         | Webhook受信                  |
+| `GET /api/repos/{id}/queue`         | SSO/OIDC + read scope               | queue、ETA、lane表示         |
+| `GET /api/decisions/{operation_id}` | SSO/OIDC + audit scope              | reason graph / evidence      |
+| `POST /api/pr/{id}/recheck`         | SSO/OIDC + author/write             | policy非変更のGitHub再照合   |
+| `POST /api/pr/{id}/feedback`        | SSO/OIDC + contributor              | decision-linked feedback作成 |
+| `POST /api/flaky/reports`           | SSO/OIDC + CI read                  | flaky evidence収集           |
+| `POST /api/repos/{id}/pause`        | operator + re-auth                  | pause                        |
+| `POST /api/repos/{id}/drain`        | operator + re-auth                  | 新規投入停止、既存処理継続   |
+| `POST /api/pr/{id}/break-glass`     | proposal作成のみ                    | 二段階例外workflow開始       |
+| `POST /internal/merge`              | Deno OIDC + signed envelope         | Merger App API               |
+| `POST /internal/reconcile`          | Deno Cron / operator / self-service | GitHub再照合                 |
+| `POST /internal/outbox/drain`       | same-app scheduler / Deno OIDC      | bounded outbox drain         |
 
 ### 16.4 API原則
 
@@ -1600,24 +1600,24 @@ yoroi/gate = BLOCKED
 
 ### 17.2 要件
 
-| ID | 優先 | 要求 |
-|---|---|---|
-| CFG-001 | MUST | desired stateとactual stateを定期比較しdriftを検知する |
-| CFG-002 | MUST | resource、権限拡大、保護低下、破壊変更をrisk分類する |
-| CFG-003 | MUST | driftまたは変更からTerraform planを生成し、plan digestを記録する |
-| CFG-004 | MUST | applyはtrusted GitHub Actionsへ委譲し、Deno Deploy appでTerraformを実行しない |
-| CFG-005 | MUST | apply時に承認済みplan digestと再照合する |
-| CFG-006 | MUST | Org owner、App permission、Ruleset bypass、policy rootの変更を二名以上で承認する |
-| CFG-007 | MUST | Yoroi自身が自分の必須Checkや保護ルールを単独で削除できない |
-| CFG-008 | MUST | UIで行った緊急変更を15分以内の目標で検知する |
-| CFG-009 | SHOULD | driftの自動remediation PRを作るが、high riskは自動applyしない |
-| CFG-010 | SHOULD | policy / Ruleset変更を過去eventへwhat-if replayする |
-| CFG-011 | MUST | Terraform state、apply credential、GitHub App keyを別の信頼境界へ置く |
-| CFG-012 | MUST | bootstrap problemを文書化し、Yoroiが依存する最低限のRulesetを別管理する |
-| CFG-013 | MUST | Development / Build contextへMerger keyと本番DB credentialが存在しないことをdrift検査する |
-| CFG-014 | MUST | `yoroi-control`と`yoroi-merger`のdeploy権限、GitHub App、OIDC trustを分離する |
-| CFG-015 | MUST | Deno revision rollout前にmigration互換性を検査し、rollback可能範囲を記録する |
-| CFG-016 | SHOULD | production timeline lock、active revision、source commitのdriftを検知する |
+| ID      | 優先   | 要求                                                                                      |
+| ------- | ------ | ----------------------------------------------------------------------------------------- |
+| CFG-001 | MUST   | desired stateとactual stateを定期比較しdriftを検知する                                    |
+| CFG-002 | MUST   | resource、権限拡大、保護低下、破壊変更をrisk分類する                                      |
+| CFG-003 | MUST   | driftまたは変更からTerraform planを生成し、plan digestを記録する                          |
+| CFG-004 | MUST   | applyはtrusted GitHub Actionsへ委譲し、Deno Deploy appでTerraformを実行しない             |
+| CFG-005 | MUST   | apply時に承認済みplan digestと再照合する                                                  |
+| CFG-006 | MUST   | Org owner、App permission、Ruleset bypass、policy rootの変更を二名以上で承認する          |
+| CFG-007 | MUST   | Yoroi自身が自分の必須Checkや保護ルールを単独で削除できない                                |
+| CFG-008 | MUST   | UIで行った緊急変更を15分以内の目標で検知する                                              |
+| CFG-009 | SHOULD | driftの自動remediation PRを作るが、high riskは自動applyしない                             |
+| CFG-010 | SHOULD | policy / Ruleset変更を過去eventへwhat-if replayする                                       |
+| CFG-011 | MUST   | Terraform state、apply credential、GitHub App keyを別の信頼境界へ置く                     |
+| CFG-012 | MUST   | bootstrap problemを文書化し、Yoroiが依存する最低限のRulesetを別管理する                   |
+| CFG-013 | MUST   | Development / Build contextへMerger keyと本番DB credentialが存在しないことをdrift検査する |
+| CFG-014 | MUST   | `yoroi-control`と`yoroi-merger`のdeploy権限、GitHub App、OIDC trustを分離する             |
+| CFG-015 | MUST   | Deno revision rollout前にmigration互換性を検査し、rollback可能範囲を記録する              |
+| CFG-016 | SHOULD | production timeline lock、active revision、source commitのdriftを検知する                 |
 
 ### 17.3 Bootstrapの境界
 
@@ -1638,34 +1638,34 @@ Yoroiが自分を守るRulesetをYoroi自身だけで管理すると循環する
 
 以下は初期目標であり、PoCの実測後に確定する。
 
-| ID | 分類 | 初期目標 | 測定 |
-|---|---|---|---|
-| NFR-001 | Webhook受理 | 月99.95%、p95 1秒以内、上限10秒。応答前にinbox commit | GitHub delivery + Deno trace + DB commit |
-| NFR-002 | 初期状態反映 | PR openから初期summaryを正常時p95 30秒以内 | event received→Check Run/comment update |
-| NFR-003 | Merge安全性 | 誤merge 0、duplicate merge 0 | decision audit + incident |
-| NFR-004 | Scheduler可用性 | 月99.9%。停止時はoutbox保持、merge fail closed | PostgreSQL outbox / lease / Deno Cron metrics |
-| NFR-005 | 復旧 | RTO 30分、RPO 0 decision eventsを目標 | 四半期recovery drill |
-| NFR-006 | 整合収束 | Webhook欠落から15分以内 | GitHub snapshot diff |
-| NFR-007 | CI効率 | 同等安全性のSerial基準比でqueue待ち30%減 | Shadow simulation / lead time |
-| NFR-008 | Flaky制御 | 同一failureの無限retry 0 | failure fingerprint counter |
-| NFR-009 | Rate limit | secondary limit違反0、残量20%で縮退 | GitHub API headers |
-| NFR-010 | 監査完全性 | mergeの100%にdecision envelopeとevidence link | 日次completeness job |
-| NFR-011 | Scalability | 初期仮定500 repos、2,000 open PR、50 events/s | load test。確定値ではない |
-| NFR-012 | Privacy | retention jobと削除要求を定期検証 | retention audit |
-| NFR-013 | Deploy safety | canary / gradual deploy、即時rollback | deploy audit |
-| NFR-014 | Accessibility | Dashboardはkeyboard操作、色以外の状態表現 | accessibility test |
-| NFR-015 | Portability | GitHub API、CI、notificationをadapter化 | contract test |
-| NFR-016 | 承認継続 | 内容不変rebase/force-pushの承認維持率99%以上、誤維持0 | scope digest fixtures + production sample audit |
-| NFR-017 | Reviewer noise | 内容不変push由来の再review request 0、重複依頼率1%未満 | review request reason metric |
-| NFR-018 | Actionability | block表示の95%以上にreason、次のactor、self-service actionまたはescalation先 | summary schema audit |
-| NFR-019 | Recheck | request ack p95 2秒、正常時の再評価完了p95 60秒 | command/API trace |
-| NFR-020 | ETA品質 | eligible queue entryの90%以上にETA範囲を表示し、P90実績が表示範囲内となる率80%以上 | forecast calibration |
-| NFR-021 | Notification quality | 同一root causeの重複comment 0、不要通知率を四半期ごとに低下 | notification feedback / coalesce metric |
-| NFR-022 | Developer理解度 | pilot surveyで「なぜ止まったか分かる」肯定80%以上 | task-based survey |
-| NFR-023 | Developer信頼感 | pilot survey中央値4/5以上、回避行動意向がbaseline以下 | quarterly pulse survey |
-| NFR-024 | Revision traceability | decisionの100%をDeno app/context/revision/source commitへ追跡可能 | OTel + deployment evidence audit |
-| NFR-025 | Durable processing | instance termination、Cron skip、DB failover後もevent loss 0、二重副作用0 | fault injection + reconcile |
-| NFR-026 | Data residency | 保存先ごとにregion、転送先、PII classをinventory化しpolicy適合100% | architecture/config audit |
+| ID      | 分類                  | 初期目標                                                                           | 測定                                            |
+| ------- | --------------------- | ---------------------------------------------------------------------------------- | ----------------------------------------------- |
+| NFR-001 | Webhook受理           | 月99.95%、p95 1秒以内、上限10秒。応答前にinbox commit                              | GitHub delivery + Deno trace + DB commit        |
+| NFR-002 | 初期状態反映          | PR openから初期summaryを正常時p95 30秒以内                                         | event received→Check Run/comment update         |
+| NFR-003 | Merge安全性           | 誤merge 0、duplicate merge 0                                                       | decision audit + incident                       |
+| NFR-004 | Scheduler可用性       | 月99.9%。停止時はoutbox保持、merge fail closed                                     | PostgreSQL outbox / lease / Deno Cron metrics   |
+| NFR-005 | 復旧                  | RTO 30分、RPO 0 decision eventsを目標                                              | 四半期recovery drill                            |
+| NFR-006 | 整合収束              | Webhook欠落から15分以内                                                            | GitHub snapshot diff                            |
+| NFR-007 | CI効率                | 同等安全性のSerial基準比でqueue待ち30%減                                           | Shadow simulation / lead time                   |
+| NFR-008 | Flaky制御             | 同一failureの無限retry 0                                                           | failure fingerprint counter                     |
+| NFR-009 | Rate limit            | secondary limit違反0、残量20%で縮退                                                | GitHub API headers                              |
+| NFR-010 | 監査完全性            | mergeの100%にdecision envelopeとevidence link                                      | 日次completeness job                            |
+| NFR-011 | Scalability           | 初期仮定500 repos、2,000 open PR、50 events/s                                      | load test。確定値ではない                       |
+| NFR-012 | Privacy               | retention jobと削除要求を定期検証                                                  | retention audit                                 |
+| NFR-013 | Deploy safety         | canary / gradual deploy、即時rollback                                              | deploy audit                                    |
+| NFR-014 | Accessibility         | Dashboardはkeyboard操作、色以外の状態表現                                          | accessibility test                              |
+| NFR-015 | Portability           | GitHub API、CI、notificationをadapter化                                            | contract test                                   |
+| NFR-016 | 承認継続              | 内容不変rebase/force-pushの承認維持率99%以上、誤維持0                              | scope digest fixtures + production sample audit |
+| NFR-017 | Reviewer noise        | 内容不変push由来の再review request 0、重複依頼率1%未満                             | review request reason metric                    |
+| NFR-018 | Actionability         | block表示の95%以上にreason、次のactor、self-service actionまたはescalation先       | summary schema audit                            |
+| NFR-019 | Recheck               | request ack p95 2秒、正常時の再評価完了p95 60秒                                    | command/API trace                               |
+| NFR-020 | ETA品質               | eligible queue entryの90%以上にETA範囲を表示し、P90実績が表示範囲内となる率80%以上 | forecast calibration                            |
+| NFR-021 | Notification quality  | 同一root causeの重複comment 0、不要通知率を四半期ごとに低下                        | notification feedback / coalesce metric         |
+| NFR-022 | Developer理解度       | pilot surveyで「なぜ止まったか分かる」肯定80%以上                                  | task-based survey                               |
+| NFR-023 | Developer信頼感       | pilot survey中央値4/5以上、回避行動意向がbaseline以下                              | quarterly pulse survey                          |
+| NFR-024 | Revision traceability | decisionの100%をDeno app/context/revision/source commitへ追跡可能                  | OTel + deployment evidence audit                |
+| NFR-025 | Durable processing    | instance termination、Cron skip、DB failover後もevent loss 0、二重副作用0          | fault injection + reconcile                     |
+| NFR-026 | Data residency        | 保存先ごとにregion、転送先、PII classをinventory化しpolicy適合100%                 | architecture/config audit                       |
 
 ### 18.1 性能より安全を優先する場面
 
@@ -1757,14 +1757,14 @@ Secret、token、raw Authorization header、private repositoryの本文はlogへ
 
 ### 19.4 インシデントモード
 
-| モード | 動作 |
-|---|---|
-| Normal | policyどおり運用 |
-| Degraded Read-only | 新規merge停止、CheckとDashboardは継続 |
-| Serial Fallback | Speculative/Batchを止め1件ずつ処理 |
-| Tree Closed | 全通常merge停止。既存CIは診断目的で継続可能 |
-| Emergency Hotfix | 専用lane、二名承認、TTL、事後再検証 |
-| Merger Disabled | Merger App token生成を停止またはkey失効 |
+| モード             | 動作                                        |
+| ------------------ | ------------------------------------------- |
+| Normal             | policyどおり運用                            |
+| Degraded Read-only | 新規merge停止、CheckとDashboardは継続       |
+| Serial Fallback    | Speculative/Batchを止め1件ずつ処理          |
+| Tree Closed        | 全通常merge停止。既存CIは診断目的で継続可能 |
+| Emergency Hotfix   | 専用lane、二名承認、TTL、事後再検証         |
+| Merger Disabled    | Merger App token生成を停止またはkey失効     |
 
 ### 19.5 復旧runbookの必須項目
 
@@ -1785,15 +1785,15 @@ Secret、token、raw Authorization header、private repositoryの本文はlogへ
 
 ## 20. 段階導入ロードマップ
 
-| 段階 | 期間目安 | 提供 | Security / Reliability Exit | Developer Experience Exit |
-|---|---:|---|---|---|
-| 0. Journey / Threat Design | 2–3週 | journey map、UI prototype、App権限表、scope taxonomy、Deno ADR | threat review、owner合意、data residency判断 | 代表developer 8名以上のtask testで主要状態の理解率80%以上 |
-| 1. Observe | 4–6週 | Deno control app、PostgreSQL inbox/outbox、initial summary、reason graph、recheck、feedback | 30日分でevent loss 0、shadow誤判定2%未満 | 初期summary p95 30秒、actionable block 95%、理解度肯定80%以上 |
-| 2. Approval Continuity | 4–6週 | ownership graph、scope digest、carry-forward、review request coalescing、`yoroi/gate` | owner coverage 100%、誤った承認維持0 | 内容不変更新の維持率99%以上、重複再依頼0、reviewer満足中央値4/5 |
-| 3. Serial Merge | 4–8週 | exact candidate、PostgreSQL lease/fencing、別Merger app、pause、recovery、ETA | fault injection合格、RTO演習、10 repos稼働 | ETA coverage90%、block理解度80%、trust score中央値4/5 |
-| 4. Speculative / Batch | 6–10週 | 累積候補、adaptive window、rebuild通知、batch cross-link、flaky self-service | Serial同等安全性、p95 queue time 30%減 | unexplained rerun feedback baseline比50%減、相互作用通知100% |
-| 5. Org Governance | 6–10週 | Terraform drift、dual control、policy simulator、Deno revision guard | 重要設定drift検知100%、apply監査 | admin向けtask success 90%、一般developerの追加学習時間30分以内 |
-| 6. Advanced | 継続 | cross-repo DAG、auto-bisect、auto-revert、external KMS | 個別risk acceptanceと段階rollout | 四半期trust/comprehensionを維持し、回避行動の増加なし |
+| 段階                       | 期間目安 | 提供                                                                                        | Security / Reliability Exit                  | Developer Experience Exit                                       |
+| -------------------------- | -------: | ------------------------------------------------------------------------------------------- | -------------------------------------------- | --------------------------------------------------------------- |
+| 0. Journey / Threat Design |    2–3週 | journey map、UI prototype、App権限表、scope taxonomy、Deno ADR                              | threat review、owner合意、data residency判断 | 代表developer 8名以上のtask testで主要状態の理解率80%以上       |
+| 1. Observe                 |    4–6週 | Deno control app、PostgreSQL inbox/outbox、initial summary、reason graph、recheck、feedback | 30日分でevent loss 0、shadow誤判定2%未満     | 初期summary p95 30秒、actionable block 95%、理解度肯定80%以上   |
+| 2. Approval Continuity     |    4–6週 | ownership graph、scope digest、carry-forward、review request coalescing、`yoroi/gate`       | owner coverage 100%、誤った承認維持0         | 内容不変更新の維持率99%以上、重複再依頼0、reviewer満足中央値4/5 |
+| 3. Serial Merge            |    4–8週 | exact candidate、PostgreSQL lease/fencing、別Merger app、pause、recovery、ETA               | fault injection合格、RTO演習、10 repos稼働   | ETA coverage90%、block理解度80%、trust score中央値4/5           |
+| 4. Speculative / Batch     |   6–10週 | 累積候補、adaptive window、rebuild通知、batch cross-link、flaky self-service                | Serial同等安全性、p95 queue time 30%減       | unexplained rerun feedback baseline比50%減、相互作用通知100%    |
+| 5. Org Governance          |   6–10週 | Terraform drift、dual control、policy simulator、Deno revision guard                        | 重要設定drift検知100%、apply監査             | admin向けtask success 90%、一般developerの追加学習時間30分以内  |
+| 6. Advanced                |     継続 | cross-repo DAG、auto-bisect、auto-revert、external KMS                                      | 個別risk acceptanceと段階rollout             | 四半期trust/comprehensionを維持し、回避行動の増加なし           |
 
 ### 20.1 MVP
 
@@ -1855,74 +1855,74 @@ Secret、token、raw Authorization header、private repositoryの本文はlogへ
 
 ## 21. 受入シナリオ
 
-| ID | 状況 | 注入 | 期待結果 |
-|---|---|---|---|
-| AT-01 | A/B/C干渉 | A pass、B fail、CはA+B+Cでpass | Aのみmerge。B排除。CをA+Cで再検証後merge |
-| AT-02 | 重複Webhook | 同じdeliveryを10回送信 | Check、queue、merge operationは各1回 |
-| AT-03 | 順不同Event | `check_completed`後に`workflow_started` | 状態が後退せずreconcileで正規化 |
-| AT-04A | 内容不変force-push | commit整理/rebase後、scope change digest一致かつnew baseへのreplay resultがnew headと一致 | 人の承認を維持し再依頼しない。旧CI/candidateは失効し新exact candidateを再検証 |
-| AT-04B | scope内変更force-push | payments scopeのblobが1件変化 | paymentsに結合した承認だけ失効。無関係scope承認は維持。旧candidateをmergeしない |
-| AT-04C | 同一性判定不能 | truncated tree未解消、submodule/LFS/generated差分が曖昧 | 影響scope承認を安全側に失効し、理由と必要actionを表示 |
-| AT-04D | whitespace変更 | patch-id stableなら同一だがblob OIDは変化 | 既定policyでは内容変更として失効。限定scopeの明示ruleがある場合だけ例外 |
-| AT-04E | 新baseが同じ高感度pathを変更 | PR changeは同一でreplayも成功したが、main側auth interfaceが更新 | policyのcontext re-reviewによりauth承認だけ再依頼。候補/CIは再生成 |
-| AT-04F | 新baseが無関係pathだけ変更 | PR change同一、context proof成功 | 全scope承認を維持し、review request再送なし。候補/CIだけ再生成 |
-| AT-05 | 未起動Check | 期待jobのeventが遅延 | 未存在をsuccessにせずtimeoutと診断 |
-| AT-06 | Flaky cascade | 先頭jobが既知flakyで1回失敗 | policy上限内retry、後続全破棄を抑制、confidence表示 |
-| AT-07 | 真の先頭失敗 | Bが決定的failure | Bをejectし影響後続だけ再構築 |
-| AT-08 | Batch interaction | A/B単体pass、A+Bでfail | 最小集合`{A,B}`を記録し同時batch禁止。両PRを相互linkし、当事者へ同じfingerprintと次のactionを通知 |
-| AT-09 | Fork attack | PRがSecret表示と外部送信を試行 | Secretなし、read-only、egress policyで失敗、alert |
-| AT-10 | Policy弱体化 | author兼operatorが承認数を0へ変更 | 現行policyのGovernor 2名なしでは適用不可 |
-| AT-11 | Bot outage | Deno instance / outbox drain / APIを停止 | merge fail closed、inbox/outbox保持、Cron/reconcile後に副作用を一回だけ処理 |
-| AT-12 | GitHub rate limit | secondary limitを模擬 | backoff、window縮小、ETA更新、無限retryなし |
-| AT-13 | Break-glass | 緊急hotfixを要求 | 二名承認、ticket、2h TTL、事後再検証、完全監査 |
-| AT-14 | Config drift | Ruleset bypassをUIで追加 | 15分以内検知、risk high、Terraform remediation plan |
-| AT-15 | Cross-repo schema | producer破壊変更、consumer未対応 | dependency / contract gateでmerge阻止 |
-| AT-16 | Approval membership | approverがteamから削除 | merge前再検証でapproval無効化 |
-| AT-17 | Expected check race | GitHub Actions起動が遅延 | job出現までpending、早すぎるmergeなし |
-| AT-18 | Wrong candidate | CI結果のcandidate SHAが不一致 | evidence拒否、gate fail、再実行 |
-| AT-19 | Evidence tamper | PostgreSQL上のdecision metadataを変更 | hash不一致を検知、Merger拒否、外部evidenceとの差をCritical alert |
-| AT-20 | Post-merge回帰 | main monitorがculpritを一意特定 | tree close、culprit quarantine、revert path実行 |
-| AT-21 | Irreversible migration | migration後に回帰 | 自動revertせずroll-forward runbookを提示 |
-| AT-22 | Notification storm | 同一infra failureが100 PRへ波及 | 原因単位で集約し100件の個別spamを抑制 |
-| AT-23 | Repo isolation | repo Aのeventへrepo B IDを混入 | authorization失敗、状態非更新、security alert |
-| AT-24 | Deploy rollback | 新Deno revisionで判定差異 | production timelineをlockし旧revisionへrollback、outbox保持、DB互換性を確認 |
-| AT-25 | Initial summary | PR open、まだCIなし | p95 30秒以内に必要role、高感度scope、想定check、Draft扱い、次のactionを表示 |
-| AT-26 | Draft push storm | Draftへ20回push | Candidate/queue/review escalation/高コストCIなし。summaryは更新型、cheap checkだけpolicyどおり |
-| AT-27 | Conditional questionnaire | docs-only PRとauth変更PRを作る | docs PRにはformなし。auth PRだけ発火理由付きsecurity質問を表示 |
-| AT-28 | Speculative rebuild | B失敗でCをA+Cへ再構築 | C authorへB由来であること、再実行job、更新ETAを一回通知 |
-| AT-29 | Self-service recheck | GitHub API一時不整合後にauthorがcommand | policy/approvalを改変せず再取得。解消事実または変化なしをaudit付き表示 |
-| AT-30 | Recheck abuse | 100 comment、同時head update | coalesce/rate limitし、古いhead結果を公開せず、GitHub APIを枯渇させない |
-| AT-31 | Flaky report | developerが失敗testをreport | run/fingerprint/historyを自動添付。単独commandではnon-votingにならない |
-| AT-32 | Feedback appeal | wrong-ownerを報告 | decision-linked caseを即時ack。gateは迂回せず、privacy最小metadataだけ連携 |
-| AT-33 | ETA outage | GitHub障害で分布外遅延 | 確定時刻を装わずconfidenceを下げ、外部要因と更新条件を表示 |
-| AT-34 | Stale lease | instance Aのlease失効後、Bがtokenを更新。Aがmerge試行 | Mergerが古いfencing tokenを拒否し、二重merge 0 |
-| AT-35 | Cron semantics | sweep実行が次周期まで継続、続いてfailure | overlapしない。skipを観測し、明示retry上限後alert |
-| AT-36 | Deno context isolation | branch previewから本番Merger endpointを呼ぶ | OIDC context/app claim不一致またはsecret不在で拒否 |
-| AT-37 | KV watch omission | PoCで中間更新がwatchに現れない | journal/scan/reconcileで収束し、watchだけに依存した欠落なし |
-| AT-38 | Response termination | webhook応答直後にinstance終了 | commit済みinbox/outboxから回収。detached Promise喪失でもevent loss 0 |
-| AT-39 | Diff/tree API limit | PR files 3,000件超、またはrecursive treeが100,000 entry/7MB超 | subtree/blobを個別取得し、完全性を証明するまでapproval continuityを確定しない [S50][S55] |
-| AT-40 | Notification aggregation | 同一infra failureが100 PRへ波及後に復旧 | PRごと一つのmutable state、原因単位broadcast、復旧通知を重複させない |
+| ID     | 状況                         | 注入                                                                                      | 期待結果                                                                                          |
+| ------ | ---------------------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| AT-01  | A/B/C干渉                    | A pass、B fail、CはA+B+Cでpass                                                            | Aのみmerge。B排除。CをA+Cで再検証後merge                                                          |
+| AT-02  | 重複Webhook                  | 同じdeliveryを10回送信                                                                    | Check、queue、merge operationは各1回                                                              |
+| AT-03  | 順不同Event                  | `check_completed`後に`workflow_started`                                                   | 状態が後退せずreconcileで正規化                                                                   |
+| AT-04A | 内容不変force-push           | commit整理/rebase後、scope change digest一致かつnew baseへのreplay resultがnew headと一致 | 人の承認を維持し再依頼しない。旧CI/candidateは失効し新exact candidateを再検証                     |
+| AT-04B | scope内変更force-push        | payments scopeのblobが1件変化                                                             | paymentsに結合した承認だけ失効。無関係scope承認は維持。旧candidateをmergeしない                   |
+| AT-04C | 同一性判定不能               | truncated tree未解消、submodule/LFS/generated差分が曖昧                                   | 影響scope承認を安全側に失効し、理由と必要actionを表示                                             |
+| AT-04D | whitespace変更               | patch-id stableなら同一だがblob OIDは変化                                                 | 既定policyでは内容変更として失効。限定scopeの明示ruleがある場合だけ例外                           |
+| AT-04E | 新baseが同じ高感度pathを変更 | PR changeは同一でreplayも成功したが、main側auth interfaceが更新                           | policyのcontext re-reviewによりauth承認だけ再依頼。候補/CIは再生成                                |
+| AT-04F | 新baseが無関係pathだけ変更   | PR change同一、context proof成功                                                          | 全scope承認を維持し、review request再送なし。候補/CIだけ再生成                                    |
+| AT-05  | 未起動Check                  | 期待jobのeventが遅延                                                                      | 未存在をsuccessにせずtimeoutと診断                                                                |
+| AT-06  | Flaky cascade                | 先頭jobが既知flakyで1回失敗                                                               | policy上限内retry、後続全破棄を抑制、confidence表示                                               |
+| AT-07  | 真の先頭失敗                 | Bが決定的failure                                                                          | Bをejectし影響後続だけ再構築                                                                      |
+| AT-08  | Batch interaction            | A/B単体pass、A+Bでfail                                                                    | 最小集合`{A,B}`を記録し同時batch禁止。両PRを相互linkし、当事者へ同じfingerprintと次のactionを通知 |
+| AT-09  | Fork attack                  | PRがSecret表示と外部送信を試行                                                            | Secretなし、read-only、egress policyで失敗、alert                                                 |
+| AT-10  | Policy弱体化                 | author兼operatorが承認数を0へ変更                                                         | 現行policyのGovernor 2名なしでは適用不可                                                          |
+| AT-11  | Bot outage                   | Deno instance / outbox drain / APIを停止                                                  | merge fail closed、inbox/outbox保持、Cron/reconcile後に副作用を一回だけ処理                       |
+| AT-12  | GitHub rate limit            | secondary limitを模擬                                                                     | backoff、window縮小、ETA更新、無限retryなし                                                       |
+| AT-13  | Break-glass                  | 緊急hotfixを要求                                                                          | 二名承認、ticket、2h TTL、事後再検証、完全監査                                                    |
+| AT-14  | Config drift                 | Ruleset bypassをUIで追加                                                                  | 15分以内検知、risk high、Terraform remediation plan                                               |
+| AT-15  | Cross-repo schema            | producer破壊変更、consumer未対応                                                          | dependency / contract gateでmerge阻止                                                             |
+| AT-16  | Approval membership          | approverがteamから削除                                                                    | merge前再検証でapproval無効化                                                                     |
+| AT-17  | Expected check race          | GitHub Actions起動が遅延                                                                  | job出現までpending、早すぎるmergeなし                                                             |
+| AT-18  | Wrong candidate              | CI結果のcandidate SHAが不一致                                                             | evidence拒否、gate fail、再実行                                                                   |
+| AT-19  | Evidence tamper              | PostgreSQL上のdecision metadataを変更                                                     | hash不一致を検知、Merger拒否、外部evidenceとの差をCritical alert                                  |
+| AT-20  | Post-merge回帰               | main monitorがculpritを一意特定                                                           | tree close、culprit quarantine、revert path実行                                                   |
+| AT-21  | Irreversible migration       | migration後に回帰                                                                         | 自動revertせずroll-forward runbookを提示                                                          |
+| AT-22  | Notification storm           | 同一infra failureが100 PRへ波及                                                           | 原因単位で集約し100件の個別spamを抑制                                                             |
+| AT-23  | Repo isolation               | repo Aのeventへrepo B IDを混入                                                            | authorization失敗、状態非更新、security alert                                                     |
+| AT-24  | Deploy rollback              | 新Deno revisionで判定差異                                                                 | production timelineをlockし旧revisionへrollback、outbox保持、DB互換性を確認                       |
+| AT-25  | Initial summary              | PR open、まだCIなし                                                                       | p95 30秒以内に必要role、高感度scope、想定check、Draft扱い、次のactionを表示                       |
+| AT-26  | Draft push storm             | Draftへ20回push                                                                           | Candidate/queue/review escalation/高コストCIなし。summaryは更新型、cheap checkだけpolicyどおり    |
+| AT-27  | Conditional questionnaire    | docs-only PRとauth変更PRを作る                                                            | docs PRにはformなし。auth PRだけ発火理由付きsecurity質問を表示                                    |
+| AT-28  | Speculative rebuild          | B失敗でCをA+Cへ再構築                                                                     | C authorへB由来であること、再実行job、更新ETAを一回通知                                           |
+| AT-29  | Self-service recheck         | GitHub API一時不整合後にauthorがcommand                                                   | policy/approvalを改変せず再取得。解消事実または変化なしをaudit付き表示                            |
+| AT-30  | Recheck abuse                | 100 comment、同時head update                                                              | coalesce/rate limitし、古いhead結果を公開せず、GitHub APIを枯渇させない                           |
+| AT-31  | Flaky report                 | developerが失敗testをreport                                                               | run/fingerprint/historyを自動添付。単独commandではnon-votingにならない                            |
+| AT-32  | Feedback appeal              | wrong-ownerを報告                                                                         | decision-linked caseを即時ack。gateは迂回せず、privacy最小metadataだけ連携                        |
+| AT-33  | ETA outage                   | GitHub障害で分布外遅延                                                                    | 確定時刻を装わずconfidenceを下げ、外部要因と更新条件を表示                                        |
+| AT-34  | Stale lease                  | instance Aのlease失効後、Bがtokenを更新。Aがmerge試行                                     | Mergerが古いfencing tokenを拒否し、二重merge 0                                                    |
+| AT-35  | Cron semantics               | sweep実行が次周期まで継続、続いてfailure                                                  | overlapしない。skipを観測し、明示retry上限後alert                                                 |
+| AT-36  | Deno context isolation       | branch previewから本番Merger endpointを呼ぶ                                               | OIDC context/app claim不一致またはsecret不在で拒否                                                |
+| AT-37  | KV watch omission            | PoCで中間更新がwatchに現れない                                                            | journal/scan/reconcileで収束し、watchだけに依存した欠落なし                                       |
+| AT-38  | Response termination         | webhook応答直後にinstance終了                                                             | commit済みinbox/outboxから回収。detached Promise喪失でもevent loss 0                              |
+| AT-39  | Diff/tree API limit          | PR files 3,000件超、またはrecursive treeが100,000 entry/7MB超                             | subtree/blobを個別取得し、完全性を証明するまでapproval continuityを確定しない [S50][S55]          |
+| AT-40  | Notification aggregation     | 同一infra failureが100 PRへ波及後に復旧                                                   | PRごと一つのmutable state、原因単位broadcast、復旧通知を重複させない                              |
 
 ---
 
 ## 22. トレーサビリティ
 
-| 課題 | 主な要件 | 受入 |
-|---|---|---|
-| PR間干渉 | FR-050〜058、FR-042 | AT-01、08、15 |
-| Batch / flaky | FR-046〜049、FR-052〜059 | AT-06〜08 |
-| Status race / 不可視 | FR-005〜006、FR-014〜015、FR-043、FR-072 | AT-03、05、17、18 |
-| Owner / 承認継続 | FR-020〜029、FR-090、FR-102 | AT-04A〜04F、10、16、39 |
-| 早期期待提示 / Draft | FR-071、FR-091、FR-096〜097 | AT-25〜27 |
-| Queue説明 / ETA | FR-092〜094、FR-101、FR-104 | AT-08、28、33、40 |
-| Self-service / 異議 | FR-095、FR-098〜100 | AT-29〜32 |
-| Fork / supply chain | FR-044〜045、SEC-009〜014 | AT-09 |
-| Bot / Deno platform障害 | FR-003〜008、FR-059、FR-065〜066、SEC-018、SEC-025、SEC-032〜037 | AT-11、12、24、34〜38 |
-| 設定drift | CFG-001〜016 | AT-10、14、36 |
-| 例外・内部不正 | FR-063〜064、SEC-015〜017、SEC-026 | AT-10、13、19 |
-| 事後回帰 | FR-067〜069 | AT-20、21 |
-| Repo isolation | SEC-019 | AT-23 |
-| Developer trust | FR-091〜105、NFR-016〜023 | AT-25〜33、40 |
+| 課題                    | 主な要件                                                         | 受入                    |
+| ----------------------- | ---------------------------------------------------------------- | ----------------------- |
+| PR間干渉                | FR-050〜058、FR-042                                              | AT-01、08、15           |
+| Batch / flaky           | FR-046〜049、FR-052〜059                                         | AT-06〜08               |
+| Status race / 不可視    | FR-005〜006、FR-014〜015、FR-043、FR-072                         | AT-03、05、17、18       |
+| Owner / 承認継続        | FR-020〜029、FR-090、FR-102                                      | AT-04A〜04F、10、16、39 |
+| 早期期待提示 / Draft    | FR-071、FR-091、FR-096〜097                                      | AT-25〜27               |
+| Queue説明 / ETA         | FR-092〜094、FR-101、FR-104                                      | AT-08、28、33、40       |
+| Self-service / 異議     | FR-095、FR-098〜100                                              | AT-29〜32               |
+| Fork / supply chain     | FR-044〜045、SEC-009〜014                                        | AT-09                   |
+| Bot / Deno platform障害 | FR-003〜008、FR-059、FR-065〜066、SEC-018、SEC-025、SEC-032〜037 | AT-11、12、24、34〜38   |
+| 設定drift               | CFG-001〜016                                                     | AT-10、14、36           |
+| 例外・内部不正          | FR-063〜064、SEC-015〜017、SEC-026                               | AT-10、13、19           |
+| 事後回帰                | FR-067〜069                                                      | AT-20、21               |
+| Repo isolation          | SEC-019                                                          | AT-23                   |
+| Developer trust         | FR-091〜105、NFR-016〜023                                        | AT-25〜33、40           |
 
 ---
 
@@ -2060,7 +2060,7 @@ Secret、token、raw Authorization header、private repositoryの本文はlogへ
 
 ## 変更履歴
 
-| 版 | 日付 | 変更 |
-|---|---|---|
-| 0.1 | 2026-08-24 | 既存OSS・製品・運用課題の調査、汎用要件、Cloudflare構成、セキュリティ、導入計画を初版化 |
+| 版  | 日付       | 変更                                                                                                                                                                                                                                       |
+| --- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 0.1 | 2026-08-24 | 既存OSS・製品・運用課題の調査、汎用要件、Cloudflare構成、セキュリティ、導入計画を初版化                                                                                                                                                    |
 | 0.2 | 2026-08-25 | Deno Deploy + PostgreSQL基盤へ再設計。scope change digest + context safety proofによる承認継続、Developer Journey、初期summary、Draft抑制、ETA、再構築/相互作用通知、recheck、flaky self-service、feedback、DX指標と開発者向け成果物を追加 |

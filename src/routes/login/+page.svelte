@@ -18,9 +18,14 @@
 		max-width: 24rem;
 		margin: 15vh auto 0;
 		text-align: center;
+		background: var(--win-surface, #c0c0c0);
+		box-shadow:
+			var(--win-border-raised-outer, inset -1px -1px #0a0a0a, inset 1px 1px #fff),
+			var(--win-border-raised-inner, inset -2px -2px #808080, inset 2px 2px #dfdfdf);
+		padding: 2rem 1.5rem;
 	}
 	button {
 		padding: 0.6rem 1.2rem;
-		font-weight: 600;
+		font-weight: bold;
 	}
 </style>

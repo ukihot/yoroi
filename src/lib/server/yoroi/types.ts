@@ -257,6 +257,67 @@ export interface FeedbackCase {
 	createdAt: string;
 }
 
+/** design.md 23.10節 Reviews画面。 */
+export interface ScopeLoad {
+	scope: string;
+	pendingCount: number;
+	reviewerCount: number;
+	hasBackupReviewer: boolean;
+}
+
+export interface ReviewerLoad {
+	actor: string;
+	pendingCount: number;
+	sensitiveCount: number;
+	oldestWaitingMinutes: number;
+}
+
+export interface ReviewerLoadSummary {
+	byScope: ScopeLoad[];
+	byReviewer: ReviewerLoad[];
+	totalPending: number;
+	concentrationPct: number;
+	carryForwardRatePct: number;
+}
+
+/**
+ * design.md 23.9節 CI Reliability画面。実際に書き手があるデータだけに絞っている
+ * （flaky_test — `/yoroi flaky`コマンド、merge_candidate — Serialスケジューラ）。
+ * workflow別成功率・p50/p95実行時間・circuit breaker発動などはcheck_evidence/
+ * expected_check_plan取り込みが未実装のため対象外（画面側に正直な注記を出す）。
+ */
+export interface FlakyTestRow {
+	testFingerprint: string;
+	repoName: string | null;
+	ownerTeam: string | null;
+	failureCount: number;
+	reproductionRatePct: number | null;
+	status: string;
+	quarantineUntil: string | null;
+}
+
+export interface CiReliabilitySummary {
+	flakyTests: FlakyTestRow[];
+	candidatesBuilt: number;
+	candidatesInvalidated: number;
+	invalidationReasons: { reason: string; count: number }[];
+}
+
+/**
+ * design.md 23.11節 Policy & Drift画面のPolicy半分のみ。GitHub構成／Drift半分は
+ * design.md自身がPhase 5 Org Governance範囲・未詳細化と明記しており、consoleは
+ * 既存のプレースホルダー文言のまま。
+ */
+export interface RepoPolicySummary {
+	repoId: string;
+	repoName: string;
+	policyDigest: string;
+	source: 'published_bundle' | 'default_fallback';
+	version: string | null;
+	publishedAt: string | null;
+	openPrCount: number;
+}
+
 /**
  * Port（design.md 1.5節・24.1節）。yoroi-control側のread/write API（16章・24.2節）が
  * 実装されたら、この interface を満たすHTTP adapterへ差し替える。UI側は変更不要にする。
@@ -275,4 +336,10 @@ export interface ControlApiPort {
 	recheckPr(repoId: string, prNumber: number): Promise<RecheckOutcome>;
 	/** design.md 16章 `/api/pr/{repo}/{pr}/feedback` 相当。 */
 	submitFeedback(repoId: string, prNumber: number, description: string): Promise<FeedbackCase>;
+	/** design.md 16章 `GET /api/ci/reliability` 相当（23.9節）。 */
+	getCiReliability(): Promise<CiReliabilitySummary>;
+	/** design.md 16章 `GET /api/reviewers/load` 相当（23.10節）。 */
+	getReviewerLoad(): Promise<ReviewerLoadSummary>;
+	/** design.md 16章 `GET /api/policy/drift` 相当（23.11節、Policy半分のみ）。 */
+	getPolicySummaries(): Promise<RepoPolicySummary[]>;
 }

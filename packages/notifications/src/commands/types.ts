@@ -1,7 +1,7 @@
-import type { ActorStableId, PullRequestNumber, Sha } from "@yoroi/domain";
-import type { RepoRef } from "@yoroi/github";
-import type { ReasonGraphNode } from "@yoroi/policy";
-import type { EtaConfidence } from "../render.ts";
+import type { ActorStableId, PullRequestNumber, Sha } from '@yoroi/domain';
+import type { RepoRef } from '@yoroi/github';
+import type { ReasonGraphNode } from '@yoroi/policy';
+import type { EtaConfidence } from '../render.ts';
 
 /**
  * design.md §9.9.1's slash command registry, §15.1–15.2. `RepoPermission` is
@@ -12,12 +12,12 @@ import type { EtaConfidence } from "../render.ts";
  * an OR-condition against `isPrAuthor`, not a point on the read<write<
  * operator ladder.
  */
-export type RepoPermission = "read" | "write" | "operator";
+export type RepoPermission = 'read' | 'write' | 'operator';
 
 export const PERMISSION_RANK: Readonly<Record<RepoPermission, number>> = {
 	read: 0,
 	write: 1,
-	operator: 2,
+	operator: 2
 };
 
 export interface CommandContext {
@@ -30,15 +30,15 @@ export interface CommandContext {
 }
 
 export type CommandResult =
-	| { readonly kind: "ok"; readonly markdown: string }
-	| { readonly kind: "pending"; readonly markdown: string }
-	| { readonly kind: "denied"; readonly reason: string }
-	| { readonly kind: "rate_limited"; readonly retryAfterSeconds: number }
-	| { readonly kind: "unknown_command"; readonly attempted: string };
+	| { readonly kind: 'ok'; readonly markdown: string }
+	| { readonly kind: 'pending'; readonly markdown: string }
+	| { readonly kind: 'denied'; readonly reason: string }
+	| { readonly kind: 'rate_limited'; readonly retryAfterSeconds: number }
+	| { readonly kind: 'unknown_command'; readonly attempted: string };
 
 export interface GateSnapshot {
 	readonly headSha: Sha;
-	readonly gateConclusion: "PASS" | "BLOCKED" | "PENDING";
+	readonly gateConclusion: 'PASS' | 'BLOCKED' | 'PENDING';
 	readonly reasonGraph: ReasonGraphNode;
 }
 
@@ -57,7 +57,7 @@ export interface AuditEventInput {
 	readonly after: unknown;
 }
 
-export type FlakyConfidence = "known_infra" | "known_flaky" | "possible_change_related";
+export type FlakyConfidence = 'known_infra' | 'known_flaky' | 'possible_change_related';
 
 export interface FlakyReportInput {
 	readonly repo: RepoRef;
@@ -105,7 +105,7 @@ export interface CommandPorts {
 	recordAuditEvent(input: AuditEventInput): Promise<void>;
 	recordFlakyReport(input: FlakyReportInput): Promise<FlakyReportResult>;
 	createFlakyQuarantineProposal(
-		input: FlakyQuarantineProposalInput,
+		input: FlakyQuarantineProposalInput
 	): Promise<{ readonly proposalId: string }>;
 	recordFeedback(input: FeedbackInput): Promise<{ readonly id: number }>;
 }
@@ -113,7 +113,7 @@ export interface CommandPorts {
 export type CommandHandler = (
 	ctx: CommandContext,
 	args: readonly string[],
-	ports: CommandPorts,
+	ports: CommandPorts
 ) => Promise<CommandResult>;
 
 export interface SlashCommandSpec {

@@ -2,9 +2,13 @@ import { sql } from "drizzle-orm";
 import { db } from "./client.ts";
 import {
 	approval,
+	approvalCarryForward,
 	blockedEntry,
 	decisionEvent,
+	flakyTest,
 	fleetHealthSnapshot,
+	mergeCandidate,
+	policyBundle,
 	prDecisionSnapshot,
 	prReviewerAssignment,
 	prScopeRequirement,
@@ -13,6 +17,13 @@ import {
 	repository,
 } from "@yoroi/postgres";
 import { getEnv } from "../env.ts";
+import { DEFAULT_POLICY } from "../worker/default-policy.ts";
+
+/** r1's policyVersion below is deliberately set to match this bundle's
+ * digest, so the Policy & Drift screen's local demo shows both code paths:
+ * r1 resolves to a published bundle, r2/r3 fall back to DEFAULT_POLICY
+ * (matching production reality today — see routes/policy.ts's comment). */
+const R1_POLICY_DIGEST = "v13-payments-override (sha256:44f1a9…)";
 
 /**
  * Sample data with the same shape/content as the console app's former
@@ -35,7 +46,9 @@ async function truncateAll() {
 		TRUNCATE TABLE
 			repository, pull_request_revision, approval, pr_scope_requirement,
 			queue_entry, pr_decision_snapshot, pr_reviewer_assignment, blocked_entry,
-			feedback_case, decision_event, fleet_health_snapshot
+			feedback_case, decision_event, fleet_health_snapshot,
+			flaky_test, merge_candidate, policy_bundle, approval_carry_forward,
+			expected_check_plan, check_evidence
 		RESTART IDENTITY
 	`);
 }
@@ -45,6 +58,7 @@ async function seedRepositories() {
 		{
 			repoId: "r1",
 			installationId: 1,
+			githubRepositoryId: 1001,
 			name: "acme/payments-api",
 			mode: "serial",
 			status: "active",
@@ -53,7 +67,7 @@ async function seedRepositories() {
 			ciSuccessRatePct: 88,
 			p50LeadTimeMinutes: 47,
 			targetBranch: "main",
-			policyVersion: "v12 (sha256:9f2a…)",
+			policyVersion: R1_POLICY_DIGEST,
 			rulesetConsistent: true,
 			installationOk: true,
 			lastWebhookAt: minutesAgo(1),
@@ -73,6 +87,7 @@ async function seedRepositories() {
 		{
 			repoId: "r2",
 			installationId: 1,
+			githubRepositoryId: 1002,
 			name: "acme/web-frontend",
 			mode: "speculative",
 			status: "active",
@@ -101,6 +116,7 @@ async function seedRepositories() {
 		{
 			repoId: "r3",
 			installationId: 1,
+			githubRepositoryId: 1003,
 			name: "acme/infra-terraform",
 			mode: "advisory",
 			status: "paused",
@@ -259,6 +275,25 @@ async function seedApprovalsAndDecisions() {
 			actorStableId: "k-sato",
 			role: "scope_approver",
 			maintained: true,
+		},
+	]);
+
+	// design.md §4.3/§8.3: r1/405's "db" approval (approval id 3 above, in
+	// insertion order) survived a rebase because the scope's content proved
+	// unchanged — carried forward instead of re-requested. Backs the Reviews
+	// screen's carry-forward-rate stat (routes/reviewers.ts).
+	await db.insert(approvalCarryForward).values([
+		{
+			originalApprovalId: 3,
+			repoId: "r1",
+			prNumber: 405,
+			scopeId: "db",
+			oldBaseSha: "a1b2c3d",
+			oldHeadSha: "e4f5061",
+			newBaseSha: "a1b2c3d",
+			newHeadSha: "7890abc",
+			contextProofDigest: "sha256:demo-carry-forward",
+			proofAlgorithm: "deterministic-replay",
 		},
 	]);
 
@@ -523,6 +558,40 @@ async function seedReviewAssignments() {
 			estimatedReviewMinutes: 15,
 			waitingSince: minutesAgo(26 * 60),
 		},
+		// Below: other actors, not DEV_ACTOR — My Work only shows the logged-in
+		// actor's own assignments, but the Reviews screen (design.md §23.10)
+		// shows load across everyone, so it needs more than one reviewer to be
+		// a meaningful demo (backup-reviewer coverage, concentration).
+		{
+			repoId: "r1",
+			prNumber: 421,
+			scopeId: "payments-core",
+			actorStableId: "yuki-t",
+			reason: "payments-coreの backup Security Approverとして登録されています",
+			sensitive: true,
+			estimatedReviewMinutes: 25,
+			waitingSince: minutesAgo(3 * 60),
+		},
+		{
+			repoId: "r2",
+			prNumber: 933,
+			scopeId: "frontend",
+			actorStableId: "k-sato",
+			reason: "frontendのScope Approverとして登録されています",
+			sensitive: false,
+			estimatedReviewMinutes: 10,
+			waitingSince: minutesAgo(45),
+		},
+		{
+			repoId: "r2",
+			prNumber: 918,
+			scopeId: "frontend",
+			actorStableId: "k-sato",
+			reason: "frontendのScope Approverとして登録されています",
+			sensitive: false,
+			estimatedReviewMinutes: 20,
+			waitingSince: minutesAgo(2 * 60),
+		},
 	]);
 }
 
@@ -642,6 +711,110 @@ async function seedAudit() {
 	await db.insert(decisionEvent).values(filler);
 }
 
+/** design.md §23.11 Policy & Drift screen (Policy half — routes/policy.ts).
+ * r1's `policyVersion` above matches this bundle's digest exactly, so the
+ * demo shows a repo running a published org override; r2/r3 have no
+ * matching bundle and fall back to DEFAULT_POLICY, same as production
+ * reality today. `rawYaml` is a real, parseable `PolicyDocument` (a copy of
+ * DEFAULT_POLICY with a stricter payments-core override) rather than
+ * throwaway text, so it would compile for real if evaluate-pr.ts's
+ * `loadEffectivePolicy` ever actually loaded it. */
+async function seedPolicyBundle() {
+	const orgOverride = {
+		...DEFAULT_POLICY,
+		scopes: [
+			...DEFAULT_POLICY.scopes,
+			{
+				id: "payments-core",
+				match: ["services/payments/**"],
+				require: { approvals: [{ role: "security_approver" as const, count: 2 }] },
+			},
+		],
+	};
+	await db.insert(policyBundle).values([
+		{
+			digest: R1_POLICY_DIGEST,
+			installationId: 1,
+			repositoryId: 1001,
+			version: "v13",
+			rawYaml: JSON.stringify(orgOverride),
+			signer: "yuki-t",
+			createdAt: minutesAgo(14 * 24 * 60),
+		},
+	]);
+}
+
+/** design.md §23.9 CI Reliability screen (routes/ci.ts). `repositoryId`
+ * below is the GitHub numeric id (`githubRepositoryId` set on the r1/r2
+ * seed rows above), matching what the real `/yoroi flaky` command and
+ * Serial scheduler key these tables by. */
+async function seedCiSignals() {
+	await db.insert(flakyTest).values([
+		{
+			testFingerprint: "acme/payments-api:integration/auth-session",
+			repositoryId: 1001,
+			ownerTeam: "payments-platform",
+			failureCount: 18,
+			reproductionRate: 62,
+			status: "observed",
+		},
+		{
+			testFingerprint: "acme/payments-api:unit/ledger-rounding",
+			repositoryId: 1001,
+			ownerTeam: "payments-platform",
+			failureCount: 6,
+			reproductionRate: 20,
+			status: "quarantine_requested",
+			quarantineUntil: minutesFromNow(3 * 24 * 60),
+		},
+		{
+			testFingerprint: "acme/web-frontend:e2e/checkout-flow",
+			repositoryId: 1002,
+			ownerTeam: "web-platform",
+			failureCount: 4,
+			reproductionRate: 35,
+			status: "observed",
+		},
+	]);
+
+	await db.insert(mergeCandidate).values([
+		{
+			candidateSha: "cand-r1-0001",
+			installationId: 1,
+			repositoryId: 1001,
+			pullRequestNumber: 405,
+			baseSha: "a1b2c3d",
+			orderedHeads: ["7890abc"],
+			policyDigest: R1_POLICY_DIGEST,
+			builtAt: minutesAgo(90),
+		},
+		{
+			candidateSha: "cand-r1-0002",
+			installationId: 1,
+			repositoryId: 1001,
+			pullRequestNumber: 421,
+			baseSha: "7890abc",
+			orderedHeads: ["f0e1d2c"],
+			policyDigest: R1_POLICY_DIGEST,
+			builtAt: minutesAgo(40),
+			invalidatedAt: minutesAgo(35),
+			invalidationReason: "base_branch_advanced",
+		},
+		{
+			candidateSha: "cand-r2-0001",
+			installationId: 1,
+			repositoryId: 1002,
+			pullRequestNumber: 933,
+			baseSha: "b2c3d4e",
+			orderedHeads: ["1a2b3c4"],
+			policyDigest: "default",
+			builtAt: minutesAgo(20),
+			invalidatedAt: minutesAgo(18),
+			invalidationReason: "base_branch_advanced",
+		},
+	]);
+}
+
 async function seedHealth() {
 	await db.insert(fleetHealthSnapshot).values([
 		{ installationId: 1, component: "control", status: "green", reason: "outbox lag 8秒" },
@@ -673,6 +846,8 @@ async function main() {
 	await seedReviewAssignments();
 	await seedBlocked();
 	await seedAudit();
+	await seedPolicyBundle();
+	await seedCiSignals();
 	await seedHealth();
 	// feedback_case starts empty — populated via POST /api/pr/:repoId/:prNumber/feedback.
 	console.log("done.");

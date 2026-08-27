@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 /**
  * design.md §9.1, verbatim (zod v3's `.strict()` method used in place of
@@ -10,15 +10,15 @@ import { z } from "zod";
 const ApprovalRuleSchema = z
 	.object({
 		role: z.enum([
-			"reviewer",
-			"scope-approver",
-			"security-approver",
-			"data-approver",
-			"infra-approver",
-			"org-governor",
+			'reviewer',
+			'scope-approver',
+			'security-approver',
+			'data-approver',
+			'infra-approver',
+			'org-governor'
 		]),
 		count: z.number().int().positive(),
-		distinct_teams: z.boolean().optional(),
+		distinct_teams: z.boolean().optional()
 	})
 	.strict();
 
@@ -31,59 +31,65 @@ const ScopeRuleSchema = z
 				approvals: z.array(ApprovalRuleSchema),
 				checks: z.array(z.string()).optional(),
 				trusted_pipeline: z.boolean().optional(),
-				prohibit_self_weakening: z.boolean().optional(),
+				prohibit_self_weakening: z.boolean().optional()
 			})
-			.strict(),
+			.strict()
 	})
 	.strict();
 
 export const PolicySchema = z
 	.object({
-		version: z.literal("yoroi/v2"),
+		version: z.literal('yoroi/v2'),
 		defaults: z
 			.object({
-				gate_check: z.literal("yoroi/gate"),
+				gate_check: z.literal('yoroi/gate'),
 				queue: z
 					.object({
-						mode: z.enum(["observe", "advisory", "serial", "speculative", "batch"]),
-						aging: z.string(),
+						mode: z.enum(['observe', 'advisory', 'serial', 'speculative', 'batch']),
+						aging: z.string()
 					})
 					.strict(),
 				approval_continuity: z
 					.object({
-						algorithm: z.literal("scope-change-v1"),
-						whitespace: z.literal("exact"),
-						context_proof: z.literal("deterministic-replay"),
-						high_risk_base_overlap: z.enum(["reapprove", "notify_only"]),
-						ambiguous: z.literal("invalidate-affected"),
+						algorithm: z.literal('scope-change-v1'),
+						whitespace: z.literal('exact'),
+						context_proof: z.literal('deterministic-replay'),
+						high_risk_base_overlap: z.enum(['reapprove', 'notify_only']),
+						ambiguous: z.literal('invalidate-affected')
 					})
 					.strict(),
-				draft: z.object({ candidate: z.literal("disabled"), checks: z.array(z.string()) }).strict(),
-				questionnaire: z.object({ mode: z.literal("triggered") }).strict(),
-				notifications: z.object({ mutable_summary: z.boolean(), coalesce: z.string() }).strict(),
+				draft: z.object({ candidate: z.literal('disabled'), checks: z.array(z.string()) }).strict(),
+				questionnaire: z.object({ mode: z.literal('triggered') }).strict(),
+				notifications: z.object({ mutable_summary: z.boolean(), coalesce: z.string() }).strict()
 			})
 			.strict(),
 		scopes: z.array(ScopeRuleSchema),
 		risk: z
 			.record(
 				z.string(),
-				z.object({
-					queue: z.object({ mode: z.string() }).strict(),
-					prohibit_batch: z.boolean().optional(),
-				}).strict(),
+				z
+					.object({
+						queue: z.object({ mode: z.string() }).strict(),
+						prohibit_batch: z.boolean().optional()
+					})
+					.strict()
 			)
 			.optional(),
 		self_service: z
 			.object({
-				recheck: z.object({
-					enabled: z.boolean(),
-					cooldown: z.string(),
-					policy_mutation: z.literal(false),
-				}).strict(),
-				flaky_report: z.object({
-					enabled: z.boolean(),
-					quarantine_requires_approval: z.literal(true),
-				}).strict(),
+				recheck: z
+					.object({
+						enabled: z.boolean(),
+						cooldown: z.string(),
+						policy_mutation: z.literal(false)
+					})
+					.strict(),
+				flaky_report: z
+					.object({
+						enabled: z.boolean(),
+						quarantine_requires_approval: z.literal(true)
+					})
+					.strict()
 			})
 			.strict()
 			.optional(),
@@ -93,9 +99,9 @@ export const PolicySchema = z
 				distinct_actors: z.literal(true),
 				max_ttl: z.string(),
 				require_ticket: z.literal(true),
-				require_post_review: z.literal(true),
+				require_post_review: z.literal(true)
 			})
-			.strict(),
+			.strict()
 	})
 	.strict();
 

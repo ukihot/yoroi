@@ -48,12 +48,24 @@
 								</p>
 							{/if}
 							{#if item.maintainedScopes.length > 0}
-								<p class="hint">{m.mywork_carry_forward_maintained({ scopes: item.maintainedScopes.join(', ') })}</p>
+								<p class="hint">
+									{m.mywork_carry_forward_maintained({ scopes: item.maintainedScopes.join(', ') })}
+								</p>
 							{/if}
 						</td>
 						<td>{stageLabel(item.stage)}</td>
-						<td>{m.mywork_approvals_progress({ approved: item.approvalsApproved, required: item.approvalsRequired })}</td>
-						<td><StatusBadge tone={checkConclusionTone(item.ci)} label={checkConclusionLabel(item.ci)} /></td>
+						<td
+							>{m.mywork_approvals_progress({
+								approved: item.approvalsApproved,
+								required: item.approvalsRequired
+							})}</td
+						>
+						<td
+							><StatusBadge
+								tone={checkConclusionTone(item.ci)}
+								label={checkConclusionLabel(item.ci)}
+							/></td
+						>
 						<td>{item.queuePosition ?? m.common_none()}</td>
 						<td><EtaBadge eta={item.eta} /></td>
 						<td>{item.blockingReason ?? m.common_none()}</td>

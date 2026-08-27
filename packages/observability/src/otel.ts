@@ -1,5 +1,5 @@
-import { type Span, SpanStatusCode, trace } from "@opentelemetry/api";
-import type { FencingToken, OperationId, PolicyDigest, RepositoryId, Sha } from "@yoroi/domain";
+import { type Span, SpanStatusCode, trace } from '@opentelemetry/api';
+import type { FencingToken, OperationId, PolicyDigest, RepositoryId, Sha } from '@yoroi/domain';
 
 /**
  * design.md §18.1. Built-in observability is diagnostic-only — `decision_event`
@@ -17,7 +17,7 @@ import type { FencingToken, OperationId, PolicyDigest, RepositoryId, Sha } from 
  * literal baked into the package.
  */
 
-let serviceName = "yoroi";
+let serviceName = 'yoroi';
 
 export function configureServiceName(name: string): void {
 	serviceName = name;
@@ -33,19 +33,19 @@ export interface SpanAttrs {
 }
 
 function setYoroiAttributes(span: Span, attrs: SpanAttrs): void {
-	if (attrs.operationId !== undefined) span.setAttribute("yoroi.operation_id", attrs.operationId);
+	if (attrs.operationId !== undefined) span.setAttribute('yoroi.operation_id', attrs.operationId);
 	if (attrs.repositoryId !== undefined) {
-		span.setAttribute("yoroi.repository_id", attrs.repositoryId);
+		span.setAttribute('yoroi.repository_id', attrs.repositoryId);
 	}
-	if (attrs.headSha !== undefined) span.setAttribute("yoroi.head_sha", attrs.headSha);
+	if (attrs.headSha !== undefined) span.setAttribute('yoroi.head_sha', attrs.headSha);
 	if (attrs.candidateSha !== undefined) {
-		span.setAttribute("yoroi.candidate_sha", attrs.candidateSha);
+		span.setAttribute('yoroi.candidate_sha', attrs.candidateSha);
 	}
 	if (attrs.policyDigest !== undefined) {
-		span.setAttribute("yoroi.policy_digest", attrs.policyDigest);
+		span.setAttribute('yoroi.policy_digest', attrs.policyDigest);
 	}
 	if (attrs.fencingToken !== undefined) {
-		span.setAttribute("yoroi.fencing_token", attrs.fencingToken.toString());
+		span.setAttribute('yoroi.fencing_token', attrs.fencingToken.toString());
 	}
 
 	// design.md §17: Deno Deploy sets these at runtime; both are undefined
@@ -57,10 +57,10 @@ function setYoroiAttributes(span: Span, attrs: SpanAttrs): void {
 	// diagnostic-only and best-effort; nothing depends on it being present
 	// (unlike apps/merger's own production/development gate, which no longer
 	// relies on any platform-detected env var at all — see main.ts's comment).
-	const revisionId = envVarOrUndefined("DENO_DEPLOYMENT_ID");
-	if (revisionId !== undefined) span.setAttribute("yoroi.deno_revision_id", revisionId);
-	const timeline = envVarOrUndefined("DENO_TIMELINE");
-	if (timeline !== undefined) span.setAttribute("yoroi.deno_context", timeline);
+	const revisionId = envVarOrUndefined('DENO_DEPLOYMENT_ID');
+	if (revisionId !== undefined) span.setAttribute('yoroi.deno_revision_id', revisionId);
+	const timeline = envVarOrUndefined('DENO_TIMELINE');
+	if (timeline !== undefined) span.setAttribute('yoroi.deno_context', timeline);
 }
 
 function envVarOrUndefined(name: string): string | undefined {
@@ -83,7 +83,7 @@ function envVarOrUndefined(name: string): string | undefined {
 export function withSpan<T>(
 	name: string,
 	attrs: SpanAttrs,
-	fn: (span: Span) => Promise<T>,
+	fn: (span: Span) => Promise<T>
 ): Promise<T> {
 	const tracer = trace.getTracer(serviceName);
 	return tracer.startActiveSpan(name, async (span) => {

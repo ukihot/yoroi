@@ -1,8 +1,8 @@
-import { asc, desc, eq } from "drizzle-orm";
-import type { Db } from "./client.ts";
-import { decisionEvent } from "./schema.ts";
-import { computeRowHash, GENESIS_HASH } from "@yoroi/evidence";
-import type { ChainedDecisionEventRow, DecisionEventHashInput } from "@yoroi/evidence";
+import { asc, desc, eq } from 'drizzle-orm';
+import type { Db } from './client.ts';
+import { decisionEvent } from './schema.ts';
+import { computeRowHash, GENESIS_HASH } from '@yoroi/evidence';
+import type { ChainedDecisionEventRow, DecisionEventHashInput } from '@yoroi/evidence';
 
 export interface AppendDecisionEventInput {
 	readonly operationId: string | null;
@@ -32,7 +32,7 @@ export interface AppendDecisionEventInput {
  */
 export function appendDecisionEvent(
 	db: Db,
-	input: AppendDecisionEventInput,
+	input: AppendDecisionEventInput
 ): Promise<{ readonly seq: number; readonly rowHash: string }> {
 	return db.transaction(async (tx) => {
 		const [latest] = await tx
@@ -55,7 +55,7 @@ export function appendDecisionEvent(
 			reasonCode: input.reasonCode,
 			result: input.result,
 			evidence: input.evidence,
-			occurredAt: occurredAt.toISOString(),
+			occurredAt: occurredAt.toISOString()
 		};
 		const rowHash = await computeRowHash(prevHash, hashInput);
 
@@ -74,10 +74,10 @@ export function appendDecisionEvent(
 				evidence: input.evidence,
 				prevHash,
 				rowHash,
-				occurredAt,
+				occurredAt
 			})
 			.returning({ seq: decisionEvent.seq });
-		if (!row) throw new Error("appendDecisionEvent: insert returned no row");
+		if (!row) throw new Error('appendDecisionEvent: insert returned no row');
 		return { seq: row.seq, rowHash };
 	});
 }
@@ -92,7 +92,7 @@ export function appendDecisionEvent(
 export async function loadDecisionEventChain(
 	db: Db,
 	repoId: string,
-	limit = 1000,
+	limit = 1000
 ): Promise<ChainedDecisionEventRow[]> {
 	const rows = await db
 		.select()
@@ -113,7 +113,7 @@ export async function loadDecisionEventChain(
 		result: r.result,
 		evidence: r.evidence,
 		occurredAt: r.occurredAt.toISOString(),
-		prevHash: r.prevHash ?? "",
-		rowHash: r.rowHash ?? "",
+		prevHash: r.prevHash ?? '',
+		rowHash: r.rowHash ?? ''
 	}));
 }

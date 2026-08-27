@@ -1,1 +1,1 @@
-export * from "./src/otel.ts";
+export * from './src/otel.ts';

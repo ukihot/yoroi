@@ -1,4 +1,4 @@
-import type { ChainedDecisionEventRow } from "./hash-chain.ts";
+import type { ChainedDecisionEventRow } from './hash-chain.ts';
 
 /**
  * design.md §10.10/SEC-037: merge evidence must be continuously exported to
@@ -34,16 +34,16 @@ export interface EvidenceSink {
  * would defeat the whole point of exporting it. */
 export function buildEvidenceBundle(
 	bundleId: string,
-	rows: readonly EvidenceBundleRow[],
+	rows: readonly EvidenceBundleRow[]
 ): EvidenceBundle {
-	if (rows.length === 0) throw new Error("buildEvidenceBundle: rows must not be empty");
+	if (rows.length === 0) throw new Error('buildEvidenceBundle: rows must not be empty');
 	const sorted = [...rows].sort((a, b) => a.seq - b.seq);
 	for (let i = 1; i < sorted.length; i++) {
 		if (sorted[i]!.seq !== sorted[i - 1]!.seq + 1) {
 			throw new Error(
 				`buildEvidenceBundle: non-contiguous seq range (gap between ${sorted[i - 1]!.seq} and ${
 					sorted[i]!.seq
-				})`,
+				})`
 			);
 		}
 	}
@@ -52,7 +52,7 @@ export function buildEvidenceBundle(
 		generatedAt: new Date().toISOString(),
 		fromSeq: sorted[0]!.seq,
 		toSeq: sorted[sorted.length - 1]!.seq,
-		rows: sorted,
+		rows: sorted
 	};
 }
 

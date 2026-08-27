@@ -1,4 +1,4 @@
-import type { RateLimitStatus } from "./adapter.ts";
+import type { RateLimitStatus } from './adapter.ts';
 
 /** design.md §13.4: below 20% remaining, low-priority (dashboard-facing)
  * reads back off; this is a pure decision function of the observed status
@@ -9,10 +9,10 @@ export interface RateLimitDecision {
 }
 
 export function decideRateLimitBackoff(
-	status: Pick<RateLimitStatus, "remainingPct">,
+	status: Pick<RateLimitStatus, 'remainingPct'>
 ): RateLimitDecision {
 	return {
 		shouldBackoffLowPriority: status.remainingPct < 20,
-		critical: status.remainingPct < 5,
+		critical: status.remainingPct < 5
 	};
 }

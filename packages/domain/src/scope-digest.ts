@@ -1,14 +1,14 @@
-import { sha, sha256Hex } from "./ids.ts";
-import type { ScopeId, Sha, Sha256Hex } from "./ids.ts";
+import { sha, sha256Hex } from './ids.ts';
+import type { ScopeId, Sha, Sha256Hex } from './ids.ts';
 
 /** design.md §8.2, verbatim shape. */
-export type ChangeKind = "add" | "delete" | "modify" | "rename" | "mode";
+export type ChangeKind = 'add' | 'delete' | 'modify' | 'rename' | 'mode';
 
 export interface CanonicalChangeRecord {
 	readonly beforePath: string | null;
 	readonly afterPath: string | null;
 	readonly changeKind: ChangeKind;
-	readonly objectType: "blob" | "tree" | "commit"; // commit = submodule gitlink
+	readonly objectType: 'blob' | 'tree' | 'commit'; // commit = submodule gitlink
 	readonly modeBefore: string | null; // 例 "100644"
 	readonly modeAfter: string | null;
 	/**
@@ -29,7 +29,7 @@ export interface CanonicalChangeRecord {
 }
 
 export interface ScopeChangeDigestInput {
-	readonly digestAlgorithmVersion: "scope-change-v1";
+	readonly digestAlgorithmVersion: 'scope-change-v1';
 	readonly scopeMappingVersion: string;
 	readonly scopeId: ScopeId;
 	readonly records: readonly CanonicalChangeRecord[];
@@ -64,8 +64,8 @@ function encodeNullableString(value: string | null): Uint8Array {
 
 function bytesToHex(bytes: Uint8Array): string {
 	return Array.from(bytes)
-		.map((b) => b.toString(16).padStart(2, "0"))
-		.join("");
+		.map((b) => b.toString(16).padStart(2, '0'))
+		.join('');
 }
 
 /** `crypto.subtle.digest` wants a plain `ArrayBuffer`-backed view; a
@@ -76,7 +76,7 @@ function toDigestInput(bytes: Uint8Array): ArrayBuffer {
 }
 
 export async function sha256HexOf(bytes: Uint8Array): Promise<Sha256Hex> {
-	const digest = await crypto.subtle.digest("SHA-256", toDigestInput(bytes));
+	const digest = await crypto.subtle.digest('SHA-256', toDigestInput(bytes));
 	return sha256Hex(bytesToHex(new Uint8Array(digest)));
 }
 
@@ -86,7 +86,7 @@ export async function sha256HexOf(bytes: Uint8Array): Promise<Sha256Hex> {
  * SHA-256 git object format repos are not handled (noted as a known gap). */
 export async function gitBlobOid(bytes: Uint8Array): Promise<Sha> {
 	const header = utf8(`blob ${bytes.length}\0`);
-	const digest = await crypto.subtle.digest("SHA-1", toDigestInput(concatBytes(header, bytes)));
+	const digest = await crypto.subtle.digest('SHA-1', toDigestInput(concatBytes(header, bytes)));
 	return sha(bytesToHex(new Uint8Array(digest)));
 }
 
@@ -116,7 +116,7 @@ function compareBytes(a: Uint8Array, b: Uint8Array): number {
 function compareCanonicalChangeRecord(a: CanonicalChangeRecord, b: CanonicalChangeRecord): number {
 	return compareBytes(
 		encodeCanonicalRecordLengthPrefixed(a),
-		encodeCanonicalRecordLengthPrefixed(b),
+		encodeCanonicalRecordLengthPrefixed(b)
 	);
 }
 
@@ -130,7 +130,7 @@ function encodeCanonicalRecordLengthPrefixed(record: CanonicalChangeRecord): Uin
 		encodeNullableString(record.modeAfter),
 		lengthPrefixed(record.exactChangeBytes),
 		encodeNullableString(record.binaryBeforeOid),
-		encodeNullableString(record.binaryAfterOid),
+		encodeNullableString(record.binaryAfterOid)
 	);
 }
 
@@ -142,7 +142,7 @@ export function computeScopeChangeDigest(input: ScopeChangeDigestInput): Promise
 		lengthPrefixed(utf8(input.digestAlgorithmVersion)),
 		lengthPrefixed(utf8(input.scopeMappingVersion)),
 		lengthPrefixed(utf8(input.scopeId)),
-		...sorted.map(encodeCanonicalRecordLengthPrefixed),
+		...sorted.map(encodeCanonicalRecordLengthPrefixed)
 	);
 	return sha256HexOf(material);
 }
@@ -162,9 +162,9 @@ export function computeScopeResultDigest(entries: readonly ScopeResultEntry[]): 
 				lengthPrefixed(utf8(e.path)),
 				lengthPrefixed(utf8(e.objectType)),
 				lengthPrefixed(utf8(e.mode)),
-				lengthPrefixed(utf8(e.oid)),
+				lengthPrefixed(utf8(e.oid))
 			)
-		),
+		)
 	);
 	return sha256HexOf(material);
 }

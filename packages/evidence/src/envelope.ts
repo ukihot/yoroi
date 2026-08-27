@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 /**
  * design.md §12.1's DecisionEnvelope. `operationId`/`fencingToken` are typed
@@ -25,12 +25,12 @@ const SHA_PATTERN = /^[0-9a-f]{40}$/;
 const DIGEST_PATTERN = /^[0-9a-f]{64}$/;
 const NONNEGATIVE_INTEGER_PATTERN = /^(0|[1-9][0-9]*)$/;
 
-const ShaSchema = z.string().regex(SHA_PATTERN, "must be a 40-hex-char git SHA");
-const DigestSchema = z.string().regex(DIGEST_PATTERN, "must be a 64-hex-char SHA-256 digest");
+const ShaSchema = z.string().regex(SHA_PATTERN, 'must be a 40-hex-char git SHA');
+const DigestSchema = z.string().regex(DIGEST_PATTERN, 'must be a 64-hex-char SHA-256 digest');
 
 export const DecisionEnvelopeSchema = z
 	.object({
-		operationId: z.string().regex(ULID_PATTERN, "must be a ULID"),
+		operationId: z.string().regex(ULID_PATTERN, 'must be a ULID'),
 		installationId: z.number().int().positive(),
 		repositoryId: z.number().int().positive(),
 		owner: z.string().min(1),
@@ -47,20 +47,19 @@ export const DecisionEnvelopeSchema = z
 				.object({
 					changeDigest: DigestSchema,
 					resultDigest: DigestSchema,
-					contextProofDigest: DigestSchema,
+					contextProofDigest: DigestSchema
 				})
-				.strict(),
+				.strict()
 		),
 		policyDigest: DigestSchema,
 		approvalDigest: DigestSchema,
 		checkPlanDigest: DigestSchema,
 		evidenceDigest: DigestSchema,
-		fencingToken: z.string().regex(
-			NONNEGATIVE_INTEGER_PATTERN,
-			"must be a non-negative integer string",
-		),
+		fencingToken: z
+			.string()
+			.regex(NONNEGATIVE_INTEGER_PATTERN, 'must be a non-negative integer string'),
 		denoRevisionId: z.string().min(1),
-		expiresAt: z.string().datetime(),
+		expiresAt: z.string().datetime()
 	})
 	.strict();
 

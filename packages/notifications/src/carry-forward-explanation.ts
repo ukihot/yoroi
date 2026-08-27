@@ -1,4 +1,4 @@
-import type { ApprovalCarryForward } from "@yoroi/domain";
+import type { ApprovalCarryForward } from '@yoroi/domain';
 
 /**
  * design.md §23.4's My Work screen usage: renders the human-legible text
@@ -10,12 +10,16 @@ import type { ApprovalCarryForward } from "@yoroi/domain";
 export function explainCarryForward(carryForward: ApprovalCarryForward): string {
 	const shortOld = carryForward.oldHeadSha.slice(0, 7);
 	const shortNew = carryForward.newHeadSha.slice(0, 7);
-	const scopes = carryForward.unchangedScopeIds.length > 0
-		? carryForward.unchangedScopeIds.join(", ")
-		: "(なし)";
-	return `review ${carryForward.originalReviewId} での承認を維持しました（${shortOld} → ${shortNew}）。` +
+	const scopes =
+		carryForward.unchangedScopeIds.length > 0
+			? carryForward.unchangedScopeIds.join(', ')
+			: '(なし)';
+	return (
+		`review ${carryForward.originalReviewId} での承認を維持しました（${shortOld} → ${shortNew}）。` +
 		`scope [${scopes}] の変更内容は新base上でも同一と判定されました` +
-		`（proof: ${carryForward.proofAlgorithm}, digest: ${
-			carryForward.contextProofDigest.slice(0, 12)
-		}…）。`;
+		`（proof: ${carryForward.proofAlgorithm}, digest: ${carryForward.contextProofDigest.slice(
+			0,
+			12
+		)}…）。`
+	);
 }

@@ -1,8 +1,8 @@
-import type { CheckRunInput, GitHubAdapter, RepoRef } from "@yoroi/github";
-import type { PullRequestNumber, Sha } from "@yoroi/domain";
-import type { ReasonGraphNode } from "@yoroi/policy";
-import { buildCheckRunOutput } from "./check-run.ts";
-import { renderSummaryMarkdown, type SummaryState } from "./render.ts";
+import type { CheckRunInput, GitHubAdapter, RepoRef } from '@yoroi/github';
+import type { PullRequestNumber, Sha } from '@yoroi/domain';
+import type { ReasonGraphNode } from '@yoroi/policy';
+import { buildCheckRunOutput } from './check-run.ts';
+import { renderSummaryMarkdown, type SummaryState } from './render.ts';
 
 /** design.md §14.1's `notification_anchor` row, as plain data — this package
  * never touches Postgres itself (see deno.jsonc's top comment); the caller
@@ -29,10 +29,12 @@ function toDigestInput(bytes: Uint8Array): ArrayBuffer {
 
 async function sha256Hex(text: string): Promise<string> {
 	const digest = await crypto.subtle.digest(
-		"SHA-256",
-		toDigestInput(new TextEncoder().encode(text)),
+		'SHA-256',
+		toDigestInput(new TextEncoder().encode(text))
 	);
-	return Array.from(new Uint8Array(digest)).map((b) => b.toString(16).padStart(2, "0")).join("");
+	return Array.from(new Uint8Array(digest))
+		.map((b) => b.toString(16).padStart(2, '0'))
+		.join('');
 }
 
 /**
@@ -48,7 +50,7 @@ export async function upsertSummary(
 	headSha: Sha,
 	anchor: NotificationAnchorState,
 	state: SummaryState,
-	reasonGraph: ReasonGraphNode,
+	reasonGraph: ReasonGraphNode
 ): Promise<UpsertSummaryResult> {
 	const markdown = renderSummaryMarkdown(state, reasonGraph);
 	const reasonHash = await sha256Hex(markdown);
@@ -67,10 +69,10 @@ export async function upsertSummary(
 	let checkRunId = anchor.checkRunId;
 	if (checkRunId === null) {
 		const input: CheckRunInput = {
-			name: "yoroi/gate",
+			name: 'yoroi/gate',
 			headSha,
 			externalId: `${repo.repositoryId}:${pullRequestNumber}`,
-			...checkRunOutput,
+			...checkRunOutput
 		};
 		checkRunId = (await gh.createCheckRun(repo, input)).id;
 	} else {
@@ -81,6 +83,6 @@ export async function upsertSummary(
 		summaryCommentId: summaryCommentId!,
 		checkRunId,
 		reasonHash,
-		skippedComment,
+		skippedComment
 	};
 }

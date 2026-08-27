@@ -7,17 +7,17 @@
 
 type Brand<Base, Tag extends string> = Base & { readonly __brand: Tag };
 
-export type InstallationId = Brand<number, "InstallationId">;
-export type RepositoryId = Brand<number, "RepositoryId">;
-export type PullRequestNumber = Brand<number, "PullRequestNumber">;
-export type Sha = Brand<string, "Sha">; // commit/tree/blob OID
-export type Sha256Hex = Brand<string, "Sha256Hex">; // digest全般
-export type OperationId = Brand<string, "OperationId">; // ULID
-export type DecisionId = Brand<string, "DecisionId">; // ULID
-export type ActorStableId = Brand<string, "ActorStableId">; // GitHub user node_id
-export type ScopeId = Brand<string, "ScopeId">;
-export type FencingToken = Brand<bigint, "FencingToken">;
-export type PolicyDigest = Brand<string, "PolicyDigest">;
+export type InstallationId = Brand<number, 'InstallationId'>;
+export type RepositoryId = Brand<number, 'RepositoryId'>;
+export type PullRequestNumber = Brand<number, 'PullRequestNumber'>;
+export type Sha = Brand<string, 'Sha'>; // commit/tree/blob OID
+export type Sha256Hex = Brand<string, 'Sha256Hex'>; // digest全般
+export type OperationId = Brand<string, 'OperationId'>; // ULID
+export type DecisionId = Brand<string, 'DecisionId'>; // ULID
+export type ActorStableId = Brand<string, 'ActorStableId'>; // GitHub user node_id
+export type ScopeId = Brand<string, 'ScopeId'>;
+export type FencingToken = Brand<bigint, 'FencingToken'>;
+export type PolicyDigest = Brand<string, 'PolicyDigest'>;
 
 export function installationId(value: number): InstallationId {
 	return value as InstallationId;

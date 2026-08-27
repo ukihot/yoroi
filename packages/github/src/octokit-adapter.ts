@@ -1,9 +1,9 @@
-import { Octokit } from "octokit";
-import { throttling } from "@octokit/plugin-throttling";
-import { retry } from "@octokit/plugin-retry";
-import { createAppAuth } from "@octokit/auth-app";
-import type { InstallationId, RepositoryId } from "@yoroi/domain";
-import { sha } from "@yoroi/domain";
+import { Octokit } from 'octokit';
+import { throttling } from '@octokit/plugin-throttling';
+import { retry } from '@octokit/plugin-retry';
+import { createAppAuth } from '@octokit/auth-app';
+import type { InstallationId, RepositoryId } from '@yoroi/domain';
+import { sha } from '@yoroi/domain';
 import type {
 	CheckRun,
 	CompareResponse,
@@ -16,8 +16,8 @@ import type {
 	PullRequestInfo,
 	RateLimitStatus,
 	RepoRef,
-	TreeResponse,
-} from "./adapter.ts";
+	TreeResponse
+} from './adapter.ts';
 
 /**
  * design.md §13.2/§13.3. Not runtime-verified against live GitHub in this
@@ -38,13 +38,13 @@ const REFRESH_MARGIN_MS = 5 * 60_000; // mint a new token 5 minutes before GitHu
 function cacheKey(
 	installationId: InstallationId,
 	repositoryIds: readonly RepositoryId[],
-	permissions: Permissions,
+	permissions: Permissions
 ): string {
-	const repos = [...repositoryIds].sort((a, b) => a - b).join(",");
+	const repos = [...repositoryIds].sort((a, b) => a - b).join(',');
 	const perms = Object.keys(permissions)
 		.sort()
 		.map((k) => `${k}=${permissions[k]}`)
-		.join(",");
+		.join(',');
 	return `${installationId}:${repos}:${perms}`;
 }
 
@@ -55,7 +55,7 @@ export function createOctokitAdapter(appId: string, privateKey: string): GitHubA
 	async function mintInstallationToken(
 		installId: InstallationId,
 		repositoryIds: readonly RepositoryId[],
-		permissions: Permissions,
+		permissions: Permissions
 	): Promise<InstallationToken> {
 		const key = cacheKey(installId, repositoryIds, permissions);
 		const cached = tokenCache.get(key);
@@ -64,10 +64,10 @@ export function createOctokitAdapter(appId: string, privateKey: string): GitHubA
 		}
 		// SEC-002: token生成時にrepo/permissionをさらに限定する
 		const auth = await appAuth({
-			type: "installation",
+			type: 'installation',
 			installationId: installId,
 			repositoryIds: [...repositoryIds],
-			permissions,
+			permissions
 		});
 		const token: CachedToken = { token: auth.token, expiresAt: new Date(auth.expiresAt) };
 		tokenCache.set(key, token);
@@ -78,89 +78,92 @@ export function createOctokitAdapter(appId: string, privateKey: string): GitHubA
 		const token = await mintInstallationToken(
 			repo.installationId,
 			[repo.repositoryId],
-			permissions,
+			permissions
 		);
 		return new ThrottledOctokit({
 			auth: token.token,
 			throttle: {
 				onRateLimit: (retryAfter: number, options: { method: string; url: string }) => {
 					console.warn(
-						`[yoroi-github] rate limited on ${options.method} ${options.url}, retrying after ${retryAfter}s`,
+						`[yoroi-github] rate limited on ${options.method} ${options.url}, retrying after ${retryAfter}s`
 					);
 					return true;
 				},
-				onSecondaryRateLimit: () => true,
-			},
+				onSecondaryRateLimit: () => true
+			}
 		});
 	}
 
 	return {
 		async getTreeRecursive(repo, treeSha): Promise<TreeResponse> {
-			const octokit = await clientFor(repo, { contents: "read" });
+			const octokit = await clientFor(repo, { contents: 'read' });
 			const res = await octokit.rest.git.getTree({
 				owner: repo.owner,
 				repo: repo.name,
 				tree_sha: treeSha,
-				recursive: "1",
+				recursive: '1'
 			});
 			return {
 				sha: sha(res.data.sha),
 				truncated: res.data.truncated ?? false,
 				entries: (res.data.tree ?? [])
-					.filter((e): e is typeof e & { path: string; mode: string; type: string; sha: string } =>
-						e.path !== undefined && e.mode !== undefined && e.type !== undefined &&
-						e.sha !== undefined
+					.filter(
+						(e): e is typeof e & { path: string; mode: string; type: string; sha: string } =>
+							e.path !== undefined &&
+							e.mode !== undefined &&
+							e.type !== undefined &&
+							e.sha !== undefined
 					)
 					.map((e) => ({
 						path: e.path,
 						mode: e.mode,
-						type: e.type as "blob" | "tree" | "commit",
-						sha: sha(e.sha),
-					})),
+						type: e.type as 'blob' | 'tree' | 'commit',
+						sha: sha(e.sha)
+					}))
 			};
 		},
 
 		async getBlob(repo, oid): Promise<Uint8Array> {
-			const octokit = await clientFor(repo, { contents: "read" });
+			const octokit = await clientFor(repo, { contents: 'read' });
 			const res = await octokit.rest.git.getBlob({
 				owner: repo.owner,
 				repo: repo.name,
-				file_sha: oid,
+				file_sha: oid
 			});
-			if (res.data.encoding === "base64") {
-				return Uint8Array.from(atob(res.data.content.replace(/\n/g, "")), (c) => c.charCodeAt(0));
+			if (res.data.encoding === 'base64') {
+				return Uint8Array.from(atob(res.data.content.replace(/\n/g, '')), (c) => c.charCodeAt(0));
 			}
 			return new TextEncoder().encode(res.data.content);
 		},
 
 		async compareCommits(repo, base, head): Promise<CompareResponse> {
-			const octokit = await clientFor(repo, { contents: "read" });
+			const octokit = await clientFor(repo, { contents: 'read' });
 			const res = await octokit.rest.repos.compareCommitsWithBasehead({
 				owner: repo.owner,
 				repo: repo.name,
-				basehead: `${base}...${head}`,
+				basehead: `${base}...${head}`
 			});
 			return {
-				files: (res.data.files ?? []).map((f) => ({ filename: f.filename, status: f.status })),
+				files: (res.data.files ?? []).map((f) => ({ filename: f.filename, status: f.status }))
 			};
 		},
 
 		async listPullRequestFiles(repo, pr): Promise<FileEntry[]> {
-			const octokit = await clientFor(repo, { pull_requests: "read" });
+			const octokit = await clientFor(repo, { pull_requests: 'read' });
 			const files = await octokit.paginate(octokit.rest.pulls.listFiles, {
 				owner: repo.owner,
 				repo: repo.name,
-				pull_number: pr,
+				pull_number: pr
 			});
 			return files.map((f) => ({ filename: f.filename, status: f.status, sha: sha(f.sha) }));
 		},
 
 		async getPullRequest(repo, pr): Promise<PullRequestInfo> {
-			const octokit = await clientFor(repo, { pull_requests: "read" });
+			const octokit = await clientFor(repo, { pull_requests: 'read' });
 			const res = await octokit.rest.pulls.get({
 				owner: repo.owner,
 				repo: repo.name,
-				pull_number: pr,
+				pull_number: pr
 			});
 			return {
 				number: pr,
@@ -169,13 +172,13 @@ export function createOctokitAdapter(appId: string, privateKey: string): GitHubA
 				baseRef: res.data.base.ref,
 				isDraft: res.data.draft ?? false,
 				mergeable: res.data.mergeable,
-				authorStableId: res.data.user?.node_id ?? "",
-				title: res.data.title,
+				authorStableId: res.data.user?.node_id ?? '',
+				title: res.data.title
 			};
 		},
 
 		async createCheckRun(repo, input): Promise<CheckRun> {
-			const octokit = await clientFor(repo, { checks: "write" });
+			const octokit = await clientFor(repo, { checks: 'write' });
 			const res = await octokit.rest.checks.create({
 				owner: repo.owner,
 				repo: repo.name,
@@ -184,42 +187,42 @@ export function createOctokitAdapter(appId: string, privateKey: string): GitHubA
 				external_id: input.externalId,
 				status: input.status,
 				conclusion: input.conclusion,
-				output: { title: input.title, summary: input.summary, text: input.text },
+				output: { title: input.title, summary: input.summary, text: input.text }
 			});
 			return { id: res.data.id };
 		},
 
 		async updateCheckRun(repo, checkRunId, input): Promise<CheckRun> {
-			const octokit = await clientFor(repo, { checks: "write" });
+			const octokit = await clientFor(repo, { checks: 'write' });
 			const res = await octokit.rest.checks.update({
 				owner: repo.owner,
 				repo: repo.name,
 				check_run_id: checkRunId,
 				status: input.status,
 				conclusion: input.conclusion,
-				output: { title: input.title, summary: input.summary, text: input.text },
+				output: { title: input.title, summary: input.summary, text: input.text }
 			});
 			return { id: res.data.id };
 		},
 
 		async createComment(repo, pr, markdown): Promise<{ id: number }> {
-			const octokit = await clientFor(repo, { pull_requests: "write" });
+			const octokit = await clientFor(repo, { pull_requests: 'write' });
 			const res = await octokit.rest.issues.createComment({
 				owner: repo.owner,
 				repo: repo.name,
 				issue_number: pr,
-				body: markdown,
+				body: markdown
 			});
 			return { id: res.data.id };
 		},
 
 		async updateComment(repo, commentId, markdown): Promise<void> {
-			const octokit = await clientFor(repo, { pull_requests: "write" });
+			const octokit = await clientFor(repo, { pull_requests: 'write' });
 			await octokit.rest.issues.updateComment({
 				owner: repo.owner,
 				repo: repo.name,
 				comment_id: commentId,
-				body: markdown,
+				body: markdown
 			});
 		},
 
@@ -228,7 +231,7 @@ export function createOctokitAdapter(appId: string, privateKey: string): GitHubA
 			// (apps/merger checks decision_event for this operationId before
 			// ever reaching here — GitHub's merge endpoint itself has no
 			// idempotency-key concept to hook into at this layer).
-			const octokit = await clientFor(input.repo, { contents: "write", pull_requests: "write" });
+			const octokit = await clientFor(input.repo, { contents: 'write', pull_requests: 'write' });
 			const res = await octokit.rest.pulls.merge({
 				owner: input.repo.owner,
 				repo: input.repo.name,
@@ -236,12 +239,12 @@ export function createOctokitAdapter(appId: string, privateKey: string): GitHubA
 				sha: input.candidateSha,
 				commit_title: input.commitTitle,
 				commit_message: input.commitMessage,
-				merge_method: "merge",
+				merge_method: 'merge'
 			});
 			return {
 				merged: res.data.merged,
 				mergeCommitSha: res.data.sha ? sha(res.data.sha) : null,
-				message: res.data.message,
+				message: res.data.message
 			};
 		},
 
@@ -250,7 +253,7 @@ export function createOctokitAdapter(appId: string, privateKey: string): GitHubA
 		async getRateLimitStatus(): Promise<RateLimitStatus> {
 			const octokit = new ThrottledOctokit({
 				authStrategy: createAppAuth,
-				auth: { appId, privateKey },
+				auth: { appId, privateKey }
 			});
 			const res = await octokit.rest.rateLimit.get();
 			const core = res.data.resources.core;
@@ -258,8 +261,8 @@ export function createOctokitAdapter(appId: string, privateKey: string): GitHubA
 				remaining: core.remaining,
 				limit: core.limit,
 				remainingPct: core.limit > 0 ? Math.round((core.remaining / core.limit) * 100) : 100,
-				resetAt: new Date(core.reset * 1000),
+				resetAt: new Date(core.reset * 1000)
 			};
-		},
+		}
 	};
 }

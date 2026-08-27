@@ -1,6 +1,6 @@
-import { and, eq, isNull, lt, or, sql } from "drizzle-orm";
-import type { Db } from "./client.ts";
-import { branchCoordinator } from "./schema.ts";
+import { and, eq, isNull, lt, or, sql } from 'drizzle-orm';
+import type { Db } from './client.ts';
+import { branchCoordinator } from './schema.ts';
 
 export interface BranchCoordinatorKey {
 	readonly installationId: number;
@@ -17,14 +17,14 @@ export async function ensureBranchCoordinatorRow(db: Db, key: BranchCoordinatorK
 		.values({
 			installationId: key.installationId,
 			repositoryId: key.repositoryId,
-			targetBranch: key.targetBranch,
+			targetBranch: key.targetBranch
 		})
 		.onConflictDoNothing({
 			target: [
 				branchCoordinator.installationId,
 				branchCoordinator.repositoryId,
-				branchCoordinator.targetBranch,
-			],
+				branchCoordinator.targetBranch
+			]
 		});
 }
 
@@ -39,7 +39,7 @@ export async function acquireLease(
 	db: Db,
 	key: BranchCoordinatorKey,
 	operationId: string,
-	expectedBaseSha: string,
+	expectedBaseSha: string
 ): Promise<{ fencingToken: bigint } | null> {
 	const rows = await db
 		.update(branchCoordinator)
@@ -49,7 +49,7 @@ export async function acquireLease(
 			fencingToken: sql`${branchCoordinator.fencingToken} + 1`,
 			expectedBaseSha,
 			stateVersion: sql`${branchCoordinator.stateVersion} + 1`,
-			updatedAt: sql`now()`,
+			updatedAt: sql`now()`
 		})
 		.where(
 			and(
@@ -59,9 +59,9 @@ export async function acquireLease(
 				or(
 					isNull(branchCoordinator.leaseUntil),
 					lt(branchCoordinator.leaseUntil, sql`now()`),
-					eq(branchCoordinator.holderOperationId, operationId),
-				),
-			),
+					eq(branchCoordinator.holderOperationId, operationId)
+				)
+			)
 		)
 		.returning({ fencingToken: branchCoordinator.fencingToken });
 
@@ -75,7 +75,7 @@ export async function acquireLease(
  */
 export async function getCurrentFencingToken(
 	db: Db,
-	key: BranchCoordinatorKey,
+	key: BranchCoordinatorKey
 ): Promise<bigint | null> {
 	const [row] = await db
 		.select({ fencingToken: branchCoordinator.fencingToken })
@@ -84,8 +84,8 @@ export async function getCurrentFencingToken(
 			and(
 				eq(branchCoordinator.installationId, key.installationId),
 				eq(branchCoordinator.repositoryId, key.repositoryId),
-				eq(branchCoordinator.targetBranch, key.targetBranch),
-			),
+				eq(branchCoordinator.targetBranch, key.targetBranch)
+			)
 		)
 		.limit(1);
 	return row?.fencingToken ?? null;

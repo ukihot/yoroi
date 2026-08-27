@@ -26,7 +26,10 @@
 	<StatTile label={m.home_stat_high_risk()} value={data.overview.highRisk} />
 	<StatTile label={m.home_stat_long_stalled()} value={data.overview.longStalled} />
 	<StatTile label={m.home_stat_ci_failing_repos()} value={data.overview.ciFailingRepos} />
-	<StatTile label={m.home_stat_rate_limit()} value={m.common_percent({ n: data.overview.rateLimitRemainingPct })} />
+	<StatTile
+		label={m.home_stat_rate_limit()}
+		value={m.common_percent({ n: data.overview.rateLimitRemainingPct })}
+	/>
 </section>
 
 <section>
@@ -63,7 +66,10 @@
 							{entry.pr.title}
 						</td>
 						<td>
-							<StatusBadge tone={responsibilityTone(entry.responsibility)} label={responsibilityLabel(entry.responsibility)} />
+							<StatusBadge
+								tone={responsibilityTone(entry.responsibility)}
+								label={responsibilityLabel(entry.responsibility)}
+							/>
 						</td>
 						<td>{entry.reason}</td>
 						<td>{entry.nextActor}</td>

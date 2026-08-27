@@ -1,4 +1,4 @@
-import type { Sha } from "../ids.ts";
+import type { Sha } from '../ids.ts';
 
 /**
  * design.md §11.2 (Speculative mode) — Phase 4, "概要設計" (overview design)
@@ -15,7 +15,7 @@ export interface Lane {
 	/** [A], [A,B], [A,B,C] — cumulative heads up to and including this lane's position. */
 	readonly cumulativeHeads: readonly Sha[];
 	readonly candidateSha: Sha | null;
-	readonly status: "pending" | "running" | "passed" | "failed" | "ejected" | "invalidated";
+	readonly status: 'pending' | 'running' | 'passed' | 'failed' | 'ejected' | 'invalidated';
 }
 
 /**
@@ -27,17 +27,17 @@ export interface Lane {
  */
 export function rebuildAfterEjection(
 	lanes: readonly Lane[],
-	ejectedIndex: number,
+	ejectedIndex: number
 ): readonly Lane[] {
 	return lanes.map((lane, laneIndex) => {
 		if (laneIndex <= ejectedIndex) return lane;
 		return {
 			...lane,
-			cumulativeHeads: lane.cumulativeHeads.filter((_head, headIndex) =>
-				headIndex !== ejectedIndex
+			cumulativeHeads: lane.cumulativeHeads.filter(
+				(_head, headIndex) => headIndex !== ejectedIndex
 			),
 			candidateSha: null,
-			status: "pending",
+			status: 'pending'
 		};
 	});
 }

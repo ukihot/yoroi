@@ -1,5 +1,5 @@
-import type { FetchedTree, Sha, TreeEntry } from "@yoroi/domain";
-import type { GitHubAdapter, RepoRef, TreeEntryResponse } from "./adapter.ts";
+import type { FetchedTree, Sha, TreeEntry } from '@yoroi/domain';
+import type { GitHubAdapter, RepoRef, TreeEntryResponse } from './adapter.ts';
 
 function toTreeEntry(e: TreeEntryResponse): TreeEntry {
 	return { path: e.path, mode: e.mode, objectType: e.type, oid: e.sha };
@@ -15,17 +15,17 @@ function toTreeEntry(e: TreeEntryResponse): TreeEntry {
 export async function fetchCompleteTree(
 	gh: GitHubAdapter,
 	repo: RepoRef,
-	rootSha: Sha,
+	rootSha: Sha
 ): Promise<FetchedTree> {
 	const root = await gh.getTreeRecursive(repo, rootSha);
-	const nonTreeEntries = root.entries.filter((e) => e.type !== "tree").map(toTreeEntry);
+	const nonTreeEntries = root.entries.filter((e) => e.type !== 'tree').map(toTreeEntry);
 
 	if (!root.truncated) {
 		return { rootSha, entries: nonTreeEntries, blobs: new Map() };
 	}
 
 	const merged = new Map<string, TreeEntry>(nonTreeEntries.map((e) => [e.path, e]));
-	const subtreeEntries = root.entries.filter((e) => e.type === "tree");
+	const subtreeEntries = root.entries.filter((e) => e.type === 'tree');
 	for (const subtreeEntry of subtreeEntries) {
 		const sub = await fetchCompleteTree(gh, repo, subtreeEntry.sha);
 		for (const entry of sub.entries) {
@@ -43,13 +43,13 @@ export async function fetchBlobsForPaths(
 	gh: GitHubAdapter,
 	repo: RepoRef,
 	tree: FetchedTree,
-	paths: readonly string[],
+	paths: readonly string[]
 ): Promise<FetchedTree> {
 	const byPath = new Map(tree.entries.map((e) => [e.path, e]));
 	const blobs = new Map(tree.blobs);
 	for (const path of paths) {
 		const entry = byPath.get(path);
-		if (!entry || entry.objectType !== "blob" || blobs.has(entry.oid)) continue;
+		if (!entry || entry.objectType !== 'blob' || blobs.has(entry.oid)) continue;
 		blobs.set(entry.oid, await gh.getBlob(repo, entry.oid));
 	}
 	return { ...tree, blobs };

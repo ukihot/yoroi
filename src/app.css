@@ -1,0 +1,240 @@
+/**
+ * Retro (Windows 95/98-style) look for the whole console, per the user's
+ * request: reference palette/border technique only — no class renames, no
+ * markup restructuring. This file defines the shared tokens every page
+ * already referenced as `var(--yoroi-border, #d0d7de)` /
+ * `var(--yoroi-muted, #6e7781)` (previously undefined, so every page was
+ * silently using its own fallback) plus retro base-element styling (button,
+ * input, table, link, heading) so most of the app reskins for free without
+ * touching per-page markup. Per-page `<style>` blocks still hardcode a few
+ * semantic tone colors (StatusBadge, stat tiles, etc.) — those are edited in
+ * place, same class names, new values.
+ *
+ * Heading/button/badge/table-header text uses "Zen Old Mincho" (Google
+ * Fonts, linked in src/app.html) — a genuine Japanese serif kanji face
+ * ("old Mincho"), not a Latin-only dot/pixel font (Silkscreen, tried first,
+ * has no Japanese glyphs at all and silently fell back to a plain sans for
+ * any 日本語 text). Body copy, table *cells*, and form inputs deliberately
+ * stay on the plain Tahoma/Arial stack instead: this is a real dashboard
+ * full of dense tabular data (SHAs, percentages, timestamps), and a
+ * decorative serif face gets harder to scan at that density — same
+ * short-text-only tradeoff the reference CSS itself accepts by falling back
+ * to Arial when its own accent font isn't loaded.
+ */
+
+:root {
+	/* Windows 95/98 palette */
+	--win-text: #222222;
+	--win-surface: #c0c0c0;
+	--win-button-highlight: #ffffff;
+	--win-button-face: #dfdfdf;
+	--win-button-shadow: #808080;
+	--win-window-frame: #0a0a0a;
+	--win-dialog-blue: #000080;
+	--win-dialog-blue-light: #1084d0;
+	--win-link-blue: #0000ff;
+
+	--win-border-raised-outer:
+		inset -1px -1px var(--win-window-frame), inset 1px 1px var(--win-button-highlight);
+	--win-border-raised-inner:
+		inset -2px -2px var(--win-button-shadow), inset 2px 2px var(--win-button-face);
+	--win-border-sunken-outer:
+		inset -1px -1px var(--win-button-highlight), inset 1px 1px var(--win-window-frame);
+	--win-border-sunken-inner:
+		inset -2px -2px var(--win-button-face), inset 2px 2px var(--win-button-shadow);
+	--win-border-field:
+		inset -1px -1px var(--win-button-highlight), inset 1px 1px var(--win-button-shadow),
+		inset -2px -2px var(--win-button-face), inset 2px 2px var(--win-window-frame);
+
+	/* Tokens every page/component already reads (previously undefined) */
+	--yoroi-border: var(--win-button-shadow);
+	--yoroi-muted: #4d4d4d;
+	--yoroi-surface: var(--win-surface);
+
+	/* Status tones, mapped onto the flat/high-contrast retro palette instead
+	 * of soft modern tints */
+	--yoroi-green: #008000;
+	--yoroi-green-bg: #c0c0c0;
+	--yoroi-amber: #808000;
+	--yoroi-amber-bg: #c0c0c0;
+	--yoroi-red: #800000;
+	--yoroi-red-bg: #c0c0c0;
+	--yoroi-neutral: #4d4d4d;
+	--yoroi-neutral-bg: #c0c0c0;
+	/* Aliases some components already reference under a slightly different
+	 * name than the ones above (same tone colors either way). */
+	--yoroi-status-green: var(--yoroi-green);
+	--yoroi-status-amber: var(--yoroi-amber);
+	--yoroi-danger: var(--yoroi-red);
+
+	/* Fonts */
+	--win-font-body: Tahoma, 'MS Sans Serif', Arial, sans-serif;
+	--win-font-accent: 'Zen Old Mincho', 'MS Mincho', 'Hiragino Mincho ProN', serif;
+}
+
+/**
+ * Windows 95 "Display Properties → Appearance" color schemes, chosen on
+ * /settings and applied via `document.documentElement.dataset.theme`
+ * (persisted to localStorage — see src/app.html's inline init script, which
+ * sets this before first paint to avoid a flash of the wrong scheme).
+ * Approximations of the real registry color schemes, not exact exports.
+ */
+:root[data-theme='hotdog-stand'] {
+	--win-surface: #ffff00;
+	--win-button-highlight: #ffffff;
+	--win-button-face: #ffff00;
+	--win-button-shadow: #ff0000;
+	--win-window-frame: #000000;
+	--win-dialog-blue: #ff0000;
+	--win-dialog-blue-light: #ff0000;
+	--win-text: #000000;
+}
+
+:root[data-theme='rainy-day'] {
+	--win-surface: #c0c0d0;
+	--win-button-highlight: #ffffff;
+	--win-button-face: #c0c0d0;
+	--win-button-shadow: #6b6b8c;
+	--win-window-frame: #26263a;
+	--win-dialog-blue: #4a4a6a;
+	--win-dialog-blue-light: #7a7aa0;
+	--win-link-blue: #3a3aff;
+	--win-text: #1a1a2a;
+}
+
+body {
+	background: var(--win-surface);
+	color: var(--win-text);
+	font-family: var(--win-font-body);
+	font-size: 12px;
+}
+
+h1,
+h2,
+h3,
+h4 {
+	font-family: var(--win-font-accent);
+	font-weight: bold;
+	color: var(--win-text);
+}
+h1 {
+	font-size: 1.5rem;
+}
+h2 {
+	font-size: 1.2rem;
+	margin-top: 1.5rem;
+}
+h3,
+h4 {
+	font-size: 1.05rem;
+}
+
+a {
+	color: var(--win-link-blue);
+}
+a:focus {
+	outline: 1px dotted var(--win-link-blue);
+}
+
+button,
+input[type='submit'],
+input[type='reset'] {
+	box-sizing: border-box;
+	border: none;
+	color: var(--win-text);
+	background: var(--win-surface);
+	box-shadow: var(--win-border-raised-outer), var(--win-border-raised-inner);
+	border-radius: 0;
+	font-family: var(--win-font-accent);
+	font-size: 13px;
+	min-width: 75px;
+	min-height: 23px;
+	padding: 0 12px;
+	cursor: pointer;
+}
+
+button:not(:disabled):active,
+input[type='submit']:not(:disabled):active,
+input[type='reset']:not(:disabled):active {
+	box-shadow: var(--win-border-sunken-outer), var(--win-border-sunken-inner);
+}
+
+button:focus,
+input[type='submit']:focus,
+input[type='reset']:focus {
+	outline: 1px dotted var(--win-text);
+	outline-offset: -4px;
+}
+
+button:disabled,
+input[type='submit']:disabled,
+input[type='reset']:disabled {
+	color: var(--win-button-shadow);
+}
+
+input[type='text'],
+input[type='search'],
+input[type='email'],
+input[type='password'],
+input[type='number'],
+select,
+textarea {
+	box-sizing: border-box;
+	border: none;
+	border-radius: 0;
+	background: var(--win-button-highlight);
+	box-shadow: var(--win-border-field);
+	padding: 3px 4px;
+	font-family: inherit;
+	font-size: 12px;
+	color: var(--win-text);
+}
+input[type='text']:focus,
+input[type='search']:focus,
+input[type='email']:focus,
+input[type='password']:focus,
+input[type='number']:focus,
+select:focus,
+textarea:focus {
+	outline: none;
+}
+
+table {
+	border-collapse: collapse;
+	background: var(--win-button-highlight);
+}
+th {
+	box-shadow: var(--win-border-raised-outer), var(--win-border-raised-inner);
+	background: var(--win-surface);
+	font-family: var(--win-font-accent);
+	font-weight: normal;
+	text-align: left;
+}
+
+code,
+pre {
+	font-family: 'Courier New', monospace;
+}
+pre {
+	background: var(--win-button-highlight);
+	box-shadow: var(--win-border-field);
+	padding: 8px;
+}
+
+fieldset {
+	box-shadow: var(--win-border-sunken-outer), var(--win-border-sunken-inner);
+	border: none;
+	border-radius: 0;
+}
+
+::-webkit-scrollbar {
+	width: 16px;
+	height: 16px;
+}
+::-webkit-scrollbar-track {
+	background: var(--win-surface);
+}
+::-webkit-scrollbar-thumb {
+	background: var(--win-button-face);
+	box-shadow: var(--win-border-raised-outer), var(--win-border-raised-inner);
+}

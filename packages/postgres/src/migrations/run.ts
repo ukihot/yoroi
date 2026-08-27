@@ -1,4 +1,4 @@
-import postgres from "postgres";
+import postgres from 'postgres';
 
 /**
  * design.md §3.3's `packages/postgres/src/migrations/run.ts` task
@@ -16,9 +16,9 @@ export async function runMigrations(databaseUrl: string): Promise<void> {
 			)
 		`;
 
-		const dir = new URL("./", import.meta.url);
+		const dir = new URL('./', import.meta.url);
 		const files = [...Deno.readDirSync(dir)]
-			.filter((e) => e.isFile && e.name.endsWith(".sql"))
+			.filter((e) => e.isFile && e.name.endsWith('.sql'))
 			.map((e) => e.name)
 			.sort();
 
@@ -42,7 +42,7 @@ export async function runMigrations(databaseUrl: string): Promise<void> {
 }
 
 if (import.meta.main) {
-	const databaseUrl = Deno.env.get("DATABASE_URL");
-	if (!databaseUrl) throw new Error("DATABASE_URL is not set");
+	const databaseUrl = Deno.env.get('DATABASE_URL');
+	if (!databaseUrl) throw new Error('DATABASE_URL is not set');
 	await runMigrations(databaseUrl);
 }

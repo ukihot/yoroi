@@ -4,6 +4,7 @@ import { controlApi as mockControlApi } from './mock-control-api';
 import type {
 	AuditEntry,
 	BlockedEntry,
+	CiReliabilitySummary,
 	ControlApiPort,
 	FeedbackCase,
 	FleetOverview,
@@ -13,7 +14,9 @@ import type {
 	QueueEntry,
 	RecheckOutcome,
 	RepoDetail,
-	RepoSummary
+	RepoPolicySummary,
+	RepoSummary,
+	ReviewerLoadSummary
 } from './types';
 
 /**
@@ -93,7 +96,10 @@ function createHttpControlApi(baseUrl: string, apiToken: string): ControlApiPort
 			);
 			if (!body) throw new Error('yoroi-control returned no feedback case');
 			return body;
-		}
+		},
+		getCiReliability: () => get<CiReliabilitySummary>('/api/ci/reliability'),
+		getReviewerLoad: () => get<ReviewerLoadSummary>('/api/reviewers/load'),
+		getPolicySummaries: () => get<RepoPolicySummary[]>('/api/policy/drift')
 	};
 }
 

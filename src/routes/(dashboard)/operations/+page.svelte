@@ -42,8 +42,8 @@
 
 <style>
 	.all-green {
-		color: #1a7f37;
-		font-weight: 600;
+		color: var(--yoroi-green, #008000);
+		font-weight: bold;
 	}
 	table {
 		width: 100%;

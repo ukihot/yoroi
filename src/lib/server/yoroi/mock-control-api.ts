@@ -1,6 +1,7 @@
 import type {
 	AuditEntry,
 	BlockedEntry,
+	CiReliabilitySummary,
 	ControlApiPort,
 	FeedbackCase,
 	FleetOverview,
@@ -10,7 +11,9 @@ import type {
 	QueueEntry,
 	RecheckOutcome,
 	RepoDetail,
-	RepoSummary
+	RepoPolicySummary,
+	RepoSummary,
+	ReviewerLoadSummary
 } from './types';
 
 /**
@@ -487,6 +490,87 @@ const auditLog: AuditEntry[] = [
 	}
 ];
 
+const ciReliability: CiReliabilitySummary = {
+	flakyTests: [
+		{
+			testFingerprint: 'acme/payments-api:integration/auth-session',
+			repoName: 'acme/payments-api',
+			ownerTeam: 'payments-platform',
+			failureCount: 18,
+			reproductionRatePct: 62,
+			status: 'observed',
+			quarantineUntil: null
+		},
+		{
+			testFingerprint: 'acme/payments-api:unit/ledger-rounding',
+			repoName: 'acme/payments-api',
+			ownerTeam: 'payments-platform',
+			failureCount: 6,
+			reproductionRatePct: 20,
+			status: 'quarantine_requested',
+			quarantineUntil: '2026-08-30T01:53:46.500Z'
+		},
+		{
+			testFingerprint: 'acme/web-frontend:e2e/checkout-flow',
+			repoName: 'acme/web-frontend',
+			ownerTeam: 'web-platform',
+			failureCount: 4,
+			reproductionRatePct: 35,
+			status: 'observed',
+			quarantineUntil: null
+		}
+	],
+	candidatesBuilt: 3,
+	candidatesInvalidated: 2,
+	invalidationReasons: [{ reason: 'base_branch_advanced', count: 2 }]
+};
+
+const reviewerLoad: ReviewerLoadSummary = {
+	byScope: [
+		{ scope: 'payments-core', pendingCount: 2, reviewerCount: 2, hasBackupReviewer: true },
+		{ scope: 'frontend', pendingCount: 2, reviewerCount: 1, hasBackupReviewer: false },
+		{ scope: 'infra-secrets', pendingCount: 1, reviewerCount: 1, hasBackupReviewer: false }
+	],
+	byReviewer: [
+		{ actor: 'dev-actor', pendingCount: 2, sensitiveCount: 2, oldestWaitingMinutes: 1560 },
+		{ actor: 'k-sato', pendingCount: 2, sensitiveCount: 0, oldestWaitingMinutes: 120 },
+		{ actor: 'yuki-t', pendingCount: 1, sensitiveCount: 1, oldestWaitingMinutes: 180 }
+	],
+	totalPending: 5,
+	concentrationPct: 40,
+	carryForwardRatePct: 17
+};
+
+const policySummaries: RepoPolicySummary[] = [
+	{
+		repoId: 'r1',
+		repoName: 'acme/payments-api',
+		policyDigest: 'v13-payments-override (sha256:44f1a9…)',
+		source: 'published_bundle',
+		version: 'v13',
+		publishedAt: '2026-08-13T01:53:46.500Z',
+		openPrCount: 3
+	},
+	{
+		repoId: 'r2',
+		repoName: 'acme/web-frontend',
+		policyDigest: '8f6ce0778834c1377cc0c0b769d462efaa2bcb6bfea6f3db678ca7a57a99c871',
+		source: 'default_fallback',
+		version: null,
+		publishedAt: null,
+		openPrCount: 3
+	},
+	{
+		repoId: 'r3',
+		repoName: 'acme/infra-terraform',
+		policyDigest: '8f6ce0778834c1377cc0c0b769d462efaa2bcb6bfea6f3db678ca7a57a99c871',
+		source: 'default_fallback',
+		version: null,
+		publishedAt: null,
+		openPrCount: 1
+	}
+];
+
 export function createMockControlApi(): ControlApiPort {
 	return {
 		async getFleetOverview(): Promise<FleetOverview> {
@@ -587,6 +671,15 @@ export function createMockControlApi(): ControlApiPort {
 				description,
 				createdAt: new Date().toISOString()
 			};
+		},
+		async getCiReliability(): Promise<CiReliabilitySummary> {
+			return ciReliability;
+		},
+		async getReviewerLoad(): Promise<ReviewerLoadSummary> {
+			return reviewerLoad;
+		},
+		async getPolicySummaries(): Promise<RepoPolicySummary[]> {
+			return policySummaries;
 		}
 	};
 }

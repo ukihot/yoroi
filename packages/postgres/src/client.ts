@@ -1,6 +1,6 @@
-import { drizzle } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
-import * as schema from "./schema.ts";
+import { drizzle } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
+import * as schema from './schema.ts';
 
 /** Lazy connect (design.md §17.5: scale-to-zero instances shouldn't pay a
  * connection cost at module load). `postgres()` itself doesn't open a

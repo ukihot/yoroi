@@ -3,8 +3,8 @@ import type {
 	OperationId,
 	PullRequestNumber,
 	RepositoryId,
-	Sha,
-} from "@yoroi/domain";
+	Sha
+} from '@yoroi/domain';
 
 /**
  * design.md §13.1's `GitHubAdapter`, adapted: methods take a `RepoRef`
@@ -27,7 +27,7 @@ export interface RepoRef {
 export interface TreeEntryResponse {
 	readonly path: string;
 	readonly mode: string;
-	readonly type: "blob" | "tree" | "commit";
+	readonly type: 'blob' | 'tree' | 'commit';
 	readonly sha: Sha;
 }
 
@@ -51,28 +51,18 @@ export interface CheckRunInput {
 	readonly name: string;
 	readonly headSha: Sha;
 	readonly externalId: string;
-	readonly status: "queued" | "in_progress" | "completed";
+	readonly status: 'queued' | 'in_progress' | 'completed';
 	readonly conclusion?:
-		| "success"
-		| "failure"
-		| "neutral"
-		| "cancelled"
-		| "timed_out"
-		| "action_required";
+		'success' | 'failure' | 'neutral' | 'cancelled' | 'timed_out' | 'action_required';
 	readonly title: string;
 	readonly summary: string;
 	readonly text?: string;
 }
 
 export interface CheckRunUpdate {
-	readonly status: "queued" | "in_progress" | "completed";
+	readonly status: 'queued' | 'in_progress' | 'completed';
 	readonly conclusion?:
-		| "success"
-		| "failure"
-		| "neutral"
-		| "cancelled"
-		| "timed_out"
-		| "action_required";
+		'success' | 'failure' | 'neutral' | 'cancelled' | 'timed_out' | 'action_required';
 	readonly title: string;
 	readonly summary: string;
 	readonly text?: string;
@@ -98,7 +88,7 @@ export interface MergeResult {
 }
 
 export interface Permissions {
-	readonly [permission: string]: "read" | "write" | "admin";
+	readonly [permission: string]: 'read' | 'write' | 'admin';
 }
 
 export interface InstallationToken {
@@ -139,7 +129,7 @@ export interface GitHubAdapter {
 	mintInstallationToken(
 		installationId: InstallationId,
 		repositoryIds: readonly RepositoryId[],
-		permissions: Permissions,
+		permissions: Permissions
 	): Promise<InstallationToken>;
 	getRateLimitStatus(): Promise<RateLimitStatus>;
 }

@@ -45,30 +45,30 @@
 			onkeydown={(e) => e.stopPropagation()}
 		>
 			<form onsubmit={submit}>
-			<h2>{title}</h2>
-			<dl>
-				<dt>{m.action_confirm_what_changes()}</dt>
-				<dd>{confirmation.whatChanges}</dd>
-				<dt>{m.action_confirm_affected_scope()}</dt>
-				<dd>{confirmation.affectedScope}</dd>
-				<dt>{m.action_confirm_unsafe()}</dt>
-				<dd>{confirmation.whatBecomesUnsafe}</dd>
-				<dt>{m.action_confirm_expires_at()}</dt>
-				<dd>{confirmation.expiresAt ?? m.action_confirm_no_expiry()}</dd>
-				<dt>{m.action_confirm_additional_approvers()}</dt>
-				<dd>{confirmation.additionalApproversRequired}</dd>
-				<dt>{m.action_confirm_rollback()}</dt>
-				<dd>{confirmation.rollbackProcedure}</dd>
-			</dl>
+				<h2>{title}</h2>
+				<dl>
+					<dt>{m.action_confirm_what_changes()}</dt>
+					<dd>{confirmation.whatChanges}</dd>
+					<dt>{m.action_confirm_affected_scope()}</dt>
+					<dd>{confirmation.affectedScope}</dd>
+					<dt>{m.action_confirm_unsafe()}</dt>
+					<dd>{confirmation.whatBecomesUnsafe}</dd>
+					<dt>{m.action_confirm_expires_at()}</dt>
+					<dd>{confirmation.expiresAt ?? m.action_confirm_no_expiry()}</dd>
+					<dt>{m.action_confirm_additional_approvers()}</dt>
+					<dd>{confirmation.additionalApproversRequired}</dd>
+					<dt>{m.action_confirm_rollback()}</dt>
+					<dd>{confirmation.rollbackProcedure}</dd>
+				</dl>
 
-			<label>
-				{m.action_confirm_reason_label()}
-				<input type="text" bind:value={reason} required />
-			</label>
-			<label>
-				{m.action_confirm_ticket_label()}
-				<input type="text" bind:value={ticket} required />
-			</label>
+				<label>
+					{m.action_confirm_reason_label()}
+					<input type="text" bind:value={reason} required />
+				</label>
+				<label>
+					{m.action_confirm_ticket_label()}
+					<input type="text" bind:value={ticket} required />
+				</label>
 
 				<div class="actions">
 					<button type="button" onclick={() => (open = false)}>{m.common_cancel()}</button>
@@ -89,9 +89,12 @@
 		z-index: 100;
 	}
 	.panel {
-		background: var(--yoroi-surface, #fff);
+		background: var(--yoroi-surface, #c0c0c0);
 		color: inherit;
-		border-radius: 10px;
+		border-radius: 0;
+		box-shadow:
+			var(--win-border-raised-outer, inset -1px -1px #0a0a0a, inset 1px 1px #fff),
+			var(--win-border-raised-inner, inset -2px -2px #808080, inset 2px 2px #dfdfdf);
 		padding: 1.25rem 1.5rem;
 		width: min(32rem, 92vw);
 		max-height: 85vh;
@@ -131,6 +134,20 @@
 		margin-top: 0.75rem;
 	}
 	.primary {
-		font-weight: 600;
+		font-weight: bold;
+		box-shadow:
+			inset -2px -2px var(--win-window-frame, #0a0a0a),
+			inset 1px 1px var(--win-window-frame, #0a0a0a),
+			inset 2px 2px var(--win-button-highlight, #fff),
+			inset -3px -3px var(--win-button-shadow, #808080),
+			inset 3px 3px var(--win-button-face, #dfdfdf);
+	}
+	.primary:not(:disabled):active {
+		box-shadow:
+			inset 2px 2px var(--win-window-frame, #0a0a0a),
+			inset -1px -1px var(--win-window-frame, #0a0a0a),
+			inset -2px -2px var(--win-button-highlight, #fff),
+			inset 3px 3px var(--win-button-shadow, #808080),
+			inset -3px -3px var(--win-button-face, #dfdfdf);
 	}
 </style>

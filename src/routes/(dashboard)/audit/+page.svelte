@@ -14,7 +14,13 @@
 
 <form method="get" class="search">
 	<label for="audit-q">{m.audit_search_label()}</label>
-	<input id="audit-q" type="search" name="q" placeholder={m.audit_search_placeholder()} value={data.query} />
+	<input
+		id="audit-q"
+		type="search"
+		name="q"
+		placeholder={m.audit_search_placeholder()}
+		value={data.query}
+	/>
 	<button type="submit">{m.audit_search_button()}</button>
 </form>
 

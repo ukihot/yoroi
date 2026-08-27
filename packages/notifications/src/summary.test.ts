@@ -1,15 +1,15 @@
-import { assertEquals } from "@std/assert";
-import { type NotificationAnchorState, upsertSummary } from "./summary.ts";
-import type { SummaryState } from "./render.ts";
+import { assertEquals } from '@std/assert';
+import { type NotificationAnchorState, upsertSummary } from './summary.ts';
+import type { SummaryState } from './render.ts';
 import type {
 	CheckRun,
 	CheckRunInput,
 	CheckRunUpdate,
 	GitHubAdapter,
-	RepoRef,
-} from "@yoroi/github";
-import { installationId, pullRequestNumber, repositoryId, sha } from "@yoroi/domain";
-import type { ReasonGraphNode } from "@yoroi/policy";
+	RepoRef
+} from '@yoroi/github';
+import { installationId, pullRequestNumber, repositoryId, sha } from '@yoroi/domain';
+import type { ReasonGraphNode } from '@yoroi/policy';
 
 class FakeGitHubAdapter implements GitHubAdapter {
 	createdComments: { markdown: string }[] = [];
@@ -36,54 +36,54 @@ class FakeGitHubAdapter implements GitHubAdapter {
 		return Promise.resolve({ id: checkRunId });
 	}
 	getTreeRecursive(): never {
-		throw new Error("not used by upsertSummary");
+		throw new Error('not used by upsertSummary');
 	}
 	getBlob(): never {
-		throw new Error("not used by upsertSummary");
+		throw new Error('not used by upsertSummary');
 	}
 	compareCommits(): never {
-		throw new Error("not used by upsertSummary");
+		throw new Error('not used by upsertSummary');
 	}
 	listPullRequestFiles(): never {
-		throw new Error("not used by upsertSummary");
+		throw new Error('not used by upsertSummary');
 	}
 	getPullRequest(): never {
-		throw new Error("not used by upsertSummary");
+		throw new Error('not used by upsertSummary');
 	}
 	mergePullRequest(): never {
-		throw new Error("not used by upsertSummary");
+		throw new Error('not used by upsertSummary');
 	}
 	mintInstallationToken(): never {
-		throw new Error("not used by upsertSummary");
+		throw new Error('not used by upsertSummary');
 	}
 	getRateLimitStatus(): never {
-		throw new Error("not used by upsertSummary");
+		throw new Error('not used by upsertSummary');
 	}
 }
 
 const repo: RepoRef = {
 	installationId: installationId(1),
 	repositoryId: repositoryId(2),
-	owner: "org",
-	name: "repo",
+	owner: 'org',
+	name: 'repo'
 };
 const pr = pullRequestNumber(42);
-const headSha = sha("a".repeat(40));
-const graph: ReasonGraphNode = { label: "Merge可能", children: [] };
+const headSha = sha('a'.repeat(40));
+const graph: ReasonGraphNode = { label: 'Merge可能', children: [] };
 const state: SummaryState = {
-	stage: "review",
-	reasonHeadline: "レビュー待ち",
-	nextActor: "reviewer",
+	stage: 'review',
+	reasonHeadline: 'レビュー待ち',
+	nextActor: 'reviewer',
 	etaRange: null,
-	confidence: null,
+	confidence: null
 };
 const emptyAnchor: NotificationAnchorState = {
 	summaryCommentId: null,
 	checkRunId: null,
-	lastReasonHash: null,
+	lastReasonHash: null
 };
 
-Deno.test("upsertSummary: anchorが空なら新規commentとcheck runを作る", async () => {
+Deno.test('upsertSummary: anchorが空なら新規commentとcheck runを作る', async () => {
 	const gh = new FakeGitHubAdapter();
 	const result = await upsertSummary(gh, repo, pr, headSha, emptyAnchor, state, graph);
 	assertEquals(gh.createdComments.length, 1);
@@ -93,13 +93,13 @@ Deno.test("upsertSummary: anchorが空なら新規commentとcheck runを作る",
 	assertEquals(result.checkRunId, 1);
 });
 
-Deno.test("upsertSummary: 内容が変わらなければcommentの書き込みをskipする (NFR-021)", async () => {
+Deno.test('upsertSummary: 内容が変わらなければcommentの書き込みをskipする (NFR-021)', async () => {
 	const gh = new FakeGitHubAdapter();
 	const first = await upsertSummary(gh, repo, pr, headSha, emptyAnchor, state, graph);
 	const anchorAfterFirst: NotificationAnchorState = {
 		summaryCommentId: first.summaryCommentId,
 		checkRunId: first.checkRunId,
-		lastReasonHash: first.reasonHash,
+		lastReasonHash: first.reasonHash
 	};
 
 	const second = await upsertSummary(gh, repo, pr, headSha, anchorAfterFirst, state, graph);
@@ -108,16 +108,16 @@ Deno.test("upsertSummary: 内容が変わらなければcommentの書き込み�
 	assertEquals(gh.updatedComments.length, 0);
 });
 
-Deno.test("upsertSummary: 内容が変われば既存commentをupdateする（新規作成しない）", async () => {
+Deno.test('upsertSummary: 内容が変われば既存commentをupdateする（新規作成しない）', async () => {
 	const gh = new FakeGitHubAdapter();
 	const first = await upsertSummary(gh, repo, pr, headSha, emptyAnchor, state, graph);
 	const anchorAfterFirst: NotificationAnchorState = {
 		summaryCommentId: first.summaryCommentId,
 		checkRunId: first.checkRunId,
-		lastReasonHash: first.reasonHash,
+		lastReasonHash: first.reasonHash
 	};
 
-	const changedState: SummaryState = { ...state, reasonHeadline: "承認されました" };
+	const changedState: SummaryState = { ...state, reasonHeadline: '承認されました' };
 	const second = await upsertSummary(gh, repo, pr, headSha, anchorAfterFirst, changedState, graph);
 	assertEquals(second.skippedComment, false);
 	assertEquals(gh.createdComments.length, 1);
@@ -125,13 +125,13 @@ Deno.test("upsertSummary: 内容が変われば既存commentをupdateする（�
 	assertEquals(gh.updatedComments[0]?.commentId, first.summaryCommentId);
 });
 
-Deno.test("upsertSummary: check runは内容が変わらなくても毎回updateされる", async () => {
+Deno.test('upsertSummary: check runは内容が変わらなくても毎回updateされる', async () => {
 	const gh = new FakeGitHubAdapter();
 	const first = await upsertSummary(gh, repo, pr, headSha, emptyAnchor, state, graph);
 	const anchorAfterFirst: NotificationAnchorState = {
 		summaryCommentId: first.summaryCommentId,
 		checkRunId: first.checkRunId,
-		lastReasonHash: first.reasonHash,
+		lastReasonHash: first.reasonHash
 	};
 	await upsertSummary(gh, repo, pr, headSha, anchorAfterFirst, state, graph);
 	assertEquals(gh.createdCheckRuns.length, 1);

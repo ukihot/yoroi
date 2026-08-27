@@ -1,12 +1,12 @@
-import type { ScopeId, Sha, Sha256Hex } from "./ids.ts";
-import { err, ok, type Result } from "./result.ts";
+import type { ScopeId, Sha, Sha256Hex } from './ids.ts';
+import { err, ok, type Result } from './result.ts';
 import {
 	type CanonicalChangeRecord,
 	computeScopeChangeDigest,
 	computeScopeResultDigest,
 	gitBlobOid,
-	type ScopeResultEntry,
-} from "./scope-digest.ts";
+	type ScopeResultEntry
+} from './scope-digest.ts';
 
 /**
  * design.md §8.3's `evaluateContextSafety` signature takes a `GitHubAdapter`
@@ -22,7 +22,7 @@ import {
 export interface TreeEntry {
 	readonly path: string;
 	readonly mode: string;
-	readonly objectType: "blob" | "tree" | "commit";
+	readonly objectType: 'blob' | 'tree' | 'commit';
 	readonly oid: Sha;
 }
 
@@ -37,32 +37,32 @@ export interface FetchedTree {
  * No external dependency — deliberately small, only what policy scope
  * `match:` patterns (design.md §9.1) need. */
 export function matchesGlob(path: string, pattern: string): boolean {
-	let regexStr = "^";
+	let regexStr = '^';
 	for (let i = 0; i < pattern.length; i++) {
 		const c = pattern[i]!;
-		if (c === "*" && pattern[i + 1] === "*") {
-			regexStr += ".*";
+		if (c === '*' && pattern[i + 1] === '*') {
+			regexStr += '.*';
 			i++;
-		} else if (c === "*") {
-			regexStr += "[^/]*";
-		} else if (c === "?") {
-			regexStr += "[^/]";
-		} else if (".+^${}()|[]\\".includes(c)) {
+		} else if (c === '*') {
+			regexStr += '[^/]*';
+		} else if (c === '?') {
+			regexStr += '[^/]';
+		} else if ('.+^${}()|[]\\'.includes(c)) {
 			regexStr += `\\${c}`;
 		} else {
 			regexStr += c;
 		}
 	}
-	regexStr += "$";
+	regexStr += '$';
 	return new RegExp(regexStr).test(path);
 }
 
 export function extractScopeEntries(
 	tree: FetchedTree,
-	patterns: readonly string[],
+	patterns: readonly string[]
 ): ScopeResultEntry[] {
 	return tree.entries
-		.filter((e) => e.objectType === "blob" && patterns.some((p) => matchesGlob(e.path, p)))
+		.filter((e) => e.objectType === 'blob' && patterns.some((p) => matchesGlob(e.path, p)))
 		.map((e) => ({ path: e.path, objectType: e.objectType, mode: e.mode, oid: e.oid }));
 }
 
@@ -75,12 +75,12 @@ export function extractScopeEntries(
  */
 export function diffToCanonicalRecords(
 	before: FetchedTree,
-	after: FetchedTree,
+	after: FetchedTree
 ): CanonicalChangeRecord[] {
 	const beforeByPath = new Map(before.entries.map((e) => [e.path, e]));
 	const afterByPath = new Map(after.entries.map((e) => [e.path, e]));
 	const beforeByOid = new Map(
-		before.entries.filter((e) => e.objectType === "blob").map((e) => [e.oid, e]),
+		before.entries.filter((e) => e.objectType === 'blob').map((e) => [e.oid, e])
 	);
 
 	const records: CanonicalChangeRecord[] = [];
@@ -93,33 +93,34 @@ export function diffToCanonicalRecords(
 			// confirmed rename; otherwise this is a genuine add.
 			const renameSource = beforeByOid.get(afterEntry.oid);
 			if (
-				renameSource && !afterByPath.has(renameSource.path) &&
+				renameSource &&
+				!afterByPath.has(renameSource.path) &&
 				!consumedBeforePaths.has(renameSource.path)
 			) {
 				consumedBeforePaths.add(renameSource.path);
 				records.push({
 					beforePath: renameSource.path,
 					afterPath: path,
-					changeKind: "rename",
+					changeKind: 'rename',
 					objectType: afterEntry.objectType,
 					modeBefore: renameSource.mode,
 					modeAfter: afterEntry.mode,
 					exactChangeBytes: after.blobs.get(afterEntry.oid) ?? new Uint8Array(0),
 					binaryBeforeOid: null,
-					binaryAfterOid: null,
+					binaryAfterOid: null
 				});
 				continue;
 			}
 			records.push({
 				beforePath: null,
 				afterPath: path,
-				changeKind: "add",
+				changeKind: 'add',
 				objectType: afterEntry.objectType,
 				modeBefore: null,
 				modeAfter: afterEntry.mode,
 				exactChangeBytes: after.blobs.get(afterEntry.oid) ?? new Uint8Array(0),
 				binaryBeforeOid: null,
-				binaryAfterOid: after.blobs.has(afterEntry.oid) ? null : afterEntry.oid,
+				binaryAfterOid: after.blobs.has(afterEntry.oid) ? null : afterEntry.oid
 			});
 			continue;
 		}
@@ -128,25 +129,25 @@ export function diffToCanonicalRecords(
 			records.push({
 				beforePath: path,
 				afterPath: path,
-				changeKind: "modify",
+				changeKind: 'modify',
 				objectType: afterEntry.objectType,
 				modeBefore: beforeEntry.mode,
 				modeAfter: afterEntry.mode,
 				exactChangeBytes: after.blobs.get(afterEntry.oid) ?? new Uint8Array(0),
 				binaryBeforeOid: null,
-				binaryAfterOid: after.blobs.has(afterEntry.oid) ? null : afterEntry.oid,
+				binaryAfterOid: after.blobs.has(afterEntry.oid) ? null : afterEntry.oid
 			});
 		} else if (beforeEntry.mode !== afterEntry.mode) {
 			records.push({
 				beforePath: path,
 				afterPath: path,
-				changeKind: "mode",
+				changeKind: 'mode',
 				objectType: afterEntry.objectType,
 				modeBefore: beforeEntry.mode,
 				modeAfter: afterEntry.mode,
 				exactChangeBytes: new Uint8Array(0),
 				binaryBeforeOid: null,
-				binaryAfterOid: null,
+				binaryAfterOid: null
 			});
 		}
 	}
@@ -156,13 +157,13 @@ export function diffToCanonicalRecords(
 		records.push({
 			beforePath: path,
 			afterPath: null,
-			changeKind: "delete",
+			changeKind: 'delete',
 			objectType: beforeEntry.objectType,
 			modeBefore: beforeEntry.mode,
 			modeAfter: null,
 			exactChangeBytes: new Uint8Array(0),
 			binaryBeforeOid: null,
-			binaryAfterOid: null,
+			binaryAfterOid: null
 		});
 	}
 
@@ -175,12 +176,12 @@ export interface SyntheticResultTree {
 
 /** design.md §8.4's safe-side-invalidate table, as ApplyConflict kinds. */
 export type ApplyConflict =
-	| { readonly kind: "PATH_MISSING_FOR_DELETE"; readonly path: string }
-	| { readonly kind: "AMBIGUOUS_RENAME"; readonly beforePath: string; readonly afterPath: string }
-	| { readonly kind: "SUBMODULE_GITLINK"; readonly path: string }
-	| { readonly kind: "LFS_POINTER"; readonly path: string };
+	| { readonly kind: 'PATH_MISSING_FOR_DELETE'; readonly path: string }
+	| { readonly kind: 'AMBIGUOUS_RENAME'; readonly beforePath: string; readonly afterPath: string }
+	| { readonly kind: 'SUBMODULE_GITLINK'; readonly path: string }
+	| { readonly kind: 'LFS_POINTER'; readonly path: string };
 
-const LFS_POINTER_PREFIX = "version https://git-lfs";
+const LFS_POINTER_PREFIX = 'version https://git-lfs';
 
 function looksLikeLfsPointer(bytes: Uint8Array): boolean {
 	const head = new TextDecoder().decode(bytes.slice(0, LFS_POINTER_PREFIX.length));
@@ -196,7 +197,7 @@ export interface DataOnlyApplyEngine {
 	 */
 	apply(
 		newBaseTree: FetchedTree,
-		records: readonly CanonicalChangeRecord[],
+		records: readonly CanonicalChangeRecord[]
 	): Promise<Result<SyntheticResultTree, ApplyConflict>>;
 }
 
@@ -206,48 +207,48 @@ export function createDataOnlyApplyEngine(): DataOnlyApplyEngine {
 			const byPath = new Map(newBaseTree.entries.map((e) => [e.path, e]));
 
 			for (const record of records) {
-				if (record.objectType === "commit") {
+				if (record.objectType === 'commit') {
 					return err({
-						kind: "SUBMODULE_GITLINK",
-						path: record.afterPath ?? record.beforePath ?? "",
+						kind: 'SUBMODULE_GITLINK',
+						path: record.afterPath ?? record.beforePath ?? ''
 					});
 				}
 				if (record.exactChangeBytes.length > 0 && looksLikeLfsPointer(record.exactChangeBytes)) {
-					return err({ kind: "LFS_POINTER", path: record.afterPath ?? record.beforePath ?? "" });
+					return err({ kind: 'LFS_POINTER', path: record.afterPath ?? record.beforePath ?? '' });
 				}
 
 				switch (record.changeKind) {
-					case "add":
-					case "modify": {
+					case 'add':
+					case 'modify': {
 						if (!record.afterPath) {
 							return err({
-								kind: "AMBIGUOUS_RENAME",
-								beforePath: record.beforePath ?? "",
-								afterPath: "",
+								kind: 'AMBIGUOUS_RENAME',
+								beforePath: record.beforePath ?? '',
+								afterPath: ''
 							});
 						}
 						const oid = record.binaryAfterOid ?? (await gitBlobOid(record.exactChangeBytes));
 						byPath.set(record.afterPath, {
 							path: record.afterPath,
-							mode: record.modeAfter ?? "100644",
+							mode: record.modeAfter ?? '100644',
 							objectType: record.objectType,
-							oid,
+							oid
 						});
 						break;
 					}
-					case "delete": {
+					case 'delete': {
 						if (!record.beforePath || !byPath.has(record.beforePath)) {
-							return err({ kind: "PATH_MISSING_FOR_DELETE", path: record.beforePath ?? "" });
+							return err({ kind: 'PATH_MISSING_FOR_DELETE', path: record.beforePath ?? '' });
 						}
 						byPath.delete(record.beforePath);
 						break;
 					}
-					case "rename": {
+					case 'rename': {
 						if (!record.beforePath || !record.afterPath || !byPath.has(record.beforePath)) {
 							return err({
-								kind: "AMBIGUOUS_RENAME",
-								beforePath: record.beforePath ?? "",
-								afterPath: record.afterPath ?? "",
+								kind: 'AMBIGUOUS_RENAME',
+								beforePath: record.beforePath ?? '',
+								afterPath: record.afterPath ?? ''
 							});
 						}
 						const existing = byPath.get(record.beforePath)!;
@@ -255,17 +256,17 @@ export function createDataOnlyApplyEngine(): DataOnlyApplyEngine {
 						byPath.set(record.afterPath, {
 							...existing,
 							path: record.afterPath,
-							mode: record.modeAfter ?? existing.mode,
+							mode: record.modeAfter ?? existing.mode
 						});
 						break;
 					}
-					case "mode": {
+					case 'mode': {
 						if (!record.afterPath) break;
 						const existing = byPath.get(record.afterPath);
 						if (existing) {
 							byPath.set(record.afterPath, {
 								...existing,
-								mode: record.modeAfter ?? existing.mode,
+								mode: record.modeAfter ?? existing.mode
 							});
 						}
 						break;
@@ -274,7 +275,7 @@ export function createDataOnlyApplyEngine(): DataOnlyApplyEngine {
 			}
 
 			return ok({ entries: [...byPath.values()] });
-		},
+		}
 	};
 }
 
@@ -284,13 +285,13 @@ export interface ContextSafetyProof {
 	readonly oldBaseSha: Sha;
 	readonly oldHeadSha: Sha;
 	readonly newBaseSha: Sha;
-	readonly proofAlgorithm: "deterministic-replay-v1";
+	readonly proofAlgorithm: 'deterministic-replay-v1';
 	readonly oldScopeChangeDigest: Sha256Hex;
 	readonly newScopeChangeDigestOfBaseDelta: Sha256Hex; // AT-04E判定用
 	readonly replayedResultDigest: Sha256Hex | null; // indeterminateの場合はnull
 	readonly newHeadResultDigest: Sha256Hex | null;
 	readonly sensitivePathOverlap: boolean;
-	readonly outcome: "carried_forward" | "requires_context_reapproval" | "invalidate_indeterminate";
+	readonly outcome: 'carried_forward' | 'requires_context_reapproval' | 'invalidate_indeterminate';
 	readonly reason: string;
 }
 
@@ -308,7 +309,7 @@ export interface EvaluateContextSafetyInput {
 export function hasSensitivePathOverlap(
 	oldBase: FetchedTree,
 	newBase: FetchedTree,
-	sensitivePatterns: readonly string[],
+	sensitivePatterns: readonly string[]
 ): boolean {
 	if (sensitivePatterns.length === 0) return false;
 	const changed = diffToCanonicalRecords(oldBase, newBase);
@@ -324,30 +325,28 @@ export function hasSensitivePathOverlap(
 export async function evaluateContextSafety(
 	trees: { oldBase: FetchedTree; oldHead: FetchedTree; newBase: FetchedTree; newHead: FetchedTree },
 	engine: DataOnlyApplyEngine,
-	input: EvaluateContextSafetyInput,
+	input: EvaluateContextSafetyInput
 ): Promise<ContextSafetyProof> {
-	const oldRecords = diffToCanonicalRecords(trees.oldBase, trees.oldHead).filter(
-		(r) =>
-			[r.beforePath, r.afterPath].filter((p): p is string => p !== null).some((p) =>
-				input.scopePatterns.some((pat) => matchesGlob(p, pat))
-			),
+	const oldRecords = diffToCanonicalRecords(trees.oldBase, trees.oldHead).filter((r) =>
+		[r.beforePath, r.afterPath]
+			.filter((p): p is string => p !== null)
+			.some((p) => input.scopePatterns.some((pat) => matchesGlob(p, pat)))
 	);
 	const oldDigest = await computeScopeChangeDigest({
-		digestAlgorithmVersion: "scope-change-v1",
+		digestAlgorithmVersion: 'scope-change-v1',
 		scopeMappingVersion: input.scopeMappingVersion,
 		scopeId: input.scopeId,
-		records: oldRecords,
+		records: oldRecords
 	});
 	const baseDeltaDigest = await computeScopeChangeDigest({
-		digestAlgorithmVersion: "scope-change-v1",
+		digestAlgorithmVersion: 'scope-change-v1',
 		scopeMappingVersion: input.scopeMappingVersion,
 		scopeId: input.scopeId,
-		records: diffToCanonicalRecords(trees.newBase, trees.newHead).filter(
-			(r) =>
-				[r.beforePath, r.afterPath].filter((p): p is string => p !== null).some((p) =>
-					input.scopePatterns.some((pat) => matchesGlob(p, pat))
-				),
-		),
+		records: diffToCanonicalRecords(trees.newBase, trees.newHead).filter((r) =>
+			[r.beforePath, r.afterPath]
+				.filter((p): p is string => p !== null)
+				.some((p) => input.scopePatterns.some((pat) => matchesGlob(p, pat)))
+		)
 	});
 
 	// 手順3: 決定論的data-only engineで新baseへ再適用
@@ -357,12 +356,12 @@ export async function evaluateContextSafety(
 	}
 
 	const replayedResultDigest = await computeScopeResultDigest(
-		replay.value.entries.filter((e) =>
-			e.objectType === "blob" && input.scopePatterns.some((p) => matchesGlob(e.path, p))
-		),
+		replay.value.entries.filter(
+			(e) => e.objectType === 'blob' && input.scopePatterns.some((p) => matchesGlob(e.path, p))
+		)
 	);
 	const newHeadResultDigest = await computeScopeResultDigest(
-		extractScopeEntries(trees.newHead, input.scopePatterns),
+		extractScopeEntries(trees.newHead, input.scopePatterns)
 	);
 
 	if (replayedResultDigest !== newHeadResultDigest) {
@@ -370,7 +369,7 @@ export async function evaluateContextSafety(
 			input,
 			oldDigest,
 			baseDeltaDigest,
-			"result_digest_mismatch: 新base上への再適用結果がnew headと一致しない",
+			'result_digest_mismatch: 新base上への再適用結果がnew headと一致しない'
 		);
 	}
 
@@ -381,16 +380,16 @@ export async function evaluateContextSafety(
 		oldBaseSha: input.oldBaseSha,
 		oldHeadSha: input.oldHeadSha,
 		newBaseSha: input.newBaseSha,
-		proofAlgorithm: "deterministic-replay-v1",
+		proofAlgorithm: 'deterministic-replay-v1',
 		oldScopeChangeDigest: oldDigest,
 		newScopeChangeDigestOfBaseDelta: baseDeltaDigest,
 		replayedResultDigest,
 		newHeadResultDigest,
 		sensitivePathOverlap: overlap,
-		outcome: overlap ? "requires_context_reapproval" : "carried_forward",
+		outcome: overlap ? 'requires_context_reapproval' : 'carried_forward',
 		reason: overlap
-			? "new baseが承認対象scopeと重なる高感度pathを変更したため、context再承認を要求する"
-			: "scope内変更が同一であり、新base上の適用結果がnew headと一致した",
+			? 'new baseが承認対象scopeと重なる高感度pathを変更したため、context再承認を要求する'
+			: 'scope内変更が同一であり、新base上の適用結果がnew headと一致した'
 	};
 }
 
@@ -398,21 +397,21 @@ function indeterminate(
 	input: EvaluateContextSafetyInput,
 	oldDigest: Sha256Hex,
 	baseDeltaDigest: Sha256Hex,
-	conflict: ApplyConflict,
+	conflict: ApplyConflict
 ): ContextSafetyProof {
 	return {
 		scopeId: input.scopeId,
 		oldBaseSha: input.oldBaseSha,
 		oldHeadSha: input.oldHeadSha,
 		newBaseSha: input.newBaseSha,
-		proofAlgorithm: "deterministic-replay-v1",
+		proofAlgorithm: 'deterministic-replay-v1',
 		oldScopeChangeDigest: oldDigest,
 		newScopeChangeDigestOfBaseDelta: baseDeltaDigest,
 		replayedResultDigest: null,
 		newHeadResultDigest: null,
 		sensitivePathOverlap: false,
-		outcome: "invalidate_indeterminate",
-		reason: `安全側で失効: ${conflict.kind}`,
+		outcome: 'invalidate_indeterminate',
+		reason: `安全側で失効: ${conflict.kind}`
 	};
 }
 
@@ -420,20 +419,20 @@ function invalidated(
 	input: EvaluateContextSafetyInput,
 	oldDigest: Sha256Hex,
 	baseDeltaDigest: Sha256Hex,
-	reason: string,
+	reason: string
 ): ContextSafetyProof {
 	return {
 		scopeId: input.scopeId,
 		oldBaseSha: input.oldBaseSha,
 		oldHeadSha: input.oldHeadSha,
 		newBaseSha: input.newBaseSha,
-		proofAlgorithm: "deterministic-replay-v1",
+		proofAlgorithm: 'deterministic-replay-v1',
 		oldScopeChangeDigest: oldDigest,
 		newScopeChangeDigestOfBaseDelta: baseDeltaDigest,
 		replayedResultDigest: null,
 		newHeadResultDigest: null,
 		sensitivePathOverlap: false,
-		outcome: "invalidate_indeterminate",
-		reason,
+		outcome: 'invalidate_indeterminate',
+		reason
 	};
 }

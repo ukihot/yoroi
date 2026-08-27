@@ -5,9 +5,9 @@ import type {
 	RepositoryId,
 	ScopeId,
 	Sha,
-	Sha256Hex,
-} from "./ids.ts";
-import type { ApproverRole } from "./identity.ts";
+	Sha256Hex
+} from './ids.ts';
+import type { ApproverRole } from './identity.ts';
 
 /** design.md §4.3, verbatim (field names as shown; implementations map these 1:1 to DB columns). */
 

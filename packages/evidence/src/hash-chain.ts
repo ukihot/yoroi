@@ -10,7 +10,7 @@
  * function can itself guarantee.
  */
 
-export const GENESIS_HASH = "0".repeat(64);
+export const GENESIS_HASH = '0'.repeat(64);
 
 /** The fields that go into a row's hash — everything meaningful about the
  * event except `seq` (an auto-increment surrogate key, not evidence) and the
@@ -31,7 +31,7 @@ export interface DecisionEventHashInput {
 
 function sortKeysDeep(value: unknown): unknown {
 	if (Array.isArray(value)) return value.map(sortKeysDeep);
-	if (value !== null && typeof value === "object") {
+	if (value !== null && typeof value === 'object') {
 		const sorted: Record<string, unknown> = {};
 		for (const key of Object.keys(value as Record<string, unknown>).sort()) {
 			sorted[key] = sortKeysDeep((value as Record<string, unknown>)[key]);
@@ -46,13 +46,15 @@ function toDigestInput(bytes: Uint8Array): ArrayBuffer {
 }
 
 function bytesToHex(bytes: Uint8Array): string {
-	return Array.from(bytes).map((b) => b.toString(16).padStart(2, "0")).join("");
+	return Array.from(bytes)
+		.map((b) => b.toString(16).padStart(2, '0'))
+		.join('');
 }
 
 async function sha256Hex(text: string): Promise<string> {
 	const digest = await crypto.subtle.digest(
-		"SHA-256",
-		toDigestInput(new TextEncoder().encode(text)),
+		'SHA-256',
+		toDigestInput(new TextEncoder().encode(text))
 	);
 	return bytesToHex(new Uint8Array(digest));
 }
@@ -80,7 +82,7 @@ export type ChainVerificationResult =
  * chained from its predecessor — is caught here (AT-19). */
 export async function verifyChain(
 	rows: readonly ChainedDecisionEventRow[],
-	genesisPrevHash: string = GENESIS_HASH,
+	genesisPrevHash: string = GENESIS_HASH
 ): Promise<ChainVerificationResult> {
 	let expectedPrevHash = genesisPrevHash;
 	for (let i = 0; i < rows.length; i++) {
@@ -89,7 +91,7 @@ export async function verifyChain(
 			return {
 				ok: false,
 				brokenAtIndex: i,
-				reason: "prev_hash does not match preceding row's row_hash",
+				reason: "prev_hash does not match preceding row's row_hash"
 			};
 		}
 		// Only the DecisionEventHashInput fields feed the hash — `row` also
@@ -102,7 +104,7 @@ export async function verifyChain(
 			return {
 				ok: false,
 				brokenAtIndex: i,
-				reason: "row_hash does not match recomputed hash of row fields",
+				reason: 'row_hash does not match recomputed hash of row fields'
 			};
 		}
 		expectedPrevHash = row.rowHash;

@@ -7,27 +7,26 @@
 <style>
 	.badge {
 		display: inline-block;
-		padding: 0.15rem 0.55rem;
-		border-radius: 999px;
-		font-size: 0.8rem;
-		font-weight: 600;
+		padding: 0.05rem 0.5rem;
+		border-radius: 0;
+		font-family: var(--win-font-accent, 'Zen Old Mincho', serif);
+		font-size: 0.75rem;
+		font-weight: bold;
 		line-height: 1.4;
 		white-space: nowrap;
+		background: var(--win-button-highlight, #fff);
+		box-shadow: var(--win-border-field, inset -1px -1px #fff, inset 1px 1px #808080);
 	}
 	.tone-green {
-		background: color-mix(in srgb, #1a7f37 15%, transparent);
-		color: #1a7f37;
+		color: var(--yoroi-green, #008000);
 	}
 	.tone-amber {
-		background: color-mix(in srgb, #9a6700 15%, transparent);
-		color: #9a6700;
+		color: var(--yoroi-amber, #808000);
 	}
 	.tone-red {
-		background: color-mix(in srgb, #cf222e 15%, transparent);
-		color: #cf222e;
+		color: var(--yoroi-red, #800000);
 	}
 	.tone-neutral {
-		background: color-mix(in srgb, #6e7781 15%, transparent);
-		color: #6e7781;
+		color: var(--yoroi-neutral, #4d4d4d);
 	}
 </style>

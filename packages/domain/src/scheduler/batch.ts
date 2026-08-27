@@ -7,7 +7,7 @@
  */
 
 export type PrId = string;
-export type CandidateResult = "pass" | "fail";
+export type CandidateResult = 'pass' | 'fail';
 export type RunCandidate = (subset: readonly PrId[]) => Promise<CandidateResult>;
 
 /**
@@ -19,7 +19,7 @@ export type RunCandidate = (subset: readonly PrId[]) => Promise<CandidateResult>
  */
 export async function isolateFailureSet(
 	batch: readonly PrId[],
-	runCandidate: RunCandidate,
+	runCandidate: RunCandidate
 ): Promise<readonly PrId[]> {
 	if (batch.length <= 1) return batch;
 
@@ -28,14 +28,14 @@ export async function isolateFailureSet(
 	const right = batch.slice(mid);
 	const [leftResult, rightResult] = await Promise.all([runCandidate(left), runCandidate(right)]);
 
-	if (leftResult === "fail" && rightResult === "pass") return isolateFailureSet(left, runCandidate);
-	if (leftResult === "pass" && rightResult === "fail") {
+	if (leftResult === 'fail' && rightResult === 'pass') return isolateFailureSet(left, runCandidate);
+	if (leftResult === 'pass' && rightResult === 'fail') {
 		return isolateFailureSet(right, runCandidate);
 	}
-	if (leftResult === "fail" && rightResult === "fail") {
+	if (leftResult === 'fail' && rightResult === 'fail') {
 		const [leftIsolated, rightIsolated] = await Promise.all([
 			isolateFailureSet(left, runCandidate),
-			isolateFailureSet(right, runCandidate),
+			isolateFailureSet(right, runCandidate)
 		]);
 		return [...leftIsolated, ...rightIsolated];
 	}
@@ -50,12 +50,12 @@ export async function isolateFailureSet(
 export async function findInteractionPair(
 	left: readonly PrId[],
 	right: readonly PrId[],
-	runCandidate: RunCandidate,
+	runCandidate: RunCandidate
 ): Promise<readonly PrId[]> {
 	for (const l of left) {
 		for (const r of right) {
 			const result = await runCandidate([l, r]);
-			if (result === "fail") return [l, r];
+			if (result === 'fail') return [l, r];
 		}
 	}
 	return [...left, ...right];

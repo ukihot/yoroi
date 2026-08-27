@@ -237,3 +237,63 @@ export interface FeedbackCase {
 	description: string;
 	createdAt: string;
 }
+
+/** design.md §23.10 Reviews screen. */
+export interface ScopeLoad {
+	scope: string;
+	pendingCount: number;
+	reviewerCount: number;
+	hasBackupReviewer: boolean;
+}
+
+export interface ReviewerLoad {
+	actor: string;
+	pendingCount: number;
+	sensitiveCount: number;
+	oldestWaitingMinutes: number;
+}
+
+export interface ReviewerLoadSummary {
+	byScope: ScopeLoad[];
+	byReviewer: ReviewerLoad[];
+	totalPending: number;
+	concentrationPct: number;
+	carryForwardRatePct: number;
+}
+
+/** design.md §23.9 CI Reliability screen. Scoped to what has a real writer
+ * today (flaky_test via the `/yoroi flaky` command, merge_candidate via the
+ * Serial scheduler) — per-job success rate / p50-p95 duration / circuit
+ * breaker need check_evidence ingestion that doesn't exist yet (see
+ * apps/control's plan notes); the console renders an honest note about that
+ * gap instead of fabricating those numbers. */
+export interface FlakyTestRow {
+	testFingerprint: string;
+	repoName: string | null;
+	ownerTeam: string | null;
+	failureCount: number;
+	reproductionRatePct: number | null;
+	status: string;
+	quarantineUntil: string | null;
+}
+
+export interface CiReliabilitySummary {
+	flakyTests: FlakyTestRow[];
+	candidatesBuilt: number;
+	candidatesInvalidated: number;
+	invalidationReasons: { reason: string; count: number }[];
+}
+
+/** design.md §23.11 Policy & Drift screen — Policy half only. The
+ * GitHub構成/Drift half is explicitly Phase 5 Org Governance scope per
+ * design.md's own note in that section ("本書ではまだ詳細化していない") and
+ * stays a placeholder in the console; this type only covers what's real. */
+export interface RepoPolicySummary {
+	repoId: string;
+	repoName: string;
+	policyDigest: string;
+	source: "published_bundle" | "default_fallback";
+	version: string | null;
+	publishedAt: string | null;
+	openPrCount: number;
+}

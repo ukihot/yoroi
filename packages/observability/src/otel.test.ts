@@ -1,7 +1,7 @@
-import { assertEquals, assertRejects } from "@std/assert";
-import { SpanStatusCode, trace, type TracerProvider } from "@opentelemetry/api";
-import { configureServiceName, withSpan } from "./otel.ts";
-import { operationId, repositoryId } from "@yoroi/domain";
+import { assertEquals, assertRejects } from '@std/assert';
+import { SpanStatusCode, trace, type TracerProvider } from '@opentelemetry/api';
+import { configureServiceName, withSpan } from './otel.ts';
+import { operationId, repositoryId } from '@yoroi/domain';
 
 /**
  * No real OTel SDK (`@opentelemetry/sdk-trace-node`) is a dependency of this
@@ -35,7 +35,7 @@ class RecordingSpan {
 		this.ended = true;
 	}
 	spanContext() {
-		return { traceId: "", spanId: "", traceFlags: 0 };
+		return { traceId: '', spanId: '', traceFlags: 0 };
 	}
 	addEvent(): this {
 		return this;
@@ -63,7 +63,7 @@ class RecordingTracer {
 		return fn(span);
 	}
 	startSpan(): never {
-		throw new Error("RecordingTracer.startSpan: not used by withSpan");
+		throw new Error('RecordingTracer.startSpan: not used by withSpan');
 	}
 }
 
@@ -85,73 +85,79 @@ function install(): RecordingTracerProvider {
 	return provider;
 }
 
-Deno.test("withSpan: yoroi.*属性を正しくSpanへ設定する", async () => {
+Deno.test('withSpan: yoroi.*属性を正しくSpanへ設定する', async () => {
 	const provider = install();
-	configureServiceName("test-service");
+	configureServiceName('test-service');
 
 	await withSpan(
-		"evaluate_policy",
+		'evaluate_policy',
 		{
-			operationId: operationId("01ARZ3NDEKTSV4RRFFQ69G5FAV"),
-			repositoryId: repositoryId(42),
+			operationId: operationId('01ARZ3NDEKTSV4RRFFQ69G5FAV'),
+			repositoryId: repositoryId(42)
 		},
 		(span: unknown) => {
 			assertEquals(
-				(span as RecordingSpan).attributes["yoroi.operation_id"],
-				"01ARZ3NDEKTSV4RRFFQ69G5FAV",
+				(span as RecordingSpan).attributes['yoroi.operation_id'],
+				'01ARZ3NDEKTSV4RRFFQ69G5FAV'
 			);
-			return Promise.resolve("ok");
-		},
+			return Promise.resolve('ok');
+		}
 	);
 
 	const span = provider.tracer.lastSpan!;
-	assertEquals(span.attributes["yoroi.repository_id"], 42);
+	assertEquals(span.attributes['yoroi.repository_id'], 42);
 	assertEquals(span.ended, true);
 });
 
-Deno.test("withSpan: fnの戻り値をそのまま返す", async () => {
+Deno.test('withSpan: fnの戻り値をそのまま返す', async () => {
 	install();
-	const result = await withSpan("noop", {}, () => Promise.resolve(123));
+	const result = await withSpan('noop', {}, () => Promise.resolve(123));
 	assertEquals(result, 123);
 });
 
-Deno.test("withSpan: fnが例外を投げたらrecordException+ERROR statusを記録し、そのままrethrowする", async () => {
-	const provider = install();
-	const boom = new Error("boom");
+Deno.test(
+	'withSpan: fnが例外を投げたらrecordException+ERROR statusを記録し、そのままrethrowする',
+	async () => {
+		const provider = install();
+		const boom = new Error('boom');
 
-	await assertRejects(
-		() =>
-			withSpan("failing_step", {}, () => {
-				throw boom;
-			}),
-		Error,
-		"boom",
-	);
+		await assertRejects(
+			() =>
+				withSpan('failing_step', {}, () => {
+					throw boom;
+				}),
+			Error,
+			'boom'
+		);
 
-	const span = provider.tracer.lastSpan!;
-	assertEquals(span.exceptions, [boom]);
-	assertEquals(span.statuses, [{ code: SpanStatusCode.ERROR }]);
-	assertEquals(span.ended, true);
-});
-
-Deno.test("withSpan: attrsを省略したフィールドはSpanに設定されない", async () => {
-	const provider = install();
-	await withSpan("minimal", {}, () => Promise.resolve(undefined));
-	const span = provider.tracer.lastSpan!;
-	assertEquals("yoroi.operation_id" in span.attributes, false);
-	assertEquals("yoroi.candidate_sha" in span.attributes, false);
-});
-
-Deno.test("withSpan: DENO_DEPLOYMENT_IDが設定されていればyoroi.deno_revision_idを記録する", async () => {
-	const provider = install();
-	const original = Deno.env.get("DENO_DEPLOYMENT_ID");
-	Deno.env.set("DENO_DEPLOYMENT_ID", "rev-abc123");
-	try {
-		await withSpan("with_revision", {}, () => Promise.resolve(undefined));
-	} finally {
-		if (original === undefined) Deno.env.delete("DENO_DEPLOYMENT_ID");
-		else Deno.env.set("DENO_DEPLOYMENT_ID", original);
+		const span = provider.tracer.lastSpan!;
+		assertEquals(span.exceptions, [boom]);
+		assertEquals(span.statuses, [{ code: SpanStatusCode.ERROR }]);
+		assertEquals(span.ended, true);
 	}
+);
+
+Deno.test('withSpan: attrsを省略したフィールドはSpanに設定されない', async () => {
+	const provider = install();
+	await withSpan('minimal', {}, () => Promise.resolve(undefined));
 	const span = provider.tracer.lastSpan!;
-	assertEquals(span.attributes["yoroi.deno_revision_id"], "rev-abc123");
+	assertEquals('yoroi.operation_id' in span.attributes, false);
+	assertEquals('yoroi.candidate_sha' in span.attributes, false);
 });
+
+Deno.test(
+	'withSpan: DENO_DEPLOYMENT_IDが設定されていればyoroi.deno_revision_idを記録する',
+	async () => {
+		const provider = install();
+		const original = Deno.env.get('DENO_DEPLOYMENT_ID');
+		Deno.env.set('DENO_DEPLOYMENT_ID', 'rev-abc123');
+		try {
+			await withSpan('with_revision', {}, () => Promise.resolve(undefined));
+		} finally {
+			if (original === undefined) Deno.env.delete('DENO_DEPLOYMENT_ID');
+			else Deno.env.set('DENO_DEPLOYMENT_ID', original);
+		}
+		const span = provider.tracer.lastSpan!;
+		assertEquals(span.attributes['yoroi.deno_revision_id'], 'rev-abc123');
+	}
+);

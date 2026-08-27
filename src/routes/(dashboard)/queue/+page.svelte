@@ -84,8 +84,11 @@
 		color: var(--yoroi-muted, #6e7781);
 	}
 	.notice {
-		background: color-mix(in srgb, #9a6700 12%, transparent);
+		background: var(--win-button-highlight, #fff);
+		color: var(--yoroi-amber, #808000);
+		font-weight: bold;
+		box-shadow: var(--win-border-field, inset -1px -1px #fff, inset 1px 1px #808080);
 		padding: 0.5rem 0.75rem;
-		border-radius: 6px;
+		border-radius: 0;
 	}
 </style>

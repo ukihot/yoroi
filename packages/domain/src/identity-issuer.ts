@@ -1,4 +1,4 @@
-import { err, ok, type Result } from "./result.ts";
+import { err, ok, type Result } from './result.ts';
 
 /**
  * design.md §17.4. `apps/control` holds an `IdentityIssuer` implementation
@@ -25,23 +25,23 @@ export interface OidcClaims {
 }
 
 export type OidcVerificationError =
-	| { readonly kind: "MISSING_TOKEN" }
-	| { readonly kind: "MALFORMED_TOKEN" }
-	| { readonly kind: "AUDIENCE_MISMATCH"; readonly expected: string; readonly actual: string }
-	| { readonly kind: "EXPIRED"; readonly expiredAt: Date }
-	| { readonly kind: "WRONG_APP"; readonly expected: string; readonly actual: string }
-	| { readonly kind: "WRONG_CONTEXT"; readonly expected: string; readonly actual: string };
+	| { readonly kind: 'MISSING_TOKEN' }
+	| { readonly kind: 'MALFORMED_TOKEN' }
+	| { readonly kind: 'AUDIENCE_MISMATCH'; readonly expected: string; readonly actual: string }
+	| { readonly kind: 'EXPIRED'; readonly expiredAt: Date }
+	| { readonly kind: 'WRONG_APP'; readonly expected: string; readonly actual: string }
+	| { readonly kind: 'WRONG_CONTEXT'; readonly expected: string; readonly actual: string };
 
 export interface OidcVerifyExpectation {
 	readonly audience: string;
 	readonly allowedCallerApp: string;
-	readonly requiredContext: "production";
+	readonly requiredContext: 'production';
 }
 
 export interface OidcVerifier {
 	verify(
 		token: string | null,
-		expected: OidcVerifyExpectation,
+		expected: OidcVerifyExpectation
 	): Promise<Result<OidcClaims, OidcVerificationError>>;
 }
 
@@ -56,22 +56,22 @@ export interface OidcVerifier {
 export function checkOidcClaims(
 	claims: OidcClaims,
 	expected: OidcVerifyExpectation,
-	now: Date = new Date(),
+	now: Date = new Date()
 ): Result<OidcClaims, OidcVerificationError> {
 	if (claims.expiresAt.getTime() <= now.getTime()) {
-		return err({ kind: "EXPIRED", expiredAt: claims.expiresAt });
+		return err({ kind: 'EXPIRED', expiredAt: claims.expiresAt });
 	}
 	if (claims.audience !== expected.audience) {
-		return err({ kind: "AUDIENCE_MISMATCH", expected: expected.audience, actual: claims.audience });
+		return err({ kind: 'AUDIENCE_MISMATCH', expected: expected.audience, actual: claims.audience });
 	}
 	if (claims.app !== expected.allowedCallerApp) {
-		return err({ kind: "WRONG_APP", expected: expected.allowedCallerApp, actual: claims.app });
+		return err({ kind: 'WRONG_APP', expected: expected.allowedCallerApp, actual: claims.app });
 	}
 	if (claims.context !== expected.requiredContext) {
 		return err({
-			kind: "WRONG_CONTEXT",
+			kind: 'WRONG_CONTEXT',
 			expected: expected.requiredContext,
-			actual: claims.context,
+			actual: claims.context
 		});
 	}
 	return ok(claims);

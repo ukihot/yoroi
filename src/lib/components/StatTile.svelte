@@ -9,8 +9,9 @@
 
 <style>
 	.tile {
-		border: 1px solid var(--yoroi-border, #d0d7de);
-		border-radius: 8px;
+		border-radius: 0;
+		background: var(--win-button-highlight, #fff);
+		box-shadow: var(--win-border-field, inset -1px -1px #fff, inset 1px 1px #808080);
 		padding: 0.75rem 1rem;
 		min-width: 8rem;
 	}

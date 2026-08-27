@@ -1,4 +1,4 @@
-import type { DecisionEnvelope } from "./envelope.ts";
+import type { DecisionEnvelope } from './envelope.ts';
 
 /**
  * design.md §12.2. MVP: HMAC-SHA256 with a shared key (`importHmacSigningKey`
@@ -11,7 +11,7 @@ import type { DecisionEnvelope } from "./envelope.ts";
 
 function sortKeysDeep(value: unknown): unknown {
 	if (Array.isArray(value)) return value.map(sortKeysDeep);
-	if (value !== null && typeof value === "object") {
+	if (value !== null && typeof value === 'object') {
 		const sorted: Record<string, unknown> = {};
 		for (const key of Object.keys(value as Record<string, unknown>).sort()) {
 			sorted[key] = sortKeysDeep((value as Record<string, unknown>)[key]);
@@ -33,17 +33,17 @@ function toDigestInput(bytes: Uint8Array): ArrayBuffer {
 }
 
 function bytesToBase64Url(bytes: Uint8Array): string {
-	let binary = "";
+	let binary = '';
 	for (const byte of bytes) binary += String.fromCharCode(byte);
-	return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+	return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
 function base64UrlToBytes(value: string): Uint8Array | null {
 	try {
-		const padded = value.replace(/-/g, "+").replace(/_/g, "/").padEnd(
-			value.length + ((4 - (value.length % 4)) % 4),
-			"=",
-		);
+		const padded = value
+			.replace(/-/g, '+')
+			.replace(/_/g, '/')
+			.padEnd(value.length + ((4 - (value.length % 4)) % 4), '=');
 		const binary = atob(padded);
 		const bytes = new Uint8Array(binary.length);
 		for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
@@ -58,20 +58,20 @@ function base64UrlToBytes(value: string): Uint8Array | null {
  * in the MVP shared-key configuration. */
 export function importHmacEnvelopeKey(secret: string): Promise<CryptoKey> {
 	return crypto.subtle.importKey(
-		"raw",
+		'raw',
 		new TextEncoder().encode(secret),
-		{ name: "HMAC", hash: "SHA-256" },
+		{ name: 'HMAC', hash: 'SHA-256' },
 		false,
-		["sign", "verify"],
+		['sign', 'verify']
 	);
 }
 
 export async function signEnvelope(
 	envelope: DecisionEnvelope,
-	signingKey: CryptoKey,
+	signingKey: CryptoKey
 ): Promise<string> {
 	const material = new TextEncoder().encode(toCanonicalEnvelopeJson(envelope));
-	const signature = await crypto.subtle.sign("HMAC", signingKey, toDigestInput(material));
+	const signature = await crypto.subtle.sign('HMAC', signingKey, toDigestInput(material));
 	return bytesToBase64Url(new Uint8Array(signature));
 }
 
@@ -79,15 +79,15 @@ export async function signEnvelope(
 export async function verifyEnvelopeSignature(
 	envelope: DecisionEnvelope,
 	signatureB64: string,
-	verifyKey: CryptoKey,
+	verifyKey: CryptoKey
 ): Promise<boolean> {
 	const signatureBytes = base64UrlToBytes(signatureB64);
 	if (!signatureBytes) return false;
 	const material = new TextEncoder().encode(toCanonicalEnvelopeJson(envelope));
 	return await crypto.subtle.verify(
-		"HMAC",
+		'HMAC',
 		verifyKey,
 		toDigestInput(signatureBytes),
-		toDigestInput(material),
+		toDigestInput(material)
 	);
 }

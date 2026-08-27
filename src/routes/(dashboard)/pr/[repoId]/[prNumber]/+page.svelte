@@ -177,7 +177,7 @@
 		color: var(--yoroi-muted, #6e7781);
 	}
 	.hint.error {
-		color: var(--yoroi-danger, #cf222e);
+		color: var(--yoroi-danger, #800000);
 	}
 	.feedback {
 		display: flex;

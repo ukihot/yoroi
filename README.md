@@ -49,9 +49,27 @@ GitHub (Observer App) --webhook--> yoroi-control  --署名付きenvelope--> yoro
 ## ローカル開発
 
 ```sh
-deno install               # 依存関係のインストール(package.jsonのnpmスクリプトも動く)
-cp .env.example .env       # DATABASE_URL / ORIGIN / BETTER_AUTH_SECRET / GITHUB_CLIENT_* を編集
-npm run dev                # consoleを起動(http://localhost:5173)
+deno install                       # 依存関係のインストール(package.jsonのnpmスクリプトも動く)
+cp .env.example .env               # ルート(console)用。DATABASE_URL / ORIGIN / BETTER_AUTH_SECRET / GITHUB_CLIENT_* を編集
+cp apps/control/.env.example apps/control/.env   # DATABASE_URL等を編集(Docker不要、既存のPostgresがあればそれでよい)
+cp apps/merger/.env.example apps/merger/.env     # 同上。YOROI_MERGER_DEV=1にしてYOROI_MERGER_SHARED_TOKENをconsole側と揃える
+cd apps/control && deno task migrate && cd ../..  # packages/postgresのスキーマを一度だけ適用
+
+npm run dev                        # apps/control(:8787)・apps/merger(:8788)・console(:5173)をまとめて起動
+```
+
+`npm run dev`は[script/dev.sh](script/dev.sh)を呼ぶだけの薄いラッパー。3つ同時に上げたいだけなので
+1コマンドにまとめてある(Ctrl+Cで3つとも停止)。consoleだけを起動したい場合は`npm run dev:console`
+(`vite dev`そのもの)。
+
+consoleの`.env`に`YOROI_CONTROL_URL=http://localhost:8787`と`YOROI_CONTROL_API_TOKEN`
+(`apps/control/.env`の同名の値と同じもの)を設定すると、ダッシュボードはモック(`mock-control-api.ts`)
+ではなくローカルの実エンジンからデータを読む。**ただしログインには動くGitHub OAuth Appが要る**
+(`(dashboard)/+layout.server.ts`がセッション無しだと`/login`へリダイレクトする) —
+本番用OAuth Appのcallback URLは本番ドメイン固定なので、ローカルで実際にログインしたい場合は
+`http://localhost:5173/api/auth/callback/github`向けの別のOAuth Appをもう1つ作るのが手軽。
+
+```sh
 npm run test                # vitest
 npm run check                # svelte-check
 npm run lint                 # prettier --check + eslint

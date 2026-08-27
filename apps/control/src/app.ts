@@ -4,6 +4,9 @@ import { handleFleetBlocked, handleFleetOverview } from "./routes/fleet.ts";
 import { handleMyWork } from "./routes/my-work.ts";
 import { handleListRepos, handleRepoDetail } from "./routes/repos.ts";
 import { handleQueue } from "./routes/queue.ts";
+import { handleCiReliability } from "./routes/ci.ts";
+import { handleReviewerLoad } from "./routes/reviewers.ts";
+import { handlePolicySummary } from "./routes/policy.ts";
 import { handleFeedback, handlePrDetail, handleRecheck } from "./routes/pr.ts";
 import { handleHealth } from "./routes/health.ts";
 import { handleAudit } from "./routes/audit.ts";
@@ -59,6 +62,21 @@ const routes: Route[] = [
 		method: "POST",
 		pattern: new URLPattern({ pathname: "/api/pr/:repoId/:prNumber/feedback" }),
 		handler: handleFeedback,
+	},
+	{
+		method: "GET",
+		pattern: new URLPattern({ pathname: "/api/ci/reliability" }),
+		handler: handleCiReliability,
+	},
+	{
+		method: "GET",
+		pattern: new URLPattern({ pathname: "/api/reviewers/load" }),
+		handler: handleReviewerLoad,
+	},
+	{
+		method: "GET",
+		pattern: new URLPattern({ pathname: "/api/policy/drift" }),
+		handler: handlePolicySummary,
 	},
 	{ method: "GET", pattern: new URLPattern({ pathname: "/api/health" }), handler: handleHealth },
 	{ method: "GET", pattern: new URLPattern({ pathname: "/api/audit" }), handler: handleAudit },
