@@ -5,6 +5,10 @@
 	"app_name": "Yoroi Console",
 	"app_tagline": "構成管理Bot Yoroi 管理ダッシュボード",
 	"app_needs_attention": "対応が必要な項目",
+	"app_marquee_tagline": "☆ ようこそYoroi Consoleへ！24時間365日マージ監視中★推奨解像度1024x768☆",
+	"loading_status": "コンポーネントを取得しています…",
+	"loading_elapsed": "{seconds}秒",
+	"traffic_idle": "…通信待機中…",
 
 	"common_loading": "読み込み中…",
 	"common_none": "なし",

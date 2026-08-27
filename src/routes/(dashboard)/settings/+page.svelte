@@ -95,6 +95,11 @@
 	}
 	legend {
 		padding: 0 0.4rem;
+		/* fieldset's border comes from a box-shadow (app.css), not a real
+		 * border, so the browser never punches a gap for the legend — the
+		 * shadow line runs straight across and shows through the label
+		 * text unless the legend masks it with an opaque background. */
+		background: var(--win-surface);
 	}
 	.field-row {
 		display: flex;

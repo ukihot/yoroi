@@ -70,6 +70,14 @@
 	/* Fonts */
 	--win-font-body: Tahoma, 'MS Sans Serif', Arial, sans-serif;
 	--win-font-accent: 'Zen Old Mincho', 'MS Mincho', 'Hiragino Mincho ProN', serif;
+	/* Deliberately naff "personal homepage circa 2003" accent face — Comic
+	 * Sans on purpose, used sparingly for the marquee-ticker style bits. */
+	--win-font-party: 'Comic Sans MS', 'Chalkboard SE', 'Trebuchet MS', cursive;
+
+	/* Height of the dashboard's fixed taskbar (settings button + live
+	 * network log) — shared with DownloadOverlay's offset so it never floats
+	 * underneath it. Only the dashboard layout actually renders this bar. */
+	--yoroi-traffic-footer-h: 3rem;
 }
 
 /**
@@ -225,6 +233,88 @@ fieldset {
 	box-shadow: var(--win-border-sunken-outer), var(--win-border-sunken-inner);
 	border: none;
 	border-radius: 0;
+}
+
+/**
+ * "個人ホームページ 2003年" 装飾レイヤー — Win95のOSクロームの上に、当時の
+ * ジオシティーズ的な安っぽい賑やかしを重ねる。狙って古臭くしているだけで、
+ * 実用性を損なわない範囲にとどめる: 点滅・スクロールは常に
+ * prefers-reduced-motion で止め、h2 の★は静的な色だけで動かさない。
+ */
+h2 {
+	position: relative;
+}
+h2::before {
+	content: '★ ';
+	color: var(--win-dialog-blue-light, #1084d0);
+}
+
+@keyframes yoroi-blink {
+	0%,
+	49% {
+		opacity: 1;
+	}
+	50%,
+	100% {
+		opacity: 0.15;
+	}
+}
+.blink {
+	animation: yoroi-blink 1.1s steps(1, end) infinite;
+}
+
+@keyframes yoroi-marquee {
+	from {
+		transform: translateX(100%);
+	}
+	to {
+		transform: translateX(-100%);
+	}
+}
+.marquee {
+	overflow: hidden;
+	white-space: nowrap;
+}
+.marquee span {
+	display: inline-block;
+	padding-left: 100%;
+	animation: yoroi-marquee 16s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.blink {
+		animation: none;
+	}
+	.marquee {
+		overflow: visible;
+		white-space: normal;
+		text-align: center;
+	}
+	.marquee span {
+		display: inline;
+		padding-left: 0;
+		animation: none;
+	}
+}
+
+/* Rainbow-gif-style divider bar, the 2000s alternative to a plain <hr>. */
+.rainbow-rule {
+	height: 4px;
+	margin: 0.6rem 0;
+	background: linear-gradient(
+		90deg,
+		#ff0000,
+		#ff9900,
+		#ffee00,
+		#33ff00,
+		#0099ff,
+		#6633ff,
+		#ff00cc,
+		#ff0000
+	);
+	box-shadow:
+		inset -1px -1px var(--win-window-frame, #0a0a0a),
+		inset 1px 1px var(--win-button-highlight, #fff);
 }
 
 ::-webkit-scrollbar {

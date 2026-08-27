@@ -5,6 +5,10 @@
 	"app_name": "Yoroi Console",
 	"app_tagline": "Admin dashboard for the Yoroi merge-control bot",
 	"app_needs_attention": "Needs your attention",
+	"app_marquee_tagline": "☆ Welcome to Yoroi Console! Now merging PRs 24/7, best viewed at 1024x768 ☆",
+	"loading_status": "Fetching component…",
+	"loading_elapsed": "{seconds}s",
+	"traffic_idle": "…awaiting traffic…",
 
 	"common_loading": "Loading…",
 	"common_none": "None",

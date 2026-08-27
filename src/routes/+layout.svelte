@@ -5,11 +5,13 @@
 	import { page } from '$app/state';
 	import { locales, localizeHref } from '$lib/paraglide/runtime';
 	import favicon from '$lib/assets/favicon.svg';
+	import DownloadOverlay from '$lib/components/DownloadOverlay.svelte';
 
 	let { children } = $props();
 </script>
 
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
+<DownloadOverlay />
 {@render children()}
 
 <div style="display:none">
